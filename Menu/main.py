@@ -2,6 +2,7 @@ import pygame, sys
 import json, os
 from button import Button # Importa la clase Button para manejar botones interactivos
 import colisiones as colision
+import criaturas as cr
 
 
 pygame.init() # Inicializa todos los módulos necesarios de Pygame
@@ -79,42 +80,42 @@ def jugar():
         screen = pygame.display.set_mode((COLUMNAS*TILE, FILAS*TILE))
         clock = pygame.time.Clock()
         
-        player_f = 23    # (fila donde quieres ponerlo)
-        player_c = 10 # (columna donde quieres ponerlo)
+        player_y = cr.player.positions_y   # (Y donde quieres ponerlo)
+        player_x = cr.player.positions_x   # (X donde quieres ponerlo)
         
         def can_move(r, c):
             return 0 <= r < FILAS and 0 <= c < COLUMNAS and colision.maze[r][c] >= 1
         
         def eventos(): #Etiquetas para la matriz
-                nonlocal player_f
-                nonlocal player_c
-                if colision.maze[player_f][player_c] == 2: #Teletransportación Matemagica 1
-                            if player_f==14 and player_c==0:
-                                player_f=13
-                                player_c=18
+                nonlocal player_y
+                nonlocal player_x
+                if colision.maze[player_y][player_x] == 2: #Teletransportación Matemagica 1
+                            if player_y==14 and player_x==0:
+                                player_y=13
+                                player_x=18
                                 print("Matemagicamente Teletransportado")
                                 
-                            if player_f==13 and player_c==19:
-                                player_f=14
-                                player_c=1
+                            if player_y==13 and player_x==19:
+                                player_y=14
+                                player_x=1
                                 print("Matemagicamente Teletransportado")
                                 
-                if colision.maze[player_f][player_c] == 3: #Teletransportación Matemagica 2
-                            if player_f==0 and player_c==9:
-                                player_f=26
-                                player_c=10
+                if colision.maze[player_y][player_x] == 3: #Teletransportación Matemagica 2
+                            if player_y==0 and player_x==9:
+                                player_y=26
+                                player_x=10
                                 print("Matemagicamente Teletransportado")
                                 
-                            if player_f==27 and player_c==10:
-                                player_f=1
-                                player_c=9
+                            if player_y==27 and player_x==10:
+                                player_y=1
+                                player_x=9
                                 print("Matemagicamente Teletransportado")
         #MOVIMIENTO DEL ENEMIGO
         # ---------------------------
-        # UN SOLO ENEMIGO
+        # CERO
         # ---------------------------
-        enemigo_f = 13
-        enemigo_c = 10
+        cero_y = cr.cero.positions_y
+        cero_x = cr.cero.positions_x
 
         enemy_cooldown = 0
         enemy_wait = 300  # milisegundos
@@ -153,21 +154,21 @@ def jugar():
                 # se detecta cada vez que presionas una tecla (solo una vez)
                 if event.type == pygame.KEYDOWN:
                     if not move_cooldown:
-                        if event.key == pygame.K_w and can_move(player_f - 1, player_c):
-                            player_f -= 1
-                            print("Fila:", player_f, "Columna:", player_c)
+                        if event.key == pygame.K_w and can_move(player_y - 1, player_x):
+                            player_y -= 1
+                            print("Y:", player_y, "X:", player_x)
                             eventos()
-                        if event.key == pygame.K_s and can_move(player_f + 1, player_c):
-                            player_f += 1
-                            print("Fila:", player_f, "Columna:", player_c)
+                        if event.key == pygame.K_s and can_move(player_y + 1, player_x):
+                            player_y += 1
+                            print("Y:", player_y, "X:", player_x)
                             eventos()
-                        if event.key == pygame.K_a and can_move(player_f, player_c - 1):
-                            player_c -= 1
-                            print("Fila:", player_f, "Columna:", player_c)
+                        if event.key == pygame.K_a and can_move(player_y, player_x - 1):
+                            player_x -= 1
+                            print("Y:", player_y, "X:", player_x)
                             eventos()
-                        if event.key == pygame.K_d and can_move(player_f, player_c + 1):
-                            player_c += 1
-                            print("Fila:", player_f, "Columna:", player_c)
+                        if event.key == pygame.K_d and can_move(player_y, player_x + 1):
+                            player_x += 1
+                            print("Y:", player_y, "X:", player_x)
                             eventos()
         
                         move_cooldown = True
@@ -180,13 +181,13 @@ def jugar():
             # ---------------------------
             ahora = pygame.time.get_ticks()
             if ahora - enemy_cooldown >= enemy_wait:
-                enemigo_f, enemigo_c = mover_enemigo(enemigo_f, enemigo_c, player_f, player_c)
+                cero_y, cero_x = mover_enemigo(cero_y, cero_x, player_y, player_x)
                 enemy_cooldown = ahora
 
             # ---------------------------
             # COLISIÓN
             # ---------------------------
-            if enemigo_f == player_f and enemigo_c == player_c:
+            if cero_y == player_y and cero_x == player_x:
                 print("💀 Te atrapó el enemigo!")
                 running = False
 
@@ -202,7 +203,7 @@ def jugar():
             #Enemigo
             pygame.draw.rect(
             screen, COLOR_ENEMY,
-            (enemigo_c*TILE + 6, enemigo_f*TILE + 6, TILE-12, TILE-12)
+            (cero_x*TILE + 6, cero_y*TILE + 6, TILE-12, TILE-12)
             )
 
         
@@ -210,7 +211,7 @@ def jugar():
             pygame.draw.rect(
                 screen,
                 COLOR_PLAYER,
-                (player_c*TILE + 4, player_f*TILE + 4, TILE-8, TILE-8)
+                (player_x*TILE + 4, player_y*TILE + 4, TILE-8, TILE-8)
             )
         
             pygame.display.flip()

@@ -7,11 +7,15 @@ class criature:
         self.name=name
 
 class player(criature):
+    positions_x=10
+    positions_y=23
     hp=3
     speed=1
     name=""
 
 class cero(criature):
+    positions_x=10
+    positions_y=13
     hp=2
     speed=1
     name="Cero"
