@@ -117,8 +117,17 @@ def jugar():
         cero_y = cr.cero.positions_y
         cero_x = cr.cero.positions_x
 
-        enemy_cooldown = 0
-        enemy_wait = 300  # milisegundos
+        cero_cooldown = 0
+        cero_wait = 300  # milisegundos
+        
+        # ---------------------------
+        # Pigarto
+        # ---------------------------
+        pigarto_y = cr.pigarto.positions_y
+        pigarto_x = cr.pigarto.positions_x
+        pigarto_pos = 0
+        pigarto_cooldown = 0
+        pigarto_wait = 75  # milisegundos
 
 
         def mover_enemigo(f, c, f_obj, c_obj):
@@ -179,18 +188,34 @@ def jugar():
             # ---------------------------
             # MOVER ENEMIGO
             # ---------------------------
+            #Cero
             ahora = pygame.time.get_ticks()
-            if ahora - enemy_cooldown >= enemy_wait:
+            if ahora - cero_cooldown >= cero_wait:
                 cero_y, cero_x = mover_enemigo(cero_y, cero_x, player_y, player_x)
-                enemy_cooldown = ahora
+                cero_cooldown = ahora
 
+            #Pigarto
+            if ahora - pigarto_cooldown >= pigarto_wait:
+                if pigarto_pos<59:
+                    pigarto_pos = pigarto_pos+1
+                    pigarto_cooldown=ahora
+                if pigarto_pos>=59:
+                    pigarto_pos=0
+                    pigarto_cooldown=ahora
             # ---------------------------
             # COLISIÓN
             # ---------------------------
+            
+            #Con CERO
             if cero_y == player_y and cero_x == player_x:
                 print("💀 Te atrapó el enemigo!")
                 running = False
 
+            #Con Pigarto
+            if pigarto_y[pigarto_pos] == player_y and pigarto_x[pigarto_pos] == player_x:
+                print("💀 Te atrapó el enemigo!")
+                running = False
+                
             # DIBUJO
         
             #Mapa
@@ -201,11 +226,17 @@ def jugar():
                     pygame.draw.rect(screen, color, rect)
                     
             #Enemigo
+            #Cero
             pygame.draw.rect(
             screen, COLOR_ENEMY,
             (cero_x*TILE + 6, cero_y*TILE + 6, TILE-12, TILE-12)
             )
 
+            #Pigarto
+            pygame.draw.rect(
+            screen, COLOR_ENEMY,
+            (pigarto_x[pigarto_pos]*TILE + 6, pigarto_y[pigarto_pos]*TILE + 6, TILE-12, TILE-12)
+            )
         
             # Jugador
             pygame.draw.rect(
