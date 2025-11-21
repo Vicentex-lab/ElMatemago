@@ -74,14 +74,10 @@ def jugar():
         COLOR_WALL = (30,30,30)
         COLOR_FLOOR = (240,240,240)
         COLOR_PLAYER = (0,120,255)
+        COLOR_ENEMY = (255,50,50)
         
         screen = pygame.display.set_mode((COLUMNAS*TILE, FILAS*TILE))
         clock = pygame.time.Clock()
-        
-        COLOR_WALL = (30,30,30)
-        COLOR_FLOOR = (240,240,240)
-        COLOR_PLAYER = (0,120,255)
-        
         
         player_f = 23    # (fila donde quieres ponerlo)
         player_c = 10 # (columna donde quieres ponerlo)
@@ -113,8 +109,36 @@ def jugar():
                                 player_f=1
                                 player_c=9
                                 print("Matemagicamente Teletransportado")
+        #MOVIMIENTO DEL ENEMIGO
+        # ---------------------------
+        # UN SOLO ENEMIGO
+        # ---------------------------
+        enemigo_f = 13
+        enemigo_c = 10
+
+        enemy_cooldown = 0
+        enemy_wait = 300  # milisegundos
+
+
+        def mover_enemigo(f, c, f_obj, c_obj):
+            """Mueve al enemigo acercándose al jugador"""
+
+            # Vertical
+            if f_obj < f and can_move(f - 1, c):
+                f -= 1
+            elif f_obj > f and can_move(f + 1, c):
+                f += 1
+
+            # Horizontal
+            elif c_obj < c and can_move(f, c - 1):
+                c -= 1
+            elif c_obj > c and can_move(f, c + 1):
+                c += 1
+
+            return f, c
+
         
-        # MOVIMIENTO 
+        # MOVIMIENTO DEL JUGADOR 
         
         move_cooldown = True   # evita que avance varias casillas al dejar presionada una tecla
         
@@ -150,16 +174,39 @@ def jugar():
         
                 if event.type == pygame.KEYUP:
                     move_cooldown = False
+                    
+            # ---------------------------
+            # MOVER ENEMIGO
+            # ---------------------------
+            ahora = pygame.time.get_ticks()
+            if ahora - enemy_cooldown >= enemy_wait:
+                enemigo_f, enemigo_c = mover_enemigo(enemigo_f, enemigo_c, player_f, player_c)
+                enemy_cooldown = ahora
+
+            # ---------------------------
+            # COLISIÓN
+            # ---------------------------
+            if enemigo_f == player_f and enemigo_c == player_c:
+                print("💀 Te atrapó el enemigo!")
+                running = False
+
             # DIBUJO
         
+            #Mapa
             for r in range(FILAS):
                 for c in range(COLUMNAS):
                     rect = pygame.Rect(c*TILE, r*TILE, TILE, TILE)
                     color = COLOR_FLOOR if colision.maze[r][c] >= 1 else COLOR_WALL
                     pygame.draw.rect(screen, color, rect)
+                    
+            #Enemigo
+            pygame.draw.rect(
+            screen, COLOR_ENEMY,
+            (enemigo_c*TILE + 6, enemigo_f*TILE + 6, TILE-12, TILE-12)
+            )
+
         
-            
-            
+            # Jugador
             pygame.draw.rect(
                 screen,
                 COLOR_PLAYER,
