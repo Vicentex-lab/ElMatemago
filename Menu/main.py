@@ -2,6 +2,7 @@ import pygame, sys
 import json, os
 from button import Button # Importa la clase Button para manejar botones interactivos
 import colisiones as colision
+import criaturas as cr
 
 
 pygame.init() # Inicializa todos los módulos necesarios de Pygame
@@ -74,47 +75,71 @@ def jugar():
         COLOR_WALL = (30,30,30)
         COLOR_FLOOR = (240,240,240)
         COLOR_PLAYER = (0,120,255)
+        COLOR_ENEMY = (255,50,50)
         
         screen = pygame.display.set_mode((COLUMNAS*TILE, FILAS*TILE))
         clock = pygame.time.Clock()
         
-        COLOR_WALL = (30,30,30)
-        COLOR_FLOOR = (240,240,240)
-        COLOR_PLAYER = (0,120,255)
-        
-        
-        player_f = 23    # (fila donde quieres ponerlo)
-        player_c = 10 # (columna donde quieres ponerlo)
+        player_y = cr.player.positions_y   # (Y donde quieres ponerlo)
+        player_x = cr.player.positions_x   # (X donde quieres ponerlo)
         
         def can_move(r, c):
             return 0 <= r < FILAS and 0 <= c < COLUMNAS and colision.maze[r][c] >= 1
         
         def eventos(): #Etiquetas para la matriz
-                nonlocal player_f
-                nonlocal player_c
-                if colision.maze[player_f][player_c] == 2: #Teletransportación Matemagica 1
-                            if player_f==14 and player_c==0:
-                                player_f=13
-                                player_c=18
+                nonlocal player_y
+                nonlocal player_x
+                if colision.maze[player_y][player_x] == 2: #Teletransportación Matemagica 1
+                            if player_y==14 and player_x==0:
+                                player_y=13
+                                player_x=18
                                 print("Matemagicamente Teletransportado")
                                 
-                            if player_f==13 and player_c==19:
-                                player_f=14
-                                player_c=1
+                            if player_y==13 and player_x==19:
+                                player_y=14
+                                player_x=1
                                 print("Matemagicamente Teletransportado")
                                 
-                if colision.maze[player_f][player_c] == 3: #Teletransportación Matemagica 2
-                            if player_f==0 and player_c==9:
-                                player_f=26
-                                player_c=10
+                if colision.maze[player_y][player_x] == 3: #Teletransportación Matemagica 2
+                            if player_y==0 and player_x==9:
+                                player_y=26
+                                player_x=10
                                 print("Matemagicamente Teletransportado")
                                 
-                            if player_f==27 and player_c==10:
-                                player_f=1
-                                player_c=9
+                            if player_y==27 and player_x==10:
+                                player_y=1
+                                player_x=9
                                 print("Matemagicamente Teletransportado")
+        #MOVIMIENTO DEL ENEMIGO
+        # ---------------------------
+        # CERO
+        # ---------------------------
+        cero_y = cr.cero.positions_y
+        cero_x = cr.cero.positions_x
+
+        enemy_cooldown = 0
+        enemy_wait = 300  # milisegundos
+
+
+        def mover_enemigo(f, c, f_obj, c_obj):
+            """Mueve al enemigo acercándose al jugador"""
+
+            # Vertical
+            if f_obj < f and can_move(f - 1, c):
+                f -= 1
+            elif f_obj > f and can_move(f + 1, c):
+                f += 1
+
+            # Horizontal
+            elif c_obj < c and can_move(f, c - 1):
+                c -= 1
+            elif c_obj > c and can_move(f, c + 1):
+                c += 1
+
+            return f, c
+
         
-        # MOVIMIENTO 
+        # MOVIMIENTO DEL JUGADOR 
         
         move_cooldown = True   # evita que avance varias casillas al dejar presionada una tecla
         
@@ -129,41 +154,64 @@ def jugar():
                 # se detecta cada vez que presionas una tecla (solo una vez)
                 if event.type == pygame.KEYDOWN:
                     if not move_cooldown:
-                        if event.key == pygame.K_w and can_move(player_f - 1, player_c):
-                            player_f -= 1
-                            print("Fila:", player_f, "Columna:", player_c)
+                        if event.key == pygame.K_w and can_move(player_y - 1, player_x):
+                            player_y -= 1
+                            print("Y:", player_y, "X:", player_x)
                             eventos()
-                        if event.key == pygame.K_s and can_move(player_f + 1, player_c):
-                            player_f += 1
-                            print("Fila:", player_f, "Columna:", player_c)
+                        if event.key == pygame.K_s and can_move(player_y + 1, player_x):
+                            player_y += 1
+                            print("Y:", player_y, "X:", player_x)
                             eventos()
-                        if event.key == pygame.K_a and can_move(player_f, player_c - 1):
-                            player_c -= 1
-                            print("Fila:", player_f, "Columna:", player_c)
+                        if event.key == pygame.K_a and can_move(player_y, player_x - 1):
+                            player_x -= 1
+                            print("Y:", player_y, "X:", player_x)
                             eventos()
-                        if event.key == pygame.K_d and can_move(player_f, player_c + 1):
-                            player_c += 1
-                            print("Fila:", player_f, "Columna:", player_c)
+                        if event.key == pygame.K_d and can_move(player_y, player_x + 1):
+                            player_x += 1
+                            print("Y:", player_y, "X:", player_x)
                             eventos()
         
                         move_cooldown = True
         
                 if event.type == pygame.KEYUP:
                     move_cooldown = False
+                    
+            # ---------------------------
+            # MOVER ENEMIGO
+            # ---------------------------
+            ahora = pygame.time.get_ticks()
+            if ahora - enemy_cooldown >= enemy_wait:
+                cero_y, cero_x = mover_enemigo(cero_y, cero_x, player_y, player_x)
+                enemy_cooldown = ahora
+
+            # ---------------------------
+            # COLISIÓN
+            # ---------------------------
+            #if cero_y == player_y and cero_x == player_x:
+            #    print("💀 Te atrapó el enemigo!")
+            #    running = False
+
             # DIBUJO
         
+            #Mapa
             for r in range(FILAS):
                 for c in range(COLUMNAS):
                     rect = pygame.Rect(c*TILE, r*TILE, TILE, TILE)
                     color = COLOR_FLOOR if colision.maze[r][c] >= 1 else COLOR_WALL
                     pygame.draw.rect(screen, color, rect)
+                    
+            #Enemigo
+            pygame.draw.rect(
+            screen, COLOR_ENEMY,
+            (cero_x*TILE + 6, cero_y*TILE + 6, TILE-12, TILE-12)
+            )
+
         
-            
-            
+            # Jugador
             pygame.draw.rect(
                 screen,
                 COLOR_PLAYER,
-                (player_c*TILE + 4, player_f*TILE + 4, TILE-8, TILE-8)
+                (player_x*TILE + 4, player_y*TILE + 4, TILE-8, TILE-8)
             )
         
             pygame.display.flip()
