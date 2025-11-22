@@ -5,6 +5,16 @@ import colisiones as colision
 import criaturas as cr
 
 
+#Variables para manejar volumen slider en "opciones"
+VOLUMEN_GLOBAL = 0.5
+SLIDER_X = 400   # posición inicial del slider
+SLIDER_Y = 280
+SLIDER_WIDTH = 500
+SLIDER_HEIGHT = 10
+SLIDER_HANDLE_X = SLIDER_X + int(SLIDER_WIDTH * VOLUMEN_GLOBAL)
+HANDLE_RADIUS = 15
+
+
 pygame.init() # Inicializa todos los módulos necesarios de Pygame
 
 SCREEN = pygame.display.set_mode((1280, 720)) # Define el tamaño de la ventana
@@ -163,23 +173,26 @@ def jugar():
                 # se detecta cada vez que presionas una tecla (solo una vez)
                 if event.type == pygame.KEYDOWN:
                     if not move_cooldown:
-                        if event.key == pygame.K_w and can_move(player_y - 1, player_x):
+                        # ARRIBA (W o Flecha ↑)
+                        if (event.key == pygame.K_w or event.key == pygame.K_UP) and can_move(player_y - 1, player_x):
                             player_y -= 1
-                            print("Y:", player_y, "X:", player_x)
+                            print("Y", player_y, "X", player_x)
                             eventos()
-                        if event.key == pygame.K_s and can_move(player_y + 1, player_x):
+                        # ABAJO (S o Flecha ↓)
+                        if (event.key == pygame.K_s or event.key == pygame.K_DOWN) and can_move(player_y + 1, player_x):
                             player_y += 1
-                            print("Y:", player_y, "X:", player_x)
+                            print("Y", player_y, "X", player_x)
                             eventos()
-                        if event.key == pygame.K_a and can_move(player_y, player_x - 1):
+                        # IZQUIERDA (A o Flecha ←)
+                        if (event.key == pygame.K_a or event.key == pygame.K_LEFT) and can_move(player_y, player_x - 1):
                             player_x -= 1
-                            print("Y:", player_y, "X:", player_x)
+                            print("Y", player_y, "X", player_x)
                             eventos()
-                        if event.key == pygame.K_d and can_move(player_y, player_x + 1):
+                        # DERECHA (D o Flecha →)
+                        if (event.key == pygame.K_d or event.key == pygame.K_RIGHT) and can_move(player_y, player_x + 1):
                             player_x += 1
-                            print("Y:", player_y, "X:", player_x)
+                            print("Y", player_y, "X", player_x)
                             eventos()
-        
                         move_cooldown = True
         
                 if event.type == pygame.KEYUP:
@@ -314,10 +327,22 @@ def manual():
     while True:
         POS_MOUSE_MANUAL = pygame.mouse.get_pos()
         SCREEN.fill("gray")
-        TEXTO_MANUAL = get_letra(45).render("Acá va el manual.", True, "Black")
+        TEXTO_MANUAL = get_letra(45).render("Manual Matemagia.", True, "Black")
         RECT_MANUAL = TEXTO_MANUAL.get_rect(center=(640, 260))
         SCREEN.blit(TEXTO_MANUAL, RECT_MANUAL)
-        
+
+        # --- Botón para abrir el PDF ---
+        BOTON_PDF = Button(
+            image=None,
+            pos=(640, 350),
+            text_input="ABRIR PDF",
+            font=get_letra(55),
+            base_color="Black",
+            hovering_color="Blue"
+        )
+        BOTON_PDF.changeColor(POS_MOUSE_MANUAL)
+        BOTON_PDF.update(SCREEN)
+
         # Botón de regreso
         VOLVER_MANUAL = Button(image=None, pos=(640, 460), 
                             text_input="VOLVER", font=get_letra(75), base_color="Black", hovering_color="Red")
@@ -329,38 +354,80 @@ def manual():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
+
+                # --- Abrir PDF ---
+                if BOTON_PDF.checkForInput(POS_MOUSE_MANUAL):
+                    ruta_pdf = os.path.join("assets", "manual_matemagia.pdf")
+                    print("Abriendo PDF:", ruta_pdf)
+                    try:
+                        os.startfile(ruta_pdf)  # WINDOWS
+                    except:
+                        print("No se pudo abrir el PDF.")
+
                 if VOLVER_MANUAL.checkForInput(POS_MOUSE_MANUAL):
-                    # No detenemos la música si es la del menú
                     menu_principal()
         
         pygame.display.update()
-   
 
 # --- PANTALLA OPCIONES ---
 
 def opciones():
-    #Muestra la pantalla de opciones.
+    global VOLUMEN_GLOBAL, SLIDER_HANDLE_X
+    mouse_held = False  # Para arrastrar
     while True:
-        POS_MOUSE_OPCIONES = pygame.mouse.get_pos()
+        POS = pygame.mouse.get_pos()
         SCREEN.fill("white")
-        
-        TEXTO_OPCIONES = get_letra(35).render("Acá van las opciones (si es que))", True, "Black")
-        RECT_OPCIONES = TEXTO_OPCIONES.get_rect(center=(640, 260))
-        SCREEN.blit(TEXTO_OPCIONES, RECT_OPCIONES)
-        
-        # Botón de regreso
-        VOLVER_OPCIONES = Button(image=None, pos=(640, 460), 
-                            text_input="VOLVER", font=get_letra(75), base_color="Black", hovering_color="Green")
-        VOLVER_OPCIONES.changeColor(POS_MOUSE_OPCIONES)
-        VOLVER_OPCIONES.update(SCREEN)
-        
+        # Título
+        TEXTO_OP = get_letra(70).render("OPCIONES", True, "Black")
+        SCREEN.blit(TEXTO_OP, TEXTO_OP.get_rect(center=(640, 120)))
+
+        # Texto volumen
+        TEXTO_VOL = get_letra(40).render(f"Volumen: {int(VOLUMEN_GLOBAL*100)}%", True, "Black")
+        SCREEN.blit(TEXTO_VOL, TEXTO_VOL.get_rect(center=(640, 200)))
+
+        # --- SLIDER ---
+        # Barra
+        pygame.draw.rect(SCREEN, "gray", (SLIDER_X, SLIDER_Y, SLIDER_WIDTH, SLIDER_HEIGHT))
+
+        # Handle
+        pygame.draw.circle(SCREEN, "black", (SLIDER_HANDLE_X, SLIDER_Y + SLIDER_HEIGHT//2), HANDLE_RADIUS)
+
+        # Botón volver
+        VOLVER = Button(
+            image=None,
+            pos=(640, 500),
+            text_input="VOLVER",
+            font=get_letra(60),
+            base_color="black",
+            hovering_color="red"
+        )
+        VOLVER.changeColor(POS)
+        VOLVER.update(SCREEN)
+
+        # EVENTOS
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
+            # Comenzar arrastre
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if VOLVER_OPCIONES.checkForInput(POS_MOUSE_OPCIONES):
-                    menu_principal()
+                if (SLIDER_HANDLE_X - HANDLE_RADIUS <= POS[0] <= SLIDER_HANDLE_X + HANDLE_RADIUS
+                    and SLIDER_Y - 10 <= POS[1] <= SLIDER_Y + 30):
+                    mouse_held = True
+
+                if VOLVER.checkForInput(POS):
+                    return menu_principal()
+
+            # Terminar arrastre
+            if event.type == pygame.MOUSEBUTTONUP:
+                mouse_held = False
+
+        # Si se mantiene click, mover el handle
+        if mouse_held:
+            SLIDER_HANDLE_X = max(SLIDER_X, min(POS[0], SLIDER_X + SLIDER_WIDTH))
+            VOLUMEN_GLOBAL = (SLIDER_HANDLE_X - SLIDER_X) / SLIDER_WIDTH
+        pygame.mixer.music.set_volume(VOLUMEN_GLOBAL)
         pygame.display.update()
 
 # --- BUCLE PRINCIPAL DEL MENÚ ---
