@@ -118,7 +118,7 @@ def jugar():
         cero_x = cr.cero.positions_x
 
         cero_cooldown = 0
-        cero_wait = 300  # milisegundos
+        cr.cero.movement_ratio = 300  # milisegundos
         
         # ---------------------------
         # Pigarto
@@ -127,7 +127,11 @@ def jugar():
         pigarto_x = cr.pigarto.positions_x
         pigarto_pos = 0
         pigarto_cooldown = 0
-        pigarto_wait = 75  # milisegundos
+        cr.pigarto.movement_ratio = 75  # milisegundos
+        
+        # ---------------------------
+        # Raíz Negativa
+        # ---------------------------
 
 
         def mover_enemigo(f, c, f_obj, c_obj):
@@ -190,16 +194,16 @@ def jugar():
             # ---------------------------
             #Cero
             ahora = pygame.time.get_ticks()
-            if ahora - cero_cooldown >= cero_wait:
+            if ahora - cero_cooldown >= cr.cero.movement_ratio:
                 cero_y, cero_x = mover_enemigo(cero_y, cero_x, player_y, player_x)
                 cero_cooldown = ahora
 
             #Pigarto
-            if ahora - pigarto_cooldown >= pigarto_wait:
-                if pigarto_pos<59:
+            if ahora - pigarto_cooldown >= cr.pigarto.movement_ratio:
+                if pigarto_pos<106:
                     pigarto_pos = pigarto_pos+1
                     pigarto_cooldown=ahora
-                if pigarto_pos>=59:
+                if pigarto_pos>=106:
                     pigarto_pos=0
                     pigarto_cooldown=ahora
             # ---------------------------
