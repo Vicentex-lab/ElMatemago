@@ -4,7 +4,6 @@ import colisiones as colision
 
 
 # CONFIG
-
 TILE = 32
 FPS = 60
 
@@ -19,83 +18,98 @@ COLOR_WALL = (30,30,30)
 COLOR_FLOOR = (240,240,240)
 COLOR_PLAYER = (0,120,255)
 
-player_f = 23    # (fila donde quieres ponerlo)
-player_c = 10 # (columna donde quieres ponerlo)
+player_f = 23
+player_c = 10
 
+# Dirección de movimiento 
+dir_f = 0
+dir_c = 0
+
+# Temporizador para controlar la velocidad del movimiento por casilla
+move_timer = 0
+move_delay = 120   # milisegundos por movimiento (se para más lento o más rápido)
+
+
+# FUNCIONES
 def can_move(r, c):
     return 0 <= r < FILAS and 0 <= c < COLUMNAS and colision.maze[r][c] >= 1
 
-def eventos(): #Etiquetas para la matriz
-        global player_f
-        global player_c
-        if colision.maze[player_f][player_c] == 2: #Teletransportación Matemagica 1
-                    if player_f==14 and player_c==0:
-                        player_f=13
-                        player_c=18
-                        print("Matemagicamente Teletransportado")
-                        
-                    if player_f==13 and player_c==19:
-                        player_f=14
-                        player_c=1
-                        print("Matemagicamente Teletransportado")
-                        
-        if colision.maze[player_f][player_c] == 3: #Teletransportación Matemagica 2
-                    if player_f==0 and player_c==9:
-                        player_f=26
-                        player_c=10
-                        print("Matemagicamente Teletransportado")
-                        
-                    if player_f==27 and player_c==10:
-                        player_f=1
-                        player_c=9
-                        print("Matemagicamente Teletransportado")
 
-# MOVIMIENTO 
+def eventos():  # teletransportes
+    global player_f, player_c
 
-move_cooldown = True   # evita que avance varias casillas al dejar presionada una tecla
+    if colision.maze[player_f][player_c] == 2:  # Teletransportación Matemagica 1
+        if player_f == 14 and player_c == 0:
+            player_f = 13
+            player_c = 18
+            print("Matemagicamente Teletransportado")
 
+        if player_f == 13 and player_c == 19:
+            player_f = 14
+            player_c = 1
+            print("Matemagicamente Teletransportado")
+
+    if colision.maze[player_f][player_c] == 3:  # Teletransportación Matemagica 2
+        if player_f == 0 and player_c == 9:
+            player_f = 26
+            player_c = 10
+            print("Matemagicamente Teletransportado")
+
+        if player_f == 27 and player_c == 10:
+            player_f = 1
+            player_c = 9
+            print("Matemagicamente Teletransportado")
+
+
+# LOOP PRINCIPAL
 running = True
 while running:
-    clock.tick(FPS)
+    dt = clock.tick(FPS) 
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-        # se detecta cada vez que presionas una tecla (solo una vez)
+        # SOLO establecemos dirección (como Pac-Man)
         if event.type == pygame.KEYDOWN:
-            if not move_cooldown:
-                if event.key == pygame.K_w and can_move(player_f - 1, player_c):
-                    player_f -= 1
-                    print("Fila:", player_f, "Columna:", player_c)
-                    eventos()
-                if event.key == pygame.K_s and can_move(player_f + 1, player_c):
-                    player_f += 1
-                    print("Fila:", player_f, "Columna:", player_c)
-                    eventos()
-                if event.key == pygame.K_a and can_move(player_f, player_c - 1):
-                    player_c -= 1
-                    print("Fila:", player_f, "Columna:", player_c)
-                    eventos()
-                if event.key == pygame.K_d and can_move(player_f, player_c + 1):
-                    player_c += 1
-                    print("Fila:", player_f, "Columna:", player_c)
-                    eventos()
+            if event.key == pygame.K_w:
+                dir_f = -1
+                dir_c = 0
+            if event.key == pygame.K_s:
+                dir_f = 1
+                dir_c = 0
+            if event.key == pygame.K_a:
+                dir_f = 0
+                dir_c = -1
+            if event.key == pygame.K_d:
+                dir_f = 0
+                dir_c = 1
 
-                move_cooldown = True
+    # MOVIMIENTO CONSTANTE 
+    move_timer += dt
 
-        if event.type == pygame.KEYUP:
-            move_cooldown = False
-    # DIBUJO
+    if move_timer >= move_delay:
+        move_timer = 0
 
+        new_f = player_f + dir_f
+        new_c = player_c + dir_c
+
+        if can_move(new_f, new_c):  # si no es pared, avanza
+            player_f = new_f
+            player_c = new_c
+            print("Fila:", player_f, "Columna:", player_c)
+            eventos()
+
+  
+    # DIBUJO DEL LABERINTO
+   
     for r in range(FILAS):
         for c in range(COLUMNAS):
             rect = pygame.Rect(c*TILE, r*TILE, TILE, TILE)
             color = COLOR_FLOOR if colision.maze[r][c] >= 1 else COLOR_WALL
             pygame.draw.rect(screen, color, rect)
 
-    
-    
+    # Jugador
     pygame.draw.rect(
         screen,
         COLOR_PLAYER,
@@ -103,6 +117,7 @@ while running:
     )
 
     pygame.display.flip()
+
 
 pygame.quit()
 sys.exit()
