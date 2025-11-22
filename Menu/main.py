@@ -94,17 +94,20 @@ def jugar():
         cero_x = cr.cero.positions_x
 
         cero_cooldown = 0
-        cero_wait = 300  # milisegundos
         
         # ---------------------------
         # Pigarto
         # ---------------------------
         pigarto_y = cr.pigarto.positions_y
         pigarto_x = cr.pigarto.positions_x
-        pigarto_pos = 0
         pigarto_cooldown = 0
-        pigarto_wait = 75  # milisegundos
-
+        
+        # ---------------------------
+        # Raíz Negativa
+        # ---------------------------
+        raiznegativa_y = cr.raiznegativa.positions_y
+        raiznegativa_x = cr.raiznegativa.positions_x
+        raiznegativa_cooldown = 0
 
         def mover_enemigo(f, c, f_obj, c_obj):
             """Mueve al enemigo acercándose al jugador"""
@@ -169,18 +172,24 @@ def jugar():
             # ---------------------------
             #Cero
             ahora = pygame.time.get_ticks()
-            if ahora - cero_cooldown >= cero_wait:
+            if ahora - cero_cooldown >= cr.cero.movement_ratio:
                 cero_y, cero_x = mover_enemigo(cero_y, cero_x, player_y, player_x)
                 cero_cooldown = ahora
 
             #Pigarto
-            if ahora - pigarto_cooldown >= pigarto_wait:
-                if pigarto_pos<59:
-                    pigarto_pos = pigarto_pos+1
+            if ahora - pigarto_cooldown >= cr.pigarto.movement_ratio:
+                if cr.pigarto.pos<106:
+                    cr.pigarto.pos = cr.pigarto.pos+1
                     pigarto_cooldown=ahora
-                if pigarto_pos>=59:
-                    pigarto_pos=0
+                if cr.pigarto.pos>=106:
+                    cr.pigarto.pos=0
                     pigarto_cooldown=ahora
+                    
+            #Raiz negativa
+            if ahora - raiznegativa_cooldown >= cr.raiznegativa.movement_ratio:
+                raiznegativa_y, raiznegativa_x = mover_enemigo(raiznegativa_y, raiznegativa_x, player_y, player_x)
+                raiznegativa_cooldown = ahora
+                #cr.raiznegativa.estocada() #No funciona
             # ---------------------------
             # COLISIÓN
             # ---------------------------
@@ -191,7 +200,12 @@ def jugar():
                 running = False
 
             #Con Pigarto
-            if pigarto_y[pigarto_pos] == player_y and pigarto_x[pigarto_pos] == player_x:
+            if pigarto_y[cr.pigarto.pos] == player_y and pigarto_x[cr.pigarto.pos] == player_x:
+                print("💀 Te atrapó el enemigo!")
+                running = False
+                
+            #Con Raiz negativa
+            if raiznegativa_y == player_y and raiznegativa_x == player_x:
                 print("💀 Te atrapó el enemigo!")
                 running = False
                 
@@ -214,7 +228,13 @@ def jugar():
             #Pigarto
             pygame.draw.rect(
             screen, COLOR_ENEMY,
-            (pigarto_x[pigarto_pos]*TILE + 6, pigarto_y[pigarto_pos]*TILE + 6, TILE-12, TILE-12)
+            (pigarto_x[cr.pigarto.pos]*TILE + 6, pigarto_y[cr.pigarto.pos]*TILE + 6, TILE-12, TILE-12)
+            )
+            
+            #Raiz Negativa
+            pygame.draw.rect(
+                screen, (0, 255, 0),
+                (raiznegativa_x*TILE + 6, raiznegativa_y*TILE + 6, TILE-12, TILE-12)
             )
         
             # Jugador
