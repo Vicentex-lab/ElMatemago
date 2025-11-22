@@ -1,6 +1,8 @@
 import pygame
 import json
 import os
+import colisiones 
+
 
 # Inicializa Pygame para poder usar pygame.display.Info()
 pygame.init() 
@@ -14,6 +16,24 @@ ALTO_PANTALLA = INFO_PANTALLA.current_h
 # Define el centro de la pantalla, que usaremos para centrar los elementos
 CENTRO_X = ANCHO_PANTALLA // 2
 CENTRO_Y = ALTO_PANTALLA // 2
+
+# --- CONFIGURACIÓN DEL LABERINTO ---
+TILE = 32 # Tamaño de cada celda del laberinto
+FILAS_LABERINTO = len(colisiones.maze)
+COLUMNAS_LABERINTO = len(colisiones.maze[0])
+
+# --- CÁLCULO PARA CENTRAR EL LABERINTO EN PANTALLA COMPLETA ---
+ANCHO_LABERINTO = COLUMNAS_LABERINTO * TILE
+ALTO_LABERINTO = FILAS_LABERINTO * TILE
+
+# Centramos el laberinto usando el centro de la pantalla (cfg.CENTRO_X/Y)     
+# offset_x: Distancia desde el borde izquierdo hasta donde debe empezar el laberinto.
+# Se obtiene restando la mitad del ancho del laberinto al centro X de la pantalla.
+offset_x = CENTRO_X - (ANCHO_LABERINTO // 2)
+        
+ # offset_y: Distancia desde el borde superior hasta donde debe empezar el laberinto.
+# Se obtiene restando la mitad del alto del laberinto al centro Y de la pantalla.
+offset_y = CENTRO_Y - (ALTO_LABERINTO // 2)
 
 # --- VARIABLES GLOBALES DE JUEGO ---
 VOLUMEN_GLOBAL = 0.5

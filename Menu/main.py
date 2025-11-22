@@ -40,21 +40,19 @@ def jugar():
         print(f"Error al cargar la música del juego: {e}")"""
     
     while True:
-        TILE = 32
         FPS = 60
         
         FILAS = len(colision.maze)
         COLUMNAS = len(colision.maze[0])
-        screen = pygame.display.set_mode((COLUMNAS*TILE, FILAS*TILE))
-        clock = pygame.time.Clock()
         
         COLOR_WALL = (30,30,30)
         COLOR_FLOOR = (240,240,240)
         COLOR_PLAYER = (0,120,255)
         COLOR_ENEMY = (255,50,50)
         
-        screen = pygame.display.set_mode((COLUMNAS*TILE, FILAS*TILE))
+        screen = SCREEN
         clock = pygame.time.Clock()
+        
         
         player_y = cr.player.positions_y   # (Y donde quieres ponerlo)
         player_x = cr.player.positions_x   # (X donde quieres ponerlo)
@@ -134,6 +132,8 @@ def jugar():
         running = True
         while running:
             clock.tick(FPS)
+            
+            screen.fill((0, 0, 0)) # Fondo negro para el juego
         
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -214,7 +214,7 @@ def jugar():
             #Mapa
             for r in range(FILAS):
                 for c in range(COLUMNAS):
-                    rect = pygame.Rect(c*TILE, r*TILE, TILE, TILE)
+                    rect = pygame.Rect(c*cfg.TILE + cfg.offset_x, r*cfg.TILE + cfg.offset_y, cfg.TILE, cfg.TILE)
                     color = COLOR_FLOOR if colision.maze[r][c] >= 1 else COLOR_WALL
                     pygame.draw.rect(screen, color, rect)
                     
@@ -222,26 +222,26 @@ def jugar():
             #Cero
             pygame.draw.rect(
             screen, COLOR_ENEMY,
-            (cero_x*TILE + 6, cero_y*TILE + 6, TILE-12, TILE-12)
+            (cero_x*cfg.TILE + 6 + cfg.offset_x, cero_y*cfg.TILE + 6 +cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
             )
 
             #Pigarto
             pygame.draw.rect(
             screen, COLOR_ENEMY,
-            (pigarto_x[cr.pigarto.pos]*TILE + 6, pigarto_y[cr.pigarto.pos]*TILE + 6, TILE-12, TILE-12)
+            (pigarto_x[cr.pigarto.pos]*cfg.TILE + 6 + cfg.offset_x, pigarto_y[cr.pigarto.pos]*cfg.TILE + 6 + cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
             )
             
             #Raiz Negativa
             pygame.draw.rect(
                 screen, (0, 255, 0),
-                (raiznegativa_x*TILE + 6, raiznegativa_y*TILE + 6, TILE-12, TILE-12)
+                (raiznegativa_x*cfg.TILE + 6 + cfg.offset_x, raiznegativa_y*cfg.TILE + 6 +cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
             )
         
             # Jugador
             pygame.draw.rect(
                 screen,
                 COLOR_PLAYER,
-                (player_x*TILE + 4, player_y*TILE + 4, TILE-8, TILE-8)
+                (player_x*cfg.TILE + 4 + cfg.offset_x, player_y*cfg.TILE + 4 + cfg.offset_y, cfg.TILE-8, cfg.TILE-8)
             )
         
             pygame.display.flip()
@@ -424,6 +424,9 @@ def menu_principal():
         pygame.mixer.music.load(cfg.RUTA_MUSICA_MENU)
         pygame.mixer.music.play(-1) # Reproducción en loop
         pygame.mixer.music.set_volume(cfg.VOLUMEN_GLOBAL) # Usar el volumen global
+        
+    SCREEN.blit(BG, (0, 0))
+    pygame.display.update()
     
     while True:
         
