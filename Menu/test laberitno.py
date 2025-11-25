@@ -27,7 +27,11 @@ dir_c = 0
 
 # Temporizador para controlar la velocidad del movimiento por casilla
 move_timer = 0
+<<<<<<< Updated upstream
 move_delay = 120   # milisegundos por movimiento (se para más lento o más rápido)
+=======
+move_delay = 120   # milisegundos por movimiento 
+>>>>>>> Stashed changes
 
 
 # FUNCIONES
@@ -64,13 +68,20 @@ def eventos():  # teletransportes
 # LOOP PRINCIPAL
 running = True
 while running:
+<<<<<<< Updated upstream
     dt = clock.tick(FPS) 
+=======
+    dt = clock.tick(FPS)  # delta time para el timer
+>>>>>>> Stashed changes
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
+<<<<<<< Updated upstream
         # SOLO establecemos dirección (como Pac-Man)
+=======
+>>>>>>> Stashed changes
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w:
                 dir_f = -1
@@ -100,9 +111,15 @@ while running:
             print("Fila:", player_f, "Columna:", player_c)
             eventos()
 
+<<<<<<< Updated upstream
   
     # DIBUJO DEL LABERINTO
    
+=======
+    # -------------------
+    # DIBUJO DEL LABERINTO
+    # -------------------
+>>>>>>> Stashed changes
     for r in range(FILAS):
         for c in range(COLUMNAS):
             rect = pygame.Rect(c*TILE, r*TILE, TILE, TILE)
