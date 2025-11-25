@@ -124,49 +124,67 @@ def jugar():
 
             return f, c
 
-        
-        # MOVIMIENTO DEL JUGADOR 
-        
-        move_cooldown = True   # evita que avance varias casillas al dejar presionada una tecla
-        
+        # ============================
+        #  MOVIMIENTO DEL JUGADOR 
+        # ============================
+
+        dir_x = 0
+        dir_y = 0
+
+        move_timer = 0
+        move_delay = 120   # velocidad del personaje 
+
         running = True
         while running:
-            clock.tick(FPS)
-            
-            screen.fill((0, 0, 0)) # Fondo negro para el juego
-        
+            dt = clock.tick(FPS)
+            screen.fill((0,0,0))
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-        
-                # se detecta cada vez que presionas una tecla (solo una vez)
+
+                
                 if event.type == pygame.KEYDOWN:
-                    if not move_cooldown:
-                        # ARRIBA (W o Flecha ↑)
-                        if (event.key == pygame.K_w or event.key == pygame.K_UP) and can_move(player_y - 1, player_x):
-                            player_y -= 1
-                            print("Y", player_y, "X", player_x)
-                            eventos()
-                        # ABAJO (S o Flecha ↓)
-                        if (event.key == pygame.K_s or event.key == pygame.K_DOWN) and can_move(player_y + 1, player_x):
-                            player_y += 1
-                            print("Y", player_y, "X", player_x)
-                            eventos()
-                        # IZQUIERDA (A o Flecha ←)
-                        if (event.key == pygame.K_a or event.key == pygame.K_LEFT) and can_move(player_y, player_x - 1):
-                            player_x -= 1
-                            print("Y", player_y, "X", player_x)
-                            eventos()
-                        # DERECHA (D o Flecha →)
-                        if (event.key == pygame.K_d or event.key == pygame.K_RIGHT) and can_move(player_y, player_x + 1):
-                            player_x += 1
-                            print("Y", player_y, "X", player_x)
-                            eventos()
-                        move_cooldown = True
-        
-                if event.type == pygame.KEYUP:
-                    move_cooldown = False
-                    
+
+                    if event.key in (pygame.K_w, pygame.K_UP):
+                        if can_move(player_y - 1, player_x):
+                            dir_x = 0
+                            dir_y = -1
+
+                    if event.key in (pygame.K_s, pygame.K_DOWN):
+                        if can_move(player_y + 1, player_x):
+                            dir_x = 0
+                            dir_y = 1
+
+                    if event.key in (pygame.K_a, pygame.K_LEFT):
+                        if can_move(player_y, player_x - 1):
+                            dir_x = -1
+                            dir_y = 0
+
+                    if event.key in (pygame.K_d, pygame.K_RIGHT):
+                        if can_move(player_y, player_x + 1):
+                            dir_x = 1
+                            dir_y = 0
+
+            #  Movimiento con velocidad
+           
+            move_timer += dt
+
+            if move_timer >= move_delay:
+                move_timer = 0
+
+                new_x = player_x + dir_x
+                new_y = player_y + dir_y
+
+                # Si la siguiente casilla es pared, NO se detiene:
+                # solo sigue sin moverse, hasta que el jugador
+                # presione una dirección válida.
+                if can_move(new_y, new_x):
+                    player_x = new_x
+                    player_y = new_y
+                    eventos()
+
+                
             # ---------------------------
             # MOVER ENEMIGO
             # ---------------------------
