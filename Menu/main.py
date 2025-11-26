@@ -123,7 +123,6 @@ def jugar():
                 c += 1
 
             return f, c
-
         # ============================
         #  MOVIMIENTO DEL JUGADOR 
         # ============================
