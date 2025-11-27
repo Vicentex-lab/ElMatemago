@@ -304,7 +304,7 @@ def jugar():
             if raiznegativa_y == player_y and raiznegativa_x == player_x:
                 if player_item==item.shield.name:
                     player_pts+=cr.raiznegativa.pts
-                    COLOR_RAIZ=COLOR_WALL
+                    COLOR_RAIZ=COLOR_FLOOR
                     player_item=""
                     raiznegativa_exist=0
                     inmunidad=0
@@ -328,7 +328,7 @@ def jugar():
                         raiznegativa_x=0
                         raiznegativa_y=0
                         raiznegativa_ratio=9999999
-                        COLOR_RAIZ=COLOR_WALL
+                        COLOR_RAIZ=COLOR_FLOOR
                 elif raiznegativa_exist==1 and inmunidad!=1:
                     print("💀 raiz")
                     running = False
@@ -338,7 +338,6 @@ def jugar():
             if sword_place_x==player_x and sword_place_y==player_y:
                 player_item=item.sword.name
                 inmunidad=1
-                COLOR_SWORD=COLOR_FLOOR
                 sword_place_x=0
                 sword_place_y=1
                 player_pts+=item.sword.pts
@@ -347,7 +346,6 @@ def jugar():
             if shield_place_x==player_x and shield_place_y==player_y:
                 player_item=item.shield.name
                 inmunidad=1
-                COLOR_SHIELD=COLOR_FLOOR
                 shield_place_x=0
                 shield_place_y=2
                 player_pts+=item.shield.pts
