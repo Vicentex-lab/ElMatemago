@@ -14,7 +14,7 @@ class sword(item):
 
 class shield(item):
     name="Escudo Absoluto"
-    places_y=[3, 2, 7, 11, 26, 23] #Cambiar
-    places_x=[16, 18, 2, 2, 17, 18 ]
+    places_y=[2, 2, 7, 9, 24, 11]
+    places_x=[4, 9, 2, 17, 3, 2 ]
     damage=0
     pts=250

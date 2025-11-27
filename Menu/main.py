@@ -276,10 +276,10 @@ def jugar():
             #Con Pigarto
             if pigarto_y[cr.pigarto.pos] == player_y and pigarto_x[cr.pigarto.pos] == player_x:
                 if player_item==item.shield.name:
+                    cr.pigarto.pos=0
                     inmunidad=0
                     player_item=""
-                    cr.pigarto.pos=0
-                if player_item==item.sword.name:
+                elif player_item==item.sword.name:
                     if cero_exist==1 or raiznegativa_exist==1:
                         cr.pigarto.hp=cr.pigarto.hp-item.sword.damage
                     if cero_exist==0 and raiznegativa_exist==0 and pigarto_exist==1:
