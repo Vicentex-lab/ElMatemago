@@ -715,4 +715,5 @@ def menu_principal():
 
         pygame.display.update()
 
-menu_principal()
+if __name__ == "__main__":
+    menu_principal()

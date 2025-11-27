@@ -163,7 +163,6 @@ label_titulo_controles = tkinter.Label(
 )
 label_titulo_controles.pack(pady=10)
 
-# Aquí podrías agregar más texto/imagen explicando controles
 
 #  PANTALLA MANUAL
 
