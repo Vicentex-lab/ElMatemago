@@ -110,7 +110,7 @@ def obtener_nombre(screen, player_pts):
                 else:
                     # Capturar la tecla y validar que sea una letra o espacio
                     key_name = event.unicode
-                    if (key_name.isalpha() or key_name == ' ') and len(nombre) < 10:
+                    if key_name.isalpha() and len(nombre) < 10:
                         nombre += key_name.upper()
         
         # ------------------------------------------------------------------
@@ -121,15 +121,15 @@ def obtener_nombre(screen, player_pts):
         # Título / Instrucciones
         # Usamos un try/except para get_letra por si no está definida
         try:
-            texto_titulo = get_letra(60).render("¡HAS GANADO!", True, COLOR_CURSOR)
+            texto_titulo = get_letra(60).render("¡FIN DEL JUEGO!", True, COLOR_CURSOR)
             texto_score = get_letra(40).render(f"PUNTAJE: {player_pts}", True, COLOR_TEXTO)
-            texto_prompt = get_letra(30).render("INGRESA TU NOMBRE (solo letras):", True, COLOR_TEXTO)
+            texto_prompt = get_letra(30).render("INGRESA TU NOMBRE (SOLO LETRAS):", True, COLOR_TEXTO)
         except NameError:
             # Fallback simple si la función de fuente no está disponible
             font = pygame.font.Font(None, 60)
-            texto_titulo = font.render("¡HAS GANADO!", True, COLOR_CURSOR)
+            texto_titulo = font.render("¡FIN DEL JUEGO!", True, COLOR_CURSOR)
             texto_score = font.render(f"PUNTAJE: {player_pts}", True, COLOR_TEXTO)
-            texto_prompt = font.render("INGRESA TU NOMBRE (solo letras):", True, COLOR_TEXTO)
+            texto_prompt = font.render("INGRESA TU NOMBRE (SOLO LETRAS):", True, COLOR_TEXTO)
 
         screen.blit(texto_titulo, texto_titulo.get_rect(center=(CENTRO_X, CENTRO_Y - 150)))
         screen.blit(texto_score, texto_score.get_rect(center=(CENTRO_X, CENTRO_Y - 50)))

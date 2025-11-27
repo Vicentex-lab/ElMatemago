@@ -5,7 +5,6 @@ import colisiones as colision
 import criaturas as cr
 import items as item
 import random
-import json # Necesario si se usa json.dump/load en main.py, aunque se recomienda usar cfg.
 import configuracion as cfg
 
 # Inicializa Pygame
@@ -31,52 +30,49 @@ def manejar_salida_menu(event):
             pygame.quit()
             sys.exit()
 
-# --- PANTALLA GAME OVER (NUEVA) ---
-
-def game_over(final_pts):
-    """
-    Muestra la pantalla de Game Over con el puntaje final
-    y un botón para volver al menú principal.
-    """
-    
-    x_pos = cfg.CENTRO_X
+def low_score_message():
+    """Muestra un mensaje indicando que el puntaje es demasiado bajo para guardar y vuelve al menú."""
     
     # Detiene cualquier música que quede sonando
     pygame.mixer.music.stop() 
     
-    while True:
-        POS_MOUSE_GO = pygame.mouse.get_pos()
-        SCREEN.fill("#111111") # Fondo muy oscuro
-
-        # 1. Título
-        TEXTO_GO = cfg.get_letra(80).render("GAME OVER", True, "#FF0000") # Rojo
-        RECT_GO = TEXTO_GO.get_rect(center=(x_pos, cfg.CENTRO_Y - 200))
-        SCREEN.blit(TEXTO_GO, RECT_GO)
+    # 1. Crear un reloj local y definir FPS (⬅️ NUEVO)
+    clock = pygame.time.Clock() 
+    FPS = 60
+    
+    start_time = pygame.time.get_ticks()
+    display_time = 3000 # Mostrar por 3 segundos
+    
+    while pygame.time.get_ticks() - start_time < display_time:
         
-        # 2. Puntaje Final
-        TEXTO_SCORE = cfg.get_letra(45).render(f"PUNTAJE FINAL: {final_pts}", True, "#FFFFFF") # Blanco
-        RECT_SCORE = TEXTO_SCORE.get_rect(center=(x_pos, cfg.CENTRO_Y - 50))
-        SCREEN.blit(TEXTO_SCORE, RECT_SCORE)
+        # 2. Limitar la velocidad del bucle (⬅️ NUEVO)
+        clock.tick(FPS) 
         
-        # 3. Botón para volver al menú principal
-        VOLVER_MENU = Button(image=None, pos=(x_pos, cfg.CENTRO_Y + 150), 
-                            text_input="VOLVER AL MENÚ", font=cfg.get_letra(65), 
-                            base_color="#FFFFFF", hovering_color="#00FFFF") # Cian
-        
-        VOLVER_MENU.changeColor(POS_MOUSE_GO)
-        VOLVER_MENU.update(SCREEN)
-
+        # Manejo de eventos para permitir salir con QUIT/ESCAPE
         for event in pygame.event.get():
-            # Usamos la función de manejo global para poder cerrar con QUIT o ESCAPE
-            manejar_salida_menu(event) 
-            
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if VOLVER_MENU.checkForInput(POS_MOUSE_GO):
-                    # Volver al menú principal
-                    return menu_principal() 
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            # Permitir salir antes de tiempo presionando ESCAPE
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                return menu_principal() 
         
-        pygame.display.update()
+        # DIBUJO DEL MENSAJE 
+        SCREEN.fill("#111111") # Fondo oscuro
 
+        # Título
+        TEXTO_TITULO = cfg.get_letra(60).render("¡FIN DEL JUEGO!", True, "#FF0000") 
+        RECT_TITULO = TEXTO_TITULO.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 50))
+        SCREEN.blit(TEXTO_TITULO, RECT_TITULO)
+        
+        TEXTO_SUB = cfg.get_letra(30).render("TU PUNTAJE ES 0. NECESITAS MÁS PARA GUARDARLO.", True, "#FFFFFF")
+        RECT_SUB = TEXTO_SUB.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y + 50))
+        SCREEN.blit(TEXTO_SUB, RECT_SUB)
+        
+        pygame.display.update() 
+        
+    return menu_principal() # Vuelve al menú principal después de 3 segundos
+    
 # --- PANTALLA JUGAR (CORREGIDA) ---
 
 def jugar():
@@ -96,7 +92,7 @@ def jugar():
 
     def mostrar_puntaje(player_pts):
         fuente = cfg.get_letra(30)  
-        texto = fuente.render(f"Puntaje: {player_pts}", True, (255, 255, 0)) 
+        texto = fuente.render(f"PUNTAJE: {player_pts}", True, (255, 255, 0)) 
         SCREEN.blit(texto, (50,50)) # Usar SCREEN global
 
     # -------------------------------------------------------------------
@@ -127,6 +123,17 @@ def jugar():
     inmunidad=0
     player_pts=cr.player.pts
     temporizador=0
+    
+    # Pigarto: Resetea el índice de posición en su camino y su existencia.
+    cr.pigarto.pos = 0 
+    cr.pigarto.exist = 1 # Asumimos que debe empezar vivo
+    
+    # Cero: Resetea su existencia y posición (si fueron modificados al morir).
+    cr.cero.exist = 1 
+    
+    # Raíz Negativa: Resetea su existencia
+    cr.raiznegativa.exist = 1 
+
     
     #Spawnear Item
     #Espada
@@ -334,9 +341,12 @@ def jugar():
                     sword_place_x=cr.cero.positions_y
             elif cero_exist==1 and inmunidad!=1:
                 print("💀 cero")
-                # Detiene la música y va a la pantalla Game Over
                 pygame.mixer.music.stop() 
-                return game_over(player_pts) 
+                if player_pts > 0:
+                    cfg.guardar_nuevo_puntaje(screen, player_pts)
+                    return menu_principal() 
+                else:
+                    return low_score_message() # Puntaje 0, mensaje y retorno al menú
 
         #Con Pigarto
         if pigarto_y[cr.pigarto.pos] == player_y and pigarto_x[cr.pigarto.pos] == player_x:
@@ -366,7 +376,11 @@ def jugar():
             elif pigarto_exist==1 and inmunidad!=1:
                 print("💀 pigarto")
                 pygame.mixer.music.stop() 
-                return game_over(player_pts) # Va a la pantalla Game Over
+                if player_pts > 0:
+                    cfg.guardar_nuevo_puntaje(screen, player_pts)
+                    return menu_principal() 
+                else:
+                    return low_score_message() # Puntaje 0, mensaje y retorno al menú
             
         #Con Raiz negativa
         if raiznegativa_y == player_y and raiznegativa_x == player_x:
@@ -400,7 +414,11 @@ def jugar():
             elif raiznegativa_exist==1 and inmunidad!=1:
                 print("💀 raiz")
                 pygame.mixer.music.stop() 
-                return game_over(player_pts) # Va a la pantalla Game Over
+                if player_pts > 0:
+                    cfg.guardar_nuevo_puntaje(screen, player_pts)
+                    return menu_principal() 
+                else:
+                    return low_score_message() # Puntaje 0, mensaje y retorno al menú
         
         #COLISIÓN CON ITEMS
         #Espada
@@ -484,8 +502,7 @@ def jugar():
                 player_pts+=100
             elif temporizador/60>60:
                 player_pts+=0
-                print("ERI HORRIBLE")
-                
+                                
             pygame.mixer.music.stop() 
             # Llama a guardar puntaje con el orden corregido (screen, player_pts)
             cfg.guardar_nuevo_puntaje(SCREEN, player_pts) 
@@ -534,7 +551,7 @@ def marcadores():
             RECT_SIN_SCORES = TEXTO_SIN_SCORES.get_rect(center=(x_pos, y_start))
             SCREEN.blit(TEXTO_SIN_SCORES, RECT_SIN_SCORES)
         
-        VOLVER_MARCADORES = Button(image=None, pos=(cfg.CENTRO_X, y_start + len(top_scores) * line_spacing + 100), 
+        VOLVER_MARCADORES = Button(image=pygame.image.load("./assets/Options Rect.png"), pos=(cfg.CENTRO_X, y_start + len(top_scores) * line_spacing + 100), 
                             text_input="VOLVER", font=cfg.get_letra(75), base_color="White", hovering_color="Red")
         VOLVER_MARCADORES.changeColor(POS_MOUSE_MARCADORES)
         VOLVER_MARCADORES.update(SCREEN)
@@ -550,16 +567,16 @@ def marcadores():
 # --- PANTALLA MANUAL (CORREGIDA LA SALIDA) ---
 
 def manual():
-    print("Entrando a la pantalla de MANUAL")
+    print("ENTRANDO A LA PANTALLA DE MANUAL")
     while True:
         POS_MOUSE_MANUAL = pygame.mouse.get_pos()
         SCREEN.fill("gray")
-        TEXTO_MANUAL = cfg.get_letra(45).render("Manual Matemagia.", True, "Black")
+        TEXTO_MANUAL = cfg.get_letra(45).render("MANUAL EL MATEMAGO.", True, "Black")
         RECT_MANUAL = TEXTO_MANUAL.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 100))
         SCREEN.blit(TEXTO_MANUAL, RECT_MANUAL)
 
         BOTON_PDF = Button(
-            image=None,
+            image=pygame.image.load("./assets/Options Rect.png"),
             pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 0),
             text_input="ABRIR PDF",
             font=cfg.get_letra(55),
@@ -569,7 +586,7 @@ def manual():
         BOTON_PDF.changeColor(POS_MOUSE_MANUAL)
         BOTON_PDF.update(SCREEN)
 
-        VOLVER_MANUAL = Button(image=None, pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 150), 
+        VOLVER_MANUAL = Button(image=pygame.image.load("./assets/Options Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 150), 
                             text_input="VOLVER", font=cfg.get_letra(75), base_color="Black", hovering_color="Red")
         VOLVER_MANUAL.changeColor(POS_MOUSE_MANUAL)
         VOLVER_MANUAL.update(SCREEN)
@@ -580,7 +597,7 @@ def manual():
 
                 if BOTON_PDF.checkForInput(POS_MOUSE_MANUAL):
                     ruta_pdf = os.path.join("assets", "manual_matemagia.pdf")
-                    print("Abriendo PDF:", ruta_pdf)
+                    print("ABRIENDO PDF:", ruta_pdf)
                     try:
                         os.startfile(ruta_pdf)  # WINDOWS
                     except:
@@ -603,7 +620,7 @@ def opciones():
         TEXTO_OP = cfg.get_letra(70).render("OPCIONES", True, "Black")
         SCREEN.blit(TEXTO_OP, TEXTO_OP.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 260)))
 
-        TEXTO_VOL = cfg.get_letra(40).render(f"Volumen: {int(cfg.VOLUMEN_GLOBAL*100)}%", True, "Black")
+        TEXTO_VOL = cfg.get_letra(40).render(f"VOLUMEN: {int(cfg.VOLUMEN_GLOBAL*100)}%", True, "Black")
         SCREEN.blit(TEXTO_VOL, TEXTO_VOL.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 180)))
         
         # --- SLIDER (asume variables cfg.* definidas) ---
@@ -611,7 +628,7 @@ def opciones():
         pygame.draw.circle(SCREEN, "black", (cfg.SLIDER_HANDLE_X, cfg.SLIDER_Y + cfg.SLIDER_HEIGHT//2), cfg.HANDLE_RADIUS)
 
         VOLVER = Button(
-            image=None,
+            image=pygame.image.load("./assets/Play Rect.png"),
             pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 150),
             text_input="VOLVER",
             font=cfg.get_letra(60),
@@ -674,7 +691,7 @@ def menu_principal():
         BOTON_OPCIONES = Button(image=pygame.image.load("./assets/Options Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 150), 
                             text_input="OPCIONES", font=cfg.get_letra(60), base_color="#d7fcd4", hovering_color="White")
         BOTON_SALIR = Button(image=pygame.image.load("./assets/Play Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 250), 
-                            text_input="SALIR", font=cfg.get_letra(60), base_color="#d7fcd4", hovering_color="White")
+                            text_input="SALIR", font=cfg.get_letra(60), base_color="#d7fcd4", hovering_color="Red")
         
         for button in [BOTON_JUGAR, BOTON_MARCADORES, BOTON_MANUAL, BOTON_OPCIONES, BOTON_SALIR]:
             button.changeColor(POS_MOUSE_MENU)
