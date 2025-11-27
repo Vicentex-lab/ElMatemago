@@ -4,7 +4,8 @@ import os # Necesario para la función manual()
 from button import Button
 import colisiones as colision
 import criaturas as cr
-
+import items as item
+import random
 # --- IMPORTACIÓN DE CONFIGURACIÓN ---
 # Importa todo lo que necesitamos del nuevo archivo
 import configuracion as cfg
@@ -18,26 +19,26 @@ SCREEN = pygame.display.set_mode((cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA), pygame
 pygame.display.set_caption("EL MATEMAGO") 
 
 # Carga y escala la imagen de fondo para ajustarse a Fullscreen
-BG = pygame.image.load("assets/Background.png")
+BG = pygame.image.load("C:\\Users\\Kari\\Documents\\GitHub\\ElMatemago\\Menu\\assets\\Background.png")
 BG = pygame.transform.scale(BG, (cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA))
 
 # --- PANTALLA JUGAR ---
 
 def jugar():
     #Muestra la pantalla de juego, detiene la música del menú e inicia la música de juego.
-    RUTA_MUSICA_JUEGO = "assets/Pacmanwaka.wav"
+    RUTA_MUSICA_JUEGO = "C:\\Users\\Kari\\Documents\\GitHub\\ElMatemago\\Menu\\assets\\Matemago_Dungeon_Song.mp3"
     
     # 1. Detiene la música actual (la del menú)
     pygame.mixer.music.stop()
     
     # 2. Carga y reproduce la música del juego en loop
     
-    """try:
+    try:
         pygame.mixer.music.load(cfg.RUTA_MUSICA_JUEGO) # Usar cfg.RUTA_MUSICA_JUEGO
         pygame.mixer.music.play(-1)
         pygame.mixer.music.set_volume(cfg.VOLUMEN_GLOBAL) # Usar cfg.VOLUMEN_GLOBAL
     except pygame.error as e:
-        print(f"Error al cargar la música del juego: {e}")"""
+        print(f"Error al cargar la música del juego: {e}")
     
     while True:
         FPS = 60
@@ -48,14 +49,37 @@ def jugar():
         COLOR_WALL = (30,30,30)
         COLOR_FLOOR = (240,240,240)
         COLOR_PLAYER = (0,120,255)
-        COLOR_ENEMY = (255,50,50)
+        COLOR_CERO = (0, 0, 255)
+        COLOR_PIGARTO = (0, 255, 0)
+        COLOR_RAIZ = (255, 0, 0)
+        COLOR_SWORD = (255, 255, 0)
+        COLOR_SHIELD = (255, 165, 0)
         
         screen = SCREEN
         clock = pygame.time.Clock()
         
-        
+        #Definiciones del jugador
         player_y = cr.player.positions_y   # (Y donde quieres ponerlo)
         player_x = cr.player.positions_x   # (X donde quieres ponerlo)
+        player_item=""
+        inmunidad=0
+        player_pts=cr.player.pts
+        temporizador=0
+        
+        #Spawnear Item
+        #Espada
+        cont_aux_1=random.randint(0, 5)
+        print("espada",  cont_aux_1)
+        sword_place_y=item.sword.places_y[ cont_aux_1]
+        sword_place_x=item.sword.places_x[ cont_aux_1]
+        
+        #Escudo
+        cont_aux_2=random.randint(0, 5)
+        while cont_aux_1==cont_aux_2:
+            cont_aux_2=random.randint(0, 5)
+        print("escudo",  cont_aux_2)
+        shield_place_y=item.shield.places_y[ cont_aux_2]
+        shield_place_x=item.shield.places_x[ cont_aux_2]
         
         def can_move(r, c):
             return 0 <= r < FILAS and 0 <= c < COLUMNAS and colision.maze[r][c] >= 1
@@ -90,8 +114,9 @@ def jugar():
         # ---------------------------
         cero_y = cr.cero.positions_y
         cero_x = cr.cero.positions_x
-
+        cero_exist=cr.cero.exist
         cero_cooldown = 0
+        cero_ratio=cr.cero.movement_ratio
         
         # ---------------------------
         # Pigarto
@@ -99,13 +124,16 @@ def jugar():
         pigarto_y = cr.pigarto.positions_y
         pigarto_x = cr.pigarto.positions_x
         pigarto_cooldown = 0
-        
+        pigarto_exist=cr.pigarto.exist
+        pigarto_ratio=cr.pigarto.movement_ratio
         # ---------------------------
         # Raíz Negativa
         # ---------------------------
         raiznegativa_y = cr.raiznegativa.positions_y
         raiznegativa_x = cr.raiznegativa.positions_x
+        raiznegativa_ratio=cr.raiznegativa.movement_ratio
         raiznegativa_cooldown = 0
+        raiznegativa_exist=cr.raiznegativa.exist
 
         def mover_enemigo(f, c, f_obj, c_obj):
             """Mueve al enemigo acercándose al jugador"""
@@ -129,55 +157,73 @@ def jugar():
         
         move_cooldown = True   # evita que avance varias casillas al dejar presionada una tecla
         
+        # ============================
+        #  MOVIMIENTO DEL JUGADOR 
+        # ============================
+
+        dir_x = 0
+        dir_y = 0
+
+        move_timer = 0
+        move_delay = 120   # velocidad del personaje 
+
         running = True
         while running:
-            clock.tick(FPS)
-            
-            screen.fill((0, 0, 0)) # Fondo negro para el juego
-        
+            dt = clock.tick(FPS)
+            screen.fill((0,0,0))
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-        
-                # se detecta cada vez que presionas una tecla (solo una vez)
+                
                 if event.type == pygame.KEYDOWN:
-                    if not move_cooldown:
-                        # ARRIBA (W o Flecha ↑)
-                        if (event.key == pygame.K_w or event.key == pygame.K_UP) and can_move(player_y - 1, player_x):
-                            player_y -= 1
-                            print("Y", player_y, "X", player_x)
-                            eventos()
-                        # ABAJO (S o Flecha ↓)
-                        if (event.key == pygame.K_s or event.key == pygame.K_DOWN) and can_move(player_y + 1, player_x):
-                            player_y += 1
-                            print("Y", player_y, "X", player_x)
-                            eventos()
-                        # IZQUIERDA (A o Flecha ←)
-                        if (event.key == pygame.K_a or event.key == pygame.K_LEFT) and can_move(player_y, player_x - 1):
-                            player_x -= 1
-                            print("Y", player_y, "X", player_x)
-                            eventos()
-                        # DERECHA (D o Flecha →)
-                        if (event.key == pygame.K_d or event.key == pygame.K_RIGHT) and can_move(player_y, player_x + 1):
-                            player_x += 1
-                            print("Y", player_y, "X", player_x)
-                            eventos()
-                        move_cooldown = True
-        
-                if event.type == pygame.KEYUP:
-                    move_cooldown = False
+
+                    if event.key in (pygame.K_w, pygame.K_UP):
+                        if can_move(player_y - 1, player_x):
+                            dir_x = 0
+                            dir_y = -1
+
+                    if event.key in (pygame.K_s, pygame.K_DOWN):
+                        if can_move(player_y + 1, player_x):
+                            dir_x = 0
+                            dir_y = 1
+
+                    if event.key in (pygame.K_a, pygame.K_LEFT):
+                        if can_move(player_y, player_x - 1):
+                            dir_x = -1
+                            dir_y = 0
+
+                    if event.key in (pygame.K_d, pygame.K_RIGHT):
+                        if can_move(player_y, player_x + 1):
+                            dir_x = 1
+                            dir_y = 0
+
+            #  Movimiento con velocidad
+           
+            move_timer += dt
+
+            if move_timer >= move_delay:
+                move_timer = 0
+
+                new_x = player_x + dir_x
+                new_y = player_y + dir_y
+
+                if can_move(new_y, new_x):
+                    player_x = new_x
+                    player_y = new_y
+                    eventos()
                     
             # ---------------------------
             # MOVER ENEMIGO
             # ---------------------------
             #Cero
             ahora = pygame.time.get_ticks()
-            if ahora - cero_cooldown >= cr.cero.movement_ratio:
+            if ahora - cero_cooldown >= cero_ratio:
                 cero_y, cero_x = mover_enemigo(cero_y, cero_x, player_y, player_x)
                 cero_cooldown = ahora
 
             #Pigarto
-            if ahora - pigarto_cooldown >= cr.pigarto.movement_ratio:
+            if ahora - pigarto_cooldown >= pigarto_ratio:
                 if cr.pigarto.pos<106:
                     cr.pigarto.pos = cr.pigarto.pos+1
                     pigarto_cooldown=ahora
@@ -186,28 +232,125 @@ def jugar():
                     pigarto_cooldown=ahora
                     
             #Raiz negativa
-            if ahora - raiznegativa_cooldown >= cr.raiznegativa.movement_ratio:
+            if ahora - raiznegativa_cooldown >= raiznegativa_ratio:
                 raiznegativa_y, raiznegativa_x = mover_enemigo(raiznegativa_y, raiznegativa_x, player_y, player_x)
                 raiznegativa_cooldown = ahora
-                #cr.raiznegativa.estocada() #No funciona
+                #ESTOCADA INTEGRADA EN  MAIN
+                if raiznegativa_x==player_x:
+                    raiznegativa_ratio=cr.raiznegativa.movement_ratio-150
+                elif raiznegativa_y==player_y:
+                    raiznegativa_ratio=cr.raiznegativa.movement_ratio-150
+                else:
+                    raiznegativa_ratio=cr.raiznegativa.movement_ratio
             # ---------------------------
             # COLISIÓN
             # ---------------------------
-            
+            #""" #Inmortal inicio
             #Con CERO
             if cero_y == player_y and cero_x == player_x:
-                print("💀 Te atrapó el enemigo!")
-                running = False
+                if player_item==item.shield.name:
+                    inmunidad=0
+                    player_item=""
+                    cero_x=cr.cero.positions_x
+                    cero_y=cr.cero.positions_y
+                elif player_item==item.sword.name:
+                    player_pts+=cr.cero.pts
+                    COLOR_CERO=COLOR_WALL
+                    player_item=""
+                    cero_exist=0
+                    cero_x=0
+                    cero_y=0
+                    cero_ratio=999999999
+                    inmunidad=0
+                    if pigarto_exist==1 and raiznegativa_exist==0:
+                        print("espada: cero")
+                        COLOR_SWORD=(255, 255, 0)
+                        sword_place_y=cr.cero.positions_y
+                        sword_place_x=cr.cero.positions_y
+                elif cero_exist==1 and inmunidad!=1:
+                    print("💀 cero")
+                    running = False
 
             #Con Pigarto
             if pigarto_y[cr.pigarto.pos] == player_y and pigarto_x[cr.pigarto.pos] == player_x:
-                print("💀 Te atrapó el enemigo!")
-                running = False
+                if player_item==item.shield.name:
+                    inmunidad=0
+                    player_item=""
+                    cr.pigarto.pos=0
+                if player_item==item.sword.name:
+                    if cero_exist==1 or raiznegativa_exist==1:
+                        cr.pigarto.hp=cr.pigarto.hp-item.sword.damage
+                    if cero_exist==0 and raiznegativa_exist==0 and pigarto_exist==1:
+                        pigarto_exist=0
+                        pigarto_ratio=9999999
+                        COLOR_PIGARTO=COLOR_FLOOR
+                        player_pts+=cr.pigarto.pts
+                    player_item=""
+                    inmunidad=0
+                    
+                    cr.pigarto.pos=0
+                    if cr.pigarto.hp<=0:
+                        player_pts+=cr.pigarto.pts
+                        pigarto_exist=0
+                        pigarto_x=0
+                        pigarto_y=0
+                        pigarto_ratio=9999999
+                        COLOR_PIGARTO=COLOR_WALL
+                elif pigarto_exist==1 and inmunidad!=1:
+                    print("💀 pigarto")
+                    running = False
                 
             #Con Raiz negativa
             if raiznegativa_y == player_y and raiznegativa_x == player_x:
-                print("💀 Te atrapó el enemigo!")
-                running = False
+                if player_item==item.shield.name:
+                    player_pts+=cr.raiznegativa.pts
+                    COLOR_RAIZ=COLOR_WALL
+                    player_item=""
+                    raiznegativa_exist=0
+                    inmunidad=0
+                    raiznegativa_x=0
+                    raiznegativa_y=0
+                    raiznegativa_ratio=9999999
+                    if pigarto_exist==1 and cero_exist==0:
+                        print("espada: cero")
+                        COLOR_SWORD=(255, 255, 0)
+                        sword_place_y=cr.cero.positions_y
+                        sword_place_x=cr.cero.positions_y
+                elif player_item==item.sword.name:
+                    cr.raiznegativa.hp-=item.sword.damage
+                    player_item=""
+                    inmunidad=0
+                    raiznegativa_x=cr.raiznegativa.positions_x
+                    raiznegativa_y=cr.raiznegativa.positions_y
+                    if cr.raiznegativa.hp<=0:
+                        player_pts+=cr.raiznegativa.pts
+                        raiznegativa_exist=0
+                        raiznegativa_x=0
+                        raiznegativa_y=0
+                        raiznegativa_ratio=9999999
+                        COLOR_RAIZ=COLOR_WALL
+                elif raiznegativa_exist==1 and inmunidad!=1:
+                    print("💀 raiz")
+                    running = False
+            #""" #Inmortal final
+            #COLISIÓN CON ITEMS
+            #Espada
+            if sword_place_x==player_x and sword_place_y==player_y:
+                player_item=item.sword.name
+                inmunidad=1
+                COLOR_SWORD=COLOR_FLOOR
+                sword_place_x=0
+                sword_place_y=1
+                player_pts+=item.sword.pts
+                
+            #Escudo
+            if shield_place_x==player_x and shield_place_y==player_y:
+                player_item=item.shield.name
+                inmunidad=1
+                COLOR_SHIELD=COLOR_FLOOR
+                shield_place_x=0
+                shield_place_y=2
+                player_pts+=item.shield.pts
                 
             # DIBUJO
         
@@ -221,29 +364,60 @@ def jugar():
             #Enemigo
             #Cero
             pygame.draw.rect(
-            screen, COLOR_ENEMY,
+            screen, COLOR_CERO,
             (cero_x*cfg.TILE + 6 + cfg.offset_x, cero_y*cfg.TILE + 6 +cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
             )
 
             #Pigarto
             pygame.draw.rect(
-            screen, COLOR_ENEMY,
+            screen, COLOR_PIGARTO,
             (pigarto_x[cr.pigarto.pos]*cfg.TILE + 6 + cfg.offset_x, pigarto_y[cr.pigarto.pos]*cfg.TILE + 6 + cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
             )
             
             #Raiz Negativa
             pygame.draw.rect(
-                screen, (0, 255, 0),
+                screen, COLOR_RAIZ,
                 (raiznegativa_x*cfg.TILE + 6 + cfg.offset_x, raiznegativa_y*cfg.TILE + 6 +cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
             )
-        
+
+            # Item
+            #Espada
+            pygame.draw.rect(
+                screen, COLOR_SWORD,
+                (sword_place_x*cfg.TILE + 6 + cfg.offset_x, sword_place_y*cfg.TILE + 6 +cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
+            )
+            
+            #Escudo
+            pygame.draw.rect(
+                screen, COLOR_SHIELD,
+                (shield_place_x*cfg.TILE + 6 + cfg.offset_x, shield_place_y*cfg.TILE + 6 +cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
+            )
+            
             # Jugador
             pygame.draw.rect(
                 screen,
                 COLOR_PLAYER,
                 (player_x*cfg.TILE + 4 + cfg.offset_x, player_y*cfg.TILE + 4 + cfg.offset_y, cfg.TILE-8, cfg.TILE-8)
             )
-        
+            
+            temporizador+=1
+            
+            if pigarto_exist==0 and cero_exist==0 and raiznegativa_exist==0:
+                running = False
+                print("Puntaje sin bonus por tiempo:", player_pts)
+                if temporizador/60<=15:
+                    player_pts+=1000
+                elif temporizador/60<=20:
+                    player_pts+=500
+                elif temporizador/60<=40:
+                    player_pts+=250
+                elif temporizador/60<=60:
+                    player_pts+=100
+                elif temporizador/60>60:
+                    player_pts+=0
+                    print("ERI HORRIBLE")
+                print("Puntaje total:", player_pts)
+            
             pygame.display.flip()
         
         pygame.quit()
@@ -439,15 +613,15 @@ def menu_principal():
         SCREEN.blit(TEXTO_MENU, RECT_MENU)
         
         # Definición de los botones
-        BOTON_JUGAR = Button(image=pygame.image.load("assets/Play Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y - 150), 
+        BOTON_JUGAR = Button(image=pygame.image.load("C:\\Users\\Kari\\Documents\\GitHub\\ElMatemago\\Menu\\assets\\Play Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y - 150), 
                             text_input="JUGAR", font=cfg.get_letra(60), base_color="#d7fcd4", hovering_color="White")
-        BOTON_MARCADORES = Button(image=pygame.image.load("assets/Options Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y - 50), 
+        BOTON_MARCADORES = Button(image=pygame.image.load("C:\\Users\\Kari\\Documents\\GitHub\\ElMatemago\\Menu\\assets\\Options Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y - 50), 
                             text_input="MARCADORES", font=cfg.get_letra(55), base_color="#d7fcd4", hovering_color="White")
-        BOTON_MANUAL = Button(image=pygame.image.load("assets/Play Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 50), 
+        BOTON_MANUAL = Button(image=pygame.image.load("C:\\Users\\Kari\\Documents\\GitHub\\ElMatemago\\Menu\\assets\\Play Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 50), 
                             text_input="MANUAL", font=cfg.get_letra(55), base_color="#d7fcd4", hovering_color="White")
-        BOTON_OPCIONES = Button(image=pygame.image.load("assets/Options Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 150), 
+        BOTON_OPCIONES = Button(image=pygame.image.load("C:\\Users\\Kari\\Documents\\GitHub\\ElMatemago\\Menu\\assets\\Options Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 150), 
                             text_input="OPCIONES", font=cfg.get_letra(60), base_color="#d7fcd4", hovering_color="White")
-        BOTON_SALIR = Button(image=pygame.image.load("assets/Play Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 250), 
+        BOTON_SALIR = Button(image=pygame.image.load("C:\\Users\\Kari\\Documents\\GitHub\\ElMatemago\\Menu\\assets\\Play Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 250), 
                             text_input="SALIR", font=cfg.get_letra(60), base_color="#d7fcd4", hovering_color="White")
         # Renderiza los botones y actualiza el color al pasar el mouse
         for button in [BOTON_JUGAR, BOTON_MARCADORES, BOTON_MANUAL, BOTON_OPCIONES, BOTON_SALIR]:
