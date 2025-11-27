@@ -65,7 +65,141 @@ def cargar_mejores_puntajes():
         with open(RUTA_PUNTAJES, "r") as archivo:
             puntajes = json.load(archivo)
             # Ordena los puntajes de forma descendente (reverse=True)
-            puntajes_ordenados = sorted(puntajes, key=lambda x: x["puntaje"], reverse=True)
+            puntajes_ordenados = sorted(puntajes, key=lambda x: x["player_pts"], reverse=True)
             return puntajes_ordenados[:3] # Devuelve solo los 3 mejores
     except (json.JSONDecodeError, FileNotFoundError):
         return []
+    
+def obtener_nombre(screen, player_pts):
+    # Inicialización de variables de entrada de texto
+    nombre = ''
+    textbox = True
+    
+    # Colores
+    COLOR_TEXTO = (255, 255, 255) # Blanco
+    COLOR_FONDO_CAJA = (50, 50, 50) # Gris oscuro
+    COLOR_CURSOR = (255, 255, 0) # Amarillo
+    
+    # Rectángulo de la caja de texto
+    # Usamos valores placeholder ya que CENTRO_X no está definido aquí
+    try:
+        INPUT_RECT = pygame.Rect(CENTRO_X-300 , CENTRO_Y+50, 600, 60)
+    except NameError:
+        # Fallback si CENTRO_X y CENTRO_Y no están definidos
+        screen_width, screen_height = screen.get_size()
+        CENTRO_X = screen_width // 2
+        CENTRO_Y = screen_height // 2
+        INPUT_RECT = pygame.Rect(CENTRO_X - 300, CENTRO_Y + 50, 600, 60)
+    
+    # Bucle principal de entrada de nombre
+    while textbox:
+        # 1. PROCESAMIENTO DE EVENTOS
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    # Validar al presionar ENTER
+                    if nombre.strip() != "" and nombre.replace(' ', '').isalpha():
+                        textbox = False # Salir del bucle while
+                    else:
+                        print("❌ Nombre inválido. Solo letras y no vacío.")
+                elif event.key == pygame.K_BACKSPACE:
+                    nombre = nombre[:-1]
+                else:
+                    # Capturar la tecla y validar que sea una letra o espacio
+                    key_name = event.unicode
+                    if (key_name.isalpha() or key_name == ' ') and len(nombre) < 10:
+                        nombre += key_name.upper()
+        
+        # ------------------------------------------------------------------
+        # 2. DIBUJO EN PANTALLA: DEBE IR DENTRO DEL BUCLE WHILE
+        # ------------------------------------------------------------------
+        screen.fill((0, 0, 0)) # Fondo negro para la pantalla de game over/input
+            
+        # Título / Instrucciones
+        # Usamos un try/except para get_letra por si no está definida
+        try:
+            texto_titulo = get_letra(60).render("¡HAS GANADO!", True, COLOR_CURSOR)
+            texto_score = get_letra(40).render(f"PUNTAJE: {player_pts}", True, COLOR_TEXTO)
+            texto_prompt = get_letra(30).render("INGRESA TU NOMBRE (solo letras):", True, COLOR_TEXTO)
+        except NameError:
+            # Fallback simple si la función de fuente no está disponible
+            font = pygame.font.Font(None, 60)
+            texto_titulo = font.render("¡HAS GANADO!", True, COLOR_CURSOR)
+            texto_score = font.render(f"PUNTAJE: {player_pts}", True, COLOR_TEXTO)
+            texto_prompt = font.render("INGRESA TU NOMBRE (solo letras):", True, COLOR_TEXTO)
+
+        screen.blit(texto_titulo, texto_titulo.get_rect(center=(CENTRO_X, CENTRO_Y - 150)))
+        screen.blit(texto_score, texto_score.get_rect(center=(CENTRO_X, CENTRO_Y - 50)))
+        screen.blit(texto_prompt, texto_prompt.get_rect(center=(CENTRO_X, CENTRO_Y + 10)))
+            
+        # Dibujar la caja de texto
+        pygame.draw.rect(screen, COLOR_FONDO_CAJA, INPUT_RECT)
+        pygame.draw.rect(screen, COLOR_TEXTO, INPUT_RECT, 2) # Borde
+            
+        # Renderizar el texto ingresado
+        # Usamos el mismo fallback de fuente
+        try:
+            texto_renderizado = get_letra(40).render(nombre, True, COLOR_TEXTO)
+        except NameError:
+            font_input = pygame.font.Font(None, 40)
+            texto_renderizado = font_input.render(nombre, True, COLOR_TEXTO)
+
+            
+        # Ajustar posición del texto dentro de la caja
+        text_rect = texto_renderizado.get_rect(midleft=(INPUT_RECT.x + 10, INPUT_RECT.centery))
+        screen.blit(texto_renderizado, text_rect)
+            
+        # Dibujar el cursor (pequeña línea parpadeante)
+        if pygame.time.get_ticks() % 1000 < 500:
+            cursor_pos = text_rect.right if nombre else INPUT_RECT.x + 10
+            pygame.draw.line(screen, COLOR_CURSOR, (cursor_pos, INPUT_RECT.y + 10), (cursor_pos, INPUT_RECT.bottom - 10), 3)
+
+        # 3. ACTUALIZAR LA PANTALLA
+        pygame.display.flip()
+    
+    # 4. RETORNO DE LA FUNCIÓN: SOLO CUANDO EL BUCLE WHILE FINALIZA (textbox = False)
+    return nombre.strip()
+
+def guardar_nuevo_puntaje(screen, player_pts):
+    """
+    Solicita el nombre al usuario usando la ventana de Pygame,
+    añade el nuevo puntaje a la lista general y la guarda.
+    
+    Args:
+        player_pts (int): El puntaje obtenido por el jugador.
+        screen (pygame.Surface): La superficie de la pantalla de Pygame (nueva dependencia).
+    """
+    
+    # 1. Llama a la nueva función de entrada de texto en Pygame
+    nombre = obtener_nombre(screen, player_pts)
+            
+    print(f"Guardando puntaje para: {nombre}")
+    # ----------------------------------------
+    
+    todos_los_puntajes = []
+    
+    # Asumimos que RUTA_PUNTAJES está definida y apuntando a un archivo JSON
+    try:
+        if os.path.exists(RUTA_PUNTAJES):
+            with open(RUTA_PUNTAJES, "r") as archivo:
+                todos_los_puntajes = json.load(archivo)
+    except NameError:
+        # Manejo si RUTA_PUNTAJES no está definida
+        print("Error: RUTA_PUNTAJES no está definida. No se guardará el puntaje.")
+        return
+    except (json.JSONDecodeError, FileNotFoundError, IOError):
+        pass
+
+    # Usa player_pts que fue pasado a esta función.
+    todos_los_puntajes.append({"nombre": nombre, "player_pts": player_pts})
+
+    try:
+        with open(RUTA_PUNTAJES, "w") as archivo:
+            json.dump(todos_los_puntajes, archivo, indent=4)
+        print("Puntaje guardado exitosamente.")
+    except IOError:
+        print(f"Error al escribir en el archivo: {RUTA_PUNTAJES}")
+
