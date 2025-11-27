@@ -19,14 +19,14 @@ SCREEN = pygame.display.set_mode((cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA), pygame
 pygame.display.set_caption("EL MATEMAGO") 
 
 # Carga y escala la imagen de fondo para ajustarse a Fullscreen
-BG = pygame.image.load("C:\\Users\\Kari\\Documents\\GitHub\\ElMatemago\\Menu\\assets\\Background.png")
+BG = pygame.image.load("./assets/Background.png")
 BG = pygame.transform.scale(BG, (cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA))
 
 # --- PANTALLA JUGAR ---
 
 def jugar():
     #Muestra la pantalla de juego, detiene la música del menú e inicia la música de juego.
-    RUTA_MUSICA_JUEGO = "C:\\Users\\Kari\\Documents\\GitHub\\ElMatemago\\Menu\\assets\\Matemago_Dungeon_Song.mp3"
+    RUTA_MUSICA_JUEGO = "./assets/Matemago_Dungeon_Song.mp3"
     
     # 1. Detiene la música actual (la del menú)
     pygame.mixer.music.stop()
@@ -611,15 +611,15 @@ def menu_principal():
         SCREEN.blit(TEXTO_MENU, RECT_MENU)
         
         # Definición de los botones
-        BOTON_JUGAR = Button(image=pygame.image.load("C:\\Users\\Kari\\Documents\\GitHub\\ElMatemago\\Menu\\assets\\Play Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y - 150), 
+        BOTON_JUGAR = Button(image=pygame.image.load("./assets/Play Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y - 150), 
                             text_input="JUGAR", font=cfg.get_letra(60), base_color="#d7fcd4", hovering_color="White")
-        BOTON_MARCADORES = Button(image=pygame.image.load("C:\\Users\\Kari\\Documents\\GitHub\\ElMatemago\\Menu\\assets\\Options Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y - 50), 
+        BOTON_MARCADORES = Button(image=pygame.image.load("./assets/Options Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y - 50), 
                             text_input="MARCADORES", font=cfg.get_letra(55), base_color="#d7fcd4", hovering_color="White")
-        BOTON_MANUAL = Button(image=pygame.image.load("C:\\Users\\Kari\\Documents\\GitHub\\ElMatemago\\Menu\\assets\\Play Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 50), 
+        BOTON_MANUAL = Button(image=pygame.image.load("./assets/Play Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 50), 
                             text_input="MANUAL", font=cfg.get_letra(55), base_color="#d7fcd4", hovering_color="White")
-        BOTON_OPCIONES = Button(image=pygame.image.load("C:\\Users\\Kari\\Documents\\GitHub\\ElMatemago\\Menu\\assets\\Options Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 150), 
+        BOTON_OPCIONES = Button(image=pygame.image.load("./assets/Options Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 150), 
                             text_input="OPCIONES", font=cfg.get_letra(60), base_color="#d7fcd4", hovering_color="White")
-        BOTON_SALIR = Button(image=pygame.image.load("C:\\Users\\Kari\\Documents\\GitHub\\ElMatemago\\Menu\\assets\\Play Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 250), 
+        BOTON_SALIR = Button(image=pygame.image.load("./assets/Play Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 250), 
                             text_input="SALIR", font=cfg.get_letra(60), base_color="#d7fcd4", hovering_color="White")
         # Renderiza los botones y actualiza el color al pasar el mouse
         for button in [BOTON_JUGAR, BOTON_MARCADORES, BOTON_MANUAL, BOTON_OPCIONES, BOTON_SALIR]:
