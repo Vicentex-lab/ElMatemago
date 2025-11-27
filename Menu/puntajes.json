@@ -26,5 +26,9 @@
     {
         "nombre": "NN",
         "player_pts": 250
+    },
+    {
+        "nombre": "MIL",
+        "player_pts": 1000
     }
 ]

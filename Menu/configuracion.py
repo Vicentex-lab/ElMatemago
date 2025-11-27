@@ -81,7 +81,6 @@ def obtener_nombre(screen, player_pts):
     COLOR_CURSOR = (255, 255, 0) # Amarillo
     
     # Rectángulo de la caja de texto
-    # Usamos valores placeholder ya que CENTRO_X no está definido aquí
     try:
         INPUT_RECT = pygame.Rect(CENTRO_X-300 , CENTRO_Y+50, 600, 60)
     except NameError:

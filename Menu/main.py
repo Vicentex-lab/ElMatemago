@@ -34,7 +34,7 @@ def low_score_message():
     
     while pygame.time.get_ticks() - start_time < display_time:
         
-        # 2. Limitar la velocidad del bucle (⬅️ NUEVO)
+        # 2. Limitar la velocidad del bucle
         clock.tick(FPS) 
         
         # Manejo de eventos para permitir salir con QUIT/ESCAPE
@@ -54,7 +54,7 @@ def low_score_message():
         RECT_TITULO = TEXTO_TITULO.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 50))
         SCREEN.blit(TEXTO_TITULO, RECT_TITULO)
         
-        TEXTO_SUB = cfg.get_letra(30).render("TU PUNTAJE ES 0. NECESITAS MÁS PARA GUARDARLO.", True, "#FFFFFF")
+        TEXTO_SUB = cfg.get_letra(20).render("TU PUNTAJE ES 0. NECESITAS MÁS DE 0 PUNTOS PARA PODER GUARDARLO.", True, "#FFFFFF")
         RECT_SUB = TEXTO_SUB.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y + 50))
         SCREEN.blit(TEXTO_SUB, RECT_SUB)
         
@@ -62,7 +62,7 @@ def low_score_message():
         
     return menu_principal() # Vuelve al menú principal después de 3 segundos
     
-# --- PANTALLA JUGAR (CORREGIDA) ---
+# --- PANTALLA JUGAR ----- #
 
 def jugar():
     # Muestra la pantalla de juego, detiene la música del menú e inicia la música de juego.
@@ -72,7 +72,6 @@ def jugar():
     
     # 2. Carga y reproduce la música del juego en loop
     try:
-        # Nota: He quitado la variable RUTA_MUSICA_JUEGO y uso directamente cfg.RUTA_MUSICA_JUEGO
         pygame.mixer.music.load(cfg.RUTA_MUSICA_JUEGO) 
         pygame.mixer.music.play(-1)
         pygame.mixer.music.set_volume(cfg.VOLUMEN_GLOBAL) 
@@ -84,10 +83,6 @@ def jugar():
         texto = fuente.render(f"PUNTAJE: {player_pts}", True, (255, 255, 0)) 
         SCREEN.blit(texto, (50,50)) # Usar SCREEN global
 
-    # -------------------------------------------------------------------
-    # ¡IMPORTANTE! ELIMINACIÓN DEL 'while True:' EXTERIOR QUE CAUSABA EL LOOP INFINITO
-    # -------------------------------------------------------------------
-        
     FPS = 60
     
     FILAS = len(colision.maze)
@@ -166,6 +161,7 @@ def jugar():
                             player_y=1
                             player_x=9
                             print("Matemagicamente Teletransportado")
+    
     #MOVIMIENTO DEL ENEMIGO
     # ---------------------------
     # CERO
@@ -546,7 +542,7 @@ def marcadores():
         VOLVER_MARCADORES.update(SCREEN)
 
         for event in pygame.event.get():
-            manejar_salida_menu(event) # ⬅️ Usa la función global
+            manejar_salida_menu(event) 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if VOLVER_MARCADORES.checkForInput(POS_MOUSE_MARCADORES):
                     return menu_principal() # Usar return para volver
@@ -581,7 +577,7 @@ def manual():
         VOLVER_MANUAL.update(SCREEN)
 
         for event in pygame.event.get():
-            manejar_salida_menu(event) # ⬅️ Usa la función global
+            manejar_salida_menu(event) 
             if event.type == pygame.MOUSEBUTTONDOWN:
 
                 if BOTON_PDF.checkForInput(POS_MOUSE_MANUAL):
@@ -629,7 +625,7 @@ def opciones():
 
         # EVENTOS
         for event in pygame.event.get():
-            manejar_salida_menu(event) # ⬅️ Usa la función global
+            manejar_salida_menu(event) 
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if (cfg.SLIDER_HANDLE_X - cfg.HANDLE_RADIUS <= POS[0] <= cfg.SLIDER_HANDLE_X + cfg.HANDLE_RADIUS
@@ -688,7 +684,7 @@ def menu_principal():
         
         # Manejo de eventos
         for event in pygame.event.get():
-            manejar_salida_menu(event) # ⬅️ Usa la función global
+            manejar_salida_menu(event) 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if BOTON_JUGAR.checkForInput(POS_MOUSE_MENU):
                     jugar()
