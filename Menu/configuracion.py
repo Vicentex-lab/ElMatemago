@@ -37,8 +37,8 @@ offset_y = CENTRO_Y - (ALTO_LABERINTO // 2)
 
 # --- VARIABLES GLOBALES DE JUEGO ---
 VOLUMEN_GLOBAL = 0.5
-RUTA_MUSICA_MENU = "C:\\Users\\Kari\\Documents\\GitHub\\ElMatemago\\Menu\\assets\\Matemago_Menu_Song.mp3" 
-RUTA_MUSICA_JUEGO = "C:\\Users\\Kari\\Documents\\GitHub\\ElMatemago\\Menu\\assets\\Matemago_Dungeon_Song.mp3"
+RUTA_MUSICA_MENU = "./assets/Matemago_Menu_Song.mp3" 
+RUTA_MUSICA_JUEGO = "./assets/Matemago_Dungeon_Song.mp3"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 RUTA_PUNTAJES = os.path.join(BASE_DIR, "puntajes.json")
 
@@ -55,7 +55,7 @@ HANDLE_RADIUS = 15
 
 def get_letra(size): 
     """Carga y devuelve la fuente 'font.ttf' en el tamaño especificado."""
-    return pygame.font.Font("C:\\Users\\Kari\\Documents\\GitHub\\ElMatemago\\Menu\\assets\\prstart.ttf", size)
+    return pygame.font.Font("./assets/prstart.ttf", size)
 
 def cargar_mejores_puntajes():
     """Carga todos los puntajes del archivo JSON, los ordena y devuelve el top 3."""
