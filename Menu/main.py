@@ -7,17 +7,6 @@ import items as item
 import random
 import configuracion as cfg
 
-# Inicializa Pygame
-pygame.init() 
-pygame.mixer.init() # Inicializa el módulo de mezcla de sonido
-
-# Define la pantalla en modo Fullscreen
-SCREEN = pygame.display.set_mode((cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA), pygame.FULLSCREEN) 
-pygame.display.set_caption("EL MATEMAGO") 
-
-# Carga y escala la imagen de fondo
-BG = pygame.image.load("./assets/Background.png")
-BG = pygame.transform.scale(BG, (cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA))
 
 # --- FUNCIÓN DE UTILIDAD PARA SALIDA RÁPIDA (ESCAPE / QUIT) ---
 def manejar_salida_menu(event):
@@ -715,5 +704,16 @@ def menu_principal():
 
         pygame.display.update()
 
-if __name__ == "__main__":
-    menu_principal()
+# Inicializa Pygame
+pygame.init() 
+pygame.mixer.init() # Inicializa el módulo de mezcla de sonido
+
+# Define la pantalla en modo Fullscreen
+SCREEN = pygame.display.set_mode((cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA), pygame.FULLSCREEN) 
+pygame.display.set_caption("EL MATEMAGO") 
+
+# Carga y escala la imagen de fondo
+BG = pygame.image.load("./assets/Background.png")
+BG = pygame.transform.scale(BG, (cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA))
+
+menu_principal()
