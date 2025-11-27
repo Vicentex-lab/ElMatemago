@@ -39,7 +39,12 @@ def jugar():
         pygame.mixer.music.set_volume(cfg.VOLUMEN_GLOBAL) # Usar cfg.VOLUMEN_GLOBAL
     except pygame.error as e:
         print(f"Error al cargar la música del juego: {e}")
-    
+
+
+    def mostrar_puntaje(player_pts):
+        fuente = cfg.get_letra(30)  
+        texto = fuente.render(f"Puntaje: {player_pts}", True, (255, 255, 0)) 
+        screen.blit(texto, (50,50))
     while True:
         FPS = 60
         
@@ -159,7 +164,7 @@ def jugar():
         
         # ============================
         #  MOVIMIENTO DEL JUGADOR 
-        # ============================
+        # ============================wa
 
         dir_x = 0
         dir_y = 0
@@ -421,6 +426,7 @@ def jugar():
                     print("ERI HORRIBLE")
                 print("Puntaje total:", player_pts)
             
+            mostrar_puntaje(player_pts)
             pygame.display.flip()
         
         pygame.quit()
