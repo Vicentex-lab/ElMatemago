@@ -1,6 +1,30 @@
 [
-    {"nombre": "NICO", "puntaje": 1200},
-    {"nombre": "KARINA", "puntaje": 1200},
-    {"nombre": "KARINA", "puntaje": 1500},
-    {"nombre": "TEST", "puntaje": 800}
+    {
+        "nombre": "MAXI",
+        "player_pts": 2500
+    },
+    {
+        "nombre": "KARINA",
+        "player_pts": 2750
+    },
+    {
+        "nombre": "VICENTE",
+        "player_pts": 750
+    },
+    {
+        "nombre": "NICO",
+        "player_pts": 2750
+    },
+    {
+        "nombre": "TEST",
+        "player_pts": 250
+    },
+    {
+        "nombre": "TESTN",
+        "player_pts": 750
+    },
+    {
+        "nombre": "NN",
+        "player_pts": 250
+    }
 ]
