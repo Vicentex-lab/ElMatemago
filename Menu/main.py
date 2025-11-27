@@ -175,6 +175,7 @@ def jugar():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                    print("Puntaje:", player_pts)
                 
                 if event.type == pygame.KEYDOWN:
 
@@ -270,6 +271,7 @@ def jugar():
                 elif cero_exist==1 and inmunidad!=1:
                     print("💀 cero")
                     running = False
+                    print("Puntaje:", player_pts)
 
             #Con Pigarto
             if pigarto_y[cr.pigarto.pos] == player_y and pigarto_x[cr.pigarto.pos] == player_x:
@@ -299,6 +301,7 @@ def jugar():
                 elif pigarto_exist==1 and inmunidad!=1:
                     print("💀 pigarto")
                     running = False
+                    print("Puntaje:", player_pts)
                 
             #Con Raiz negativa
             if raiznegativa_y == player_y and raiznegativa_x == player_x:
@@ -332,6 +335,7 @@ def jugar():
                 elif raiznegativa_exist==1 and inmunidad!=1:
                     print("💀 raiz")
                     running = False
+                    print("Puntaje:", player_pts)
             #""" #Inmortal final
             #COLISIÓN CON ITEMS
             #Espada
@@ -403,6 +407,7 @@ def jugar():
             if pigarto_exist==0 and cero_exist==0 and raiznegativa_exist==0:
                 running = False
                 print("Puntaje sin bonus por tiempo:", player_pts)
+                print("Segundos", temporizador/60)
                 if temporizador/60<=15:
                     player_pts+=1000
                 elif temporizador/60<=20:
