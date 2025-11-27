@@ -597,12 +597,12 @@ def manual():
             if event.type == pygame.MOUSEBUTTONDOWN:
 
                 if BOTON_PDF.checkForInput(POS_MOUSE_MANUAL):
-                    ruta_pdf = os.path.join("assets", "manual_matemagia.pdf")
+                    ruta_pdf = os.path.join("assets", "Manual_Matemago.pdf")
                     print("ABRIENDO PDF:", ruta_pdf)
                     try:
                         os.startfile(ruta_pdf)  # WINDOWS
                     except:
-                        # Para sistemas UNIX/MacOS (ej. el tuyo: /Users/vicente...)
+                        # Para sistemas UNIX/MacOS 
                         os.system(f"open {ruta_pdf}")
                         
 

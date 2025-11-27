@@ -1,4 +1,4 @@
-# MATRIZ DEL LABERINTO (0 = pared, 1 = espacio, 2=Teleports)
+# MATRIZ DEL LABERINTO (0 = pared, 1 = espacio, 2=Teleports).
 maze = [
 #0      #3      #7      #11   #15   #18
 [0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0],#0

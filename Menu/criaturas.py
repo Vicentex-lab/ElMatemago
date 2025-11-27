@@ -15,7 +15,7 @@ class player(criature):
     positions_x=10
     positions_y=23
     hp=3
-    movement_ratio=1 #El jugador funciona bloque por bloque
+    movement_ratio=1 #El jugador funciona bloque por bloque.
     name=""
     pts=0
 
