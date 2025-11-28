@@ -136,7 +136,7 @@ def jugar():
     
     #Escudo
     cont_aux_2=random.randint(0, 5)
-    while cont_aux_1==cont_aux_2:
+    while item.shield.places_x==sword_place_x and item.shield.places_y==sword_place_y:
         cont_aux_2=random.randint(0, 5)
     print("escudo",  cont_aux_2)
     shield_place_y=item.shield.places_y[ cont_aux_2]
