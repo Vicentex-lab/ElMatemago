@@ -43,12 +43,16 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 RUTA_PUNTAJES = os.path.join(BASE_DIR, "puntajes.json")
 
 # --- CONFIGURACIÓN DEL SLIDER DE VOLUMEN ---
-SLIDER_WIDTH = 500
-SLIDER_HEIGHT = 10
-# Posición X calculada para centrar el SLIDER
+SLIDER_WIDTH = 500 #anchura
+SLIDER_HEIGHT = 10 #alto
+#es una linea horizontal
+# Posición X calculada como central inicialmente 
+#con esto centramos slider, restando la mitad del ancho a centro ventana
 SLIDER_X = CENTRO_X - (SLIDER_WIDTH // 2)  
 SLIDER_Y = CENTRO_Y - 80 
 SLIDER_HANDLE_X = SLIDER_X + int(SLIDER_WIDTH * VOLUMEN_GLOBAL)
+
+#tamaño circulo
 HANDLE_RADIUS = 15
 
 # --- FUNCIONES DE UTILIDAD ---
