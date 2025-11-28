@@ -1,4 +1,6 @@
 import pygame, sys
+import random
+import items as item
 import os # Necesario para la función manual()
 # import json, os # Ya no son necesarios aquí si están en configuracion.py
 from button import Button
@@ -41,21 +43,40 @@ def jugar():
     
     while True:
         FPS = 60
-        
         FILAS = len(colision.maze)
         COLUMNAS = len(colision.maze[0])
-        
+        inmunidad = 0
+        print ("inmunidad =", inmunidad)
         COLOR_WALL = (30,30,30)
         COLOR_FLOOR = (240,240,240)
         COLOR_PLAYER = (0,120,255)
-        COLOR_ENEMY = (255,50,50)
+        COLOR_CERO = (0, 0, 255)
+        COLOR_PIGARTO = (0, 255, 0)
+        COLOR_RAIZ = (255, 0, 0)
+        COLOR_SWORD = (255, 255, 0)
+        COLOR_SHIELD = (255, 165, 0)
         
         screen = SCREEN
         clock = pygame.time.Clock()
         
-        
+        #Definiciones del jugador
         player_y = cr.player.positions_y   # (Y donde quieres ponerlo)
         player_x = cr.player.positions_x   # (X donde quieres ponerlo)
+        player_item=""
+        inmunidad=0
+        
+        #Spawnear Item
+        #Espada
+        cont_aux=random.randint(0, 5)
+        print("espada", cont_aux)
+        sword_place_y=item.sword.places_y[cont_aux]
+        sword_place_x=item.sword.places_x[cont_aux]
+        
+        #Escudo
+        cont_aux=random.randint(0, 5)
+        print("escudo", cont_aux)
+        shield_place_y=item.shield.places_y[cont_aux]
+        shield_place_x=item.shield.places_x[cont_aux]
         
         def can_move(r, c):
             return 0 <= r < FILAS and 0 <= c < COLUMNAS and colision.maze[r][c] >= 1
@@ -90,7 +111,7 @@ def jugar():
         # ---------------------------
         cero_y = cr.cero.positions_y
         cero_x = cr.cero.positions_x
-
+        cero_exist=cr.cero.exist
         cero_cooldown = 0
         
         # ---------------------------
@@ -99,13 +120,15 @@ def jugar():
         pigarto_y = cr.pigarto.positions_y
         pigarto_x = cr.pigarto.positions_x
         pigarto_cooldown = 0
-        
+        pigarto_exist=cr.pigarto.exist
         # ---------------------------
         # Raíz Negativa
         # ---------------------------
         raiznegativa_y = cr.raiznegativa.positions_y
         raiznegativa_x = cr.raiznegativa.positions_x
+        raiznegativa_ratio=cr.raiznegativa.movement_ratio
         raiznegativa_cooldown = 0
+        raiznegativa_exist=cr.raiznegativa.exist
 
         def mover_enemigo(f, c, f_obj, c_obj):
             """Mueve al enemigo acercándose al jugador"""
@@ -203,28 +226,101 @@ def jugar():
                     pigarto_cooldown=ahora
                     
             #Raiz negativa
-            if ahora - raiznegativa_cooldown >= cr.raiznegativa.movement_ratio:
+            if ahora - raiznegativa_cooldown >= raiznegativa_ratio:
                 raiznegativa_y, raiznegativa_x = mover_enemigo(raiznegativa_y, raiznegativa_x, player_y, player_x)
                 raiznegativa_cooldown = ahora
-                #cr.raiznegativa.estocada() #No funciona
+                #ESTOCADA INTEGRADA EN  MAIN
+                if raiznegativa_x==player_x:
+                    raiznegativa_ratio=cr.raiznegativa.movement_ratio-150
+                elif raiznegativa_y==player_y:
+                    raiznegativa_ratio=cr.raiznegativa.movement_ratio-150
+                else:
+                    raiznegativa_ratio=cr.raiznegativa.movement_ratio
             # ---------------------------
             # COLISIÓN
             # ---------------------------
-            
+            #""" #Inmortal inicio
             #Con CERO
             if cero_y == player_y and cero_x == player_x:
-                print("💀 Te atrapó el enemigo!")
-                running = False
+                if player_item==item.shield.name:
+                    inmunidad=0
+                    player_item=""
+                    cero_x=cr.cero.positions_x
+                    cero_y=cr.cero.positions_y
+                elif player_item==item.sword.name:
+                    COLOR_CERO=COLOR_FLOOR
+                    player_item=""
+                    cero_exist=0
+                    inmunidad=0
+                elif cero_exist==1 and inmunidad!=1:
+                    print("💀 cero")
+                    running = False
 
             #Con Pigarto
             if pigarto_y[cr.pigarto.pos] == player_y and pigarto_x[cr.pigarto.pos] == player_x:
-                print("💀 Te atrapó el enemigo!")
-                running = False
+                if player_item==item.shield.name:
+                    inmunidad=0
+                    player_item=""
+                    cr.pigarto.pos=0
+                if player_item==item.sword.name:
+                    cr.pigarto.hp=cr.pigarto.hp-item.sword.damage
+                    player_item=""
+                    inmunidad=0
+                    
+                    """
+                    if cero_exist==0 and raiznegativa_exist==0:
+                        cont_aux=random.randint(0, 5)
+                        print("espada", cont_aux)
+                        sword_place_y=item.sword.places_y[cont_aux]
+                        sword_place_x=item.sword.places_x[cont_aux]
+                        COLOR_SWORD==(255, 255, 0)
+                    """
+                    
+                    cr.pigarto.pos=0
+                    if cr.pigarto.hp<=0:
+                        pigarto_exist=0
+                        COLOR_PIGARTO=COLOR_FLOOR
+                elif pigarto_exist==1 and inmunidad!=1:
+                    print("💀 pigarto")
+                    running = False
                 
             #Con Raiz negativa
             if raiznegativa_y == player_y and raiznegativa_x == player_x:
-                print("💀 Te atrapó el enemigo!")
-                running = False
+                if player_item==item.shield.name:
+                    COLOR_RAIZ=COLOR_FLOOR
+                    player_item=""
+                    raiznegativa_exist=0
+                    inmunidad=0
+                    print("muerte por escudo")
+                elif player_item==item.sword.name:
+                    cr.raiznegativa.hp-=item.sword.damage
+                    player_item=""
+                    inmunidad=0
+                    raiznegativa_x=cr.raiznegativa.positions_x
+                    raiznegativa_y=cr.raiznegativa.positions_y
+                    if cr.raiznegativa.hp<=0:
+                        raiznegativa_exist=0
+                        COLOR_RAIZ=COLOR_FLOOR
+                elif raiznegativa_exist==1 and inmunidad!=1:
+                    print("💀 raiz")
+                    running = False
+            #""" #Inmortal final
+            #COLISIÓN CON ITEMS
+            #Espada
+            if sword_place_x==player_x and sword_place_y==player_y:
+                player_item=item.sword.name
+                inmunidad=1
+                COLOR_SWORD=COLOR_FLOOR
+                sword_place_x=0
+                sword_place_y=1
+                
+            #Escudo
+            if shield_place_x==player_x and shield_place_y==player_y:
+                player_item=item.shield.name
+                inmunidad=1
+                COLOR_SHIELD=COLOR_FLOOR
+                shield_place_x=0
+                shield_place_y=2
                 
             # DIBUJO
         
@@ -238,22 +334,35 @@ def jugar():
             #Enemigo
             #Cero
             pygame.draw.rect(
-            screen, COLOR_ENEMY,
+            screen, COLOR_CERO,
             (cero_x*cfg.TILE + 6 + cfg.offset_x, cero_y*cfg.TILE + 6 +cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
             )
 
             #Pigarto
             pygame.draw.rect(
-            screen, COLOR_ENEMY,
+            screen, COLOR_PIGARTO,
             (pigarto_x[cr.pigarto.pos]*cfg.TILE + 6 + cfg.offset_x, pigarto_y[cr.pigarto.pos]*cfg.TILE + 6 + cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
             )
             
             #Raiz Negativa
             pygame.draw.rect(
-                screen, (0, 255, 0),
+                screen, COLOR_RAIZ,
                 (raiznegativa_x*cfg.TILE + 6 + cfg.offset_x, raiznegativa_y*cfg.TILE + 6 +cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
             )
-        
+
+            # Item
+            #Espada
+            pygame.draw.rect(
+                screen, COLOR_SWORD,
+                (sword_place_x*cfg.TILE + 6 + cfg.offset_x, sword_place_y*cfg.TILE + 6 +cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
+            )
+            
+            #Escudo
+            pygame.draw.rect(
+                screen, COLOR_SHIELD,
+                (shield_place_x*cfg.TILE + 6 + cfg.offset_x, shield_place_y*cfg.TILE + 6 +cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
+            )
+            
             # Jugador
             pygame.draw.rect(
                 screen,

@@ -1,13 +1,17 @@
 class item():
-    def __init__(self, places, name):
+    def __init__(self, places, name, damage):
         self.places=places
         self.name=name
-        
-class sword(item):
+        self.damage=damage
+
+class sword(item):       #amarillo
     name="Espada Divisora"
-    places=[[18][2], [16][3], [2][7], [2][11], [17][26], [23][18]] #0, 1, 2, 3, 4, 5
-    
-    
-#hola
-#lolsuperman
-#chao
+    places_y=[3, 2, 7, 11, 26, 23] #0, 1, 2, 3, 4, 5
+    places_x=[16, 18, 2, 2, 17, 18]
+    damage=3
+
+class shield(item):    #naranjo
+    name="Escudo Absoluto"
+    places_y=[3, 2, 7, 11, 26, 23] #Cambiar
+    places_x=[16, 18, 2, 2, 17, 18 ]
+    damage=0
