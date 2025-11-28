@@ -567,13 +567,17 @@ def manual():
     while True:
         POS_MOUSE_MANUAL = pygame.mouse.get_pos()
         SCREEN.fill("gray")
+        # Título del manual
         TEXTO_MANUAL = cfg.get_letra(45).render("MANUAL EL MATEMAGO.", True, "Black")
         RECT_MANUAL = TEXTO_MANUAL.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 100))
         SCREEN.blit(TEXTO_MANUAL, RECT_MANUAL)
-
+        #BOTÓN PARA ABRIR EL PDF
         BOTON_PDF = Button(
+            # imagen del botón
             image=pygame.image.load("./assets/Options Rect.png"),
+            # posición central
             pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 0),
+            # texto dentro del botón
             text_input="ABRIR PDF",
             font=cfg.get_letra(55),
             base_color="Black",
@@ -589,15 +593,18 @@ def manual():
 
         for event in pygame.event.get():
             manejar_salida_menu(event) 
+            # Detectar clic del mouse
             if event.type == pygame.MOUSEBUTTONDOWN:
-
+                #Abrir pdf
                 if BOTON_PDF.checkForInput(POS_MOUSE_MANUAL):
+                    # Ruta del archivo PDF dentro de la carpeta assets
                     ruta_pdf = os.path.join("assets", "Manual de Matemago.pdf")
                     print("ABRIENDO PDF:", ruta_pdf)
+                    # En Windows: abre el PDF con el programa predeterminado (Adobe, E
                     try:
-                        os.startfile(ruta_pdf)  # WINDOWS
+                        os.startfile(ruta_pdf)  
                     except:
-                        # Para sistemas UNIX/MacOS 
+                        # En Mac o Linux: usa el comando "open" para abrir el archivo
                         os.system(f"open {ruta_pdf}")
                         
 
@@ -609,18 +616,25 @@ def manual():
 # --- PANTALLA OPCIONES (CORREGIDA LA SALIDA) ---
 
 def opciones():
+    # Variable de control: indica si el usuario está arrastrando el slider
     mouse_held = False
     while True:
+         # Posición actual del mouse
         POS = pygame.mouse.get_pos()
         SCREEN.fill("white")
         TEXTO_OP = cfg.get_letra(70).render("OPCIONES", True, "Black")
         SCREEN.blit(TEXTO_OP, TEXTO_OP.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 260)))
+        
+        # Texto que muestra el volumen actual en porcentaje
 
         TEXTO_VOL = cfg.get_letra(40).render(f"VOLUMEN: {int(cfg.VOLUMEN_GLOBAL*100)}%", True, "Black")
         SCREEN.blit(TEXTO_VOL, TEXTO_VOL.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 180)))
         
         # --- SLIDER (asume variables cfg.* definidas) ---
+        
+        #Dibujar la barra del slider (rectángulo gris), configuracion declarada en configuracion.py
         pygame.draw.rect(SCREEN, "gray", (cfg.SLIDER_X, cfg.SLIDER_Y, cfg.SLIDER_WIDTH, cfg.SLIDER_HEIGHT))
+        # Dibujar la bolita del slider (círculo negro)
         pygame.draw.circle(SCREEN, "black", (cfg.SLIDER_HANDLE_X, cfg.SLIDER_Y + cfg.SLIDER_HEIGHT//2), cfg.HANDLE_RADIUS)
 
         VOLVER = Button(
@@ -637,22 +651,30 @@ def opciones():
         # EVENTOS
         for event in pygame.event.get():
             manejar_salida_menu(event) 
-
+            # Cuando el usuario hace clic con el mouse
             if event.type == pygame.MOUSEBUTTONDOWN:
+                # Detecta si el clic ocurrió sobre la bolita del slider
+                #Revisa si la posición horizontal del mouse está dentro del área de la bolita del slider.
+                #centro menos el radio
                 if (cfg.SLIDER_HANDLE_X - cfg.HANDLE_RADIUS <= POS[0] <= cfg.SLIDER_HANDLE_X + cfg.HANDLE_RADIUS
                     and cfg.SLIDER_Y - 10 <= POS[1] <= cfg.SLIDER_Y + 30):
+                     # El usuario está agarrando el slider -> activar arrastre
                     mouse_held = True
-
                 if VOLVER.checkForInput(POS):
                     return menu_principal() # Usar return para volver
-
+                 # Cuando el usuario suelta el clic -> dejar de arrastrar
             if event.type == pygame.MOUSEBUTTONUP:
                 mouse_held = False
-
+        #Configuracion mientras se arrastra
+        
+        # Mover la bolita con el mouse pero sin salirse de la barra
         if mouse_held:
             cfg.SLIDER_HANDLE_X = max(cfg.SLIDER_X, min(POS[0], cfg.SLIDER_X + cfg.SLIDER_WIDTH))
+             # Convertir la posición de la bolita en un valor entre 0.0 y 1.0
             cfg.VOLUMEN_GLOBAL = (cfg.SLIDER_HANDLE_X - cfg.SLIDER_X) / cfg.SLIDER_WIDTH
+         # Aplicar el volumen actualizado a la música
         pygame.mixer.music.set_volume(cfg.VOLUMEN_GLOBAL)
+        # Actualizar la pantalla
         pygame.display.update()
 
 # --- BUCLE PRINCIPAL DEL MENÚ (CORREGIDA LA SALIDA) ---
