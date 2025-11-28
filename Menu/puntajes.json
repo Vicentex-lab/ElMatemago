@@ -1,6 +1,189 @@
 [
+<<<<<<< Updated upstream
     {"nombre": "NICO", "puntaje": 1200},
     {"nombre": "KARINA", "puntaje": 1200},
     {"nombre": "KARINA", "puntaje": 1500},
     {"nombre": "TEST", "puntaje": 800}
+=======
+    {
+        "nombre": "MAXI",
+        "player_pts": 2500
+    },
+    {
+        "nombre": "KARINA",
+        "player_pts": 2750
+    },
+    {
+        "nombre": "VICENTE",
+        "player_pts": 750
+    },
+    {
+        "nombre": "NICO",
+        "player_pts": 2750
+    },
+    {
+        "nombre": "TEST",
+        "player_pts": 250
+    },
+    {
+        "nombre": "TESTN",
+        "player_pts": 750
+    },
+    {
+        "nombre": "NN",
+        "player_pts": 250
+    },
+    {
+        "nombre": "MIL",
+        "player_pts": 1000
+    },
+    {
+        "nombre": "\u00d1",
+        "player_pts": 750
+    },
+    {
+        "nombre": "MAXI",
+        "player_pts": 2500
+    },
+    {
+        "nombre": "AD",
+        "player_pts": 250
+    },
+    {
+        "nombre": "ASD",
+        "player_pts": 250
+    },
+    {
+        "nombre": "HOLAAA",
+        "player_pts": 2500
+    },
+    {
+        "nombre": "S",
+        "player_pts": 250
+    },
+    {
+        "nombre": "W",
+        "player_pts": 750
+    },
+    {
+        "nombre": "MAXI",
+        "player_pts": 3250
+    },
+    {
+        "nombre": "A",
+        "player_pts": 750
+    },
+    {
+        "nombre": "A",
+        "player_pts": 750
+    },
+    {
+        "nombre": "W",
+        "player_pts": 750
+    },
+    {
+        "nombre": "DDA",
+        "player_pts": 250
+    },
+    {
+        "nombre": "A",
+        "player_pts": 2750
+    },
+    {
+        "nombre": "W",
+        "player_pts": 750
+    },
+    {
+        "nombre": "MAXIOLA",
+        "player_pts": 3250
+    },
+    {
+        "nombre": "A",
+        "player_pts": 1000
+    },
+    {
+        "nombre": "A",
+        "player_pts": 250
+    },
+    {
+        "nombre": "MAXIA",
+        "player_pts": 3250
+    },
+    {
+        "nombre": "A",
+        "player_pts": 2750
+    },
+    {
+        "nombre": "A",
+        "player_pts": 250
+    },
+    {
+        "nombre": "A",
+        "player_pts": 2750
+    },
+    {
+        "nombre": "A",
+        "player_pts": 250
+    },
+    {
+        "nombre": "S",
+        "player_pts": 250
+    },
+    {
+        "nombre": "AAA",
+        "player_pts": 3250
+    },
+    {
+        "nombre": "D",
+        "player_pts": 750
+    },
+    {
+        "nombre": "A",
+        "player_pts": 250
+    },
+    {
+        "nombre": "A",
+        "player_pts": 250
+    },
+    {
+        "nombre": "MAAAX",
+        "player_pts": 3250
+    },
+    {
+        "nombre": "A",
+        "player_pts": 250
+    },
+    {
+        "nombre": "A",
+        "player_pts": 750
+    },
+    {
+        "nombre": "A",
+        "player_pts": 3250
+    },
+    {
+        "nombre": "A",
+        "player_pts": 750
+    },
+    {
+        "nombre": "A",
+        "player_pts": 750
+    },
+    {
+        "nombre": "A",
+        "player_pts": 250
+    },
+    {
+        "nombre": "A",
+        "player_pts": 250
+    },
+    {
+        "nombre": "A",
+        "player_pts": 1000
+    },
+    {
+        "nombre": "W",
+        "player_pts": 250
+    }
+>>>>>>> Stashed changes
 ]
