@@ -394,9 +394,9 @@ def jugar():
             elif player_item==item.sword.name:
                 cr.raiznegativa.hp-=item.sword.damage
                 player_item=""
-                inmunidad=0
                 raiznegativa_x=cr.raiznegativa.positions_x
                 raiznegativa_y=cr.raiznegativa.positions_y
+                inmunidad=0
                 if cr.raiznegativa.hp<=0:
                     player_pts+=cr.raiznegativa.pts
                     raiznegativa_exist=0
@@ -485,7 +485,10 @@ def jugar():
             running = False
             print("Puntaje sin bonus por tiempo:", player_pts)
             print("Segundos", temporizador/60)
-            if temporizador/60<=15:
+            if temporizador/60<=12:
+                player_pts+=2000
+                print("TIEMPO INHUMANO") 
+            elif temporizador/60<=15:
                 player_pts+=1000
             elif temporizador/60<=20:
                 player_pts+=500
