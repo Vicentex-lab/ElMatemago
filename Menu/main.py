@@ -15,10 +15,6 @@ pygame.mixer.init()  # Inicializa el módulo de mezcla de sonido
 SCREEN = pygame.display.set_mode((cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA), pygame.FULLSCREEN) 
 pygame.display.set_caption("EL MATEMAGO") 
 
-# Carga y escala la imagen de fondo
-BG = pygame.image.load("./assets/Background.png")
-BG = pygame.transform.scale(BG, (cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA))
-
 
 # --- FUNCIÓN DE UTILIDAD PARA SALIDA RÁPIDA (ESCAPE / QUIT) ---
 def manejar_salida_menu(event):
@@ -665,12 +661,12 @@ def menu_principal():
         pygame.mixer.music.play(-1) 
         pygame.mixer.music.set_volume(cfg.VOLUMEN_GLOBAL)
         
-    SCREEN.blit(BG, (0, 0))
+    SCREEN.fill((0, 0, 0))
     pygame.display.update()
     
     while True:
         
-        SCREEN.blit(BG, (0, 0)) 
+        SCREEN.fill((0, 0, 0)) 
         POS_MOUSE_MENU = pygame.mouse.get_pos()
         
         # Título del juego
