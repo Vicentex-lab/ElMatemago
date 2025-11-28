@@ -88,20 +88,12 @@
         "player_pts": 750
     },
     {
-        "nombre": "MAXIOLA",
-        "player_pts": 3250
-    },
-    {
         "nombre": "A",
         "player_pts": 1000
     },
     {
         "nombre": "A",
         "player_pts": 250
-    },
-    {
-        "nombre": "MAXIA",
-        "player_pts": 3250
     },
     {
         "nombre": "A",
@@ -122,10 +114,6 @@
     {
         "nombre": "S",
         "player_pts": 250
-    },
-    {
-        "nombre": "AAA",
-        "player_pts": 3250
     },
     {
         "nombre": "D",

@@ -213,25 +213,23 @@ def jugar():
             c += 1
 
         return f, c
-
-    
-    # MOVIMIENTO DEL JUGADOR 
+ 
     
     move_cooldown = True   # evita que avance varias casillas al dejar presionada una tecla
     
     # ============================
     #  MOVIMIENTO DEL JUGADOR 
-    # ============================wa
+    # ============================
 
-    dir_x = 0
-    dir_y = 0
+    dir_x = 0    # La dirección en donde se mueve le personaje en x
+    dir_y = 0    # En y
 
-    move_timer = 0
+    move_timer = 0     # acomula tiempo
     move_delay = 120   # velocidad del personaje 
 
     running = True
     while running:
-        dt = clock.tick(FPS)
+        tiempof = clock.tick(FPS)  # tiempof es el tiempo en ms desde el ultimo frame
         screen.fill((0,0,0))
 
         for event in pygame.event.get():
@@ -266,17 +264,17 @@ def jugar():
 
         #  Movimiento con velocidad
         
-        move_timer += dt
+        move_timer += tiempof  # se suma el tiempo que paso
 
-        if move_timer >= move_delay:
+        if move_timer >= move_delay:  # cuando pasa cierto tiempo se mueve una casilla
             move_timer = 0
 
-            new_x = player_x + dir_x
-            new_y = player_y + dir_y
+            new_x = player_x + dir_x  # calcula la siguiente casilla hacia donde va el jugador
+            new_y = player_y + dir_y  # eje: vas arriba dir_y = -1, new_y = player_y -1
 
-            if can_move(new_y, new_x):
-                player_x = new_x
-                player_y = new_y
+            if can_move(new_y, new_x):  # comprueba si no hay pared para moverte
+                player_x = new_x        # si hay pared no te mueves a esa direccion pero tampoco te detienes
+                player_y = new_y        # la dir_x e y no cambia 
                 eventos()
                 
         # ---------------------------
