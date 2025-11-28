@@ -485,7 +485,10 @@ def jugar():
             running = False
             print("Puntaje sin bonus por tiempo:", player_pts)
             print("Segundos", temporizador/60)
-            if temporizador/60<=15:
+            if temporizador/60<=12:
+                player_pts+=2000
+                print("TIEMPO INHUMANO") 
+            elif temporizador/60<=15:
                 player_pts+=1000
             elif temporizador/60<=20:
                 player_pts+=500
