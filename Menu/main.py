@@ -394,9 +394,9 @@ def jugar():
             elif player_item==item.sword.name:
                 cr.raiznegativa.hp-=item.sword.damage
                 player_item=""
-                inmunidad=0
                 raiznegativa_x=cr.raiznegativa.positions_x
                 raiznegativa_y=cr.raiznegativa.positions_y
+                inmunidad=0
                 if cr.raiznegativa.hp<=0:
                     player_pts+=cr.raiznegativa.pts
                     raiznegativa_exist=0
