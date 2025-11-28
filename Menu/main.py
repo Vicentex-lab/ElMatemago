@@ -33,7 +33,7 @@ def low_score_message():
     # Detiene cualquier música que quede sonando
     pygame.mixer.music.stop() 
     
-    # 1. Crear un reloj local y definir FPS (⬅️ NUEVO)
+    # 1. Crear un reloj local y definir FPS 
     clock = pygame.time.Clock() 
     FPS = 60
     
