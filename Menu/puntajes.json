@@ -1,34 +1,7 @@
 [
     {
         "nombre": "MAXI",
-        "player_pts": 2500
-    },
-    {
-        "nombre": "KARINA",
-        "player_pts": 2750
-    },
-    {
-        "nombre": "VICENTE",
-        "player_pts": 750
-    },
-    {
-        "nombre": "NICO",
-        "player_pts": 2750
-    },
-    {
-        "nombre": "TEST",
         "player_pts": 250
-    },
-    {
-        "nombre": "TESTN",
-        "player_pts": 750
-    },
-    {
-        "nombre": "NN",
-        "player_pts": 250
-    },
-    {
-        "nombre": "MIL",
-        "player_pts": 1000
     }
+
 ]
