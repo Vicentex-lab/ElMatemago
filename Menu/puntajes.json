@@ -6,5 +6,9 @@
     {
         "nombre": "NICE",
         "player_pts": 2500
+    },
+    {
+        "nombre": "XD",
+        "player_pts": 2500
     }
 ]

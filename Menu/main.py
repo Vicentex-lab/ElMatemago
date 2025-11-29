@@ -104,6 +104,7 @@ def jugar():
     COLOR_RAIZ = (255, 0, 0)
     COLOR_SWORD = (255, 255, 0)
     COLOR_SHIELD = (255, 165, 0)
+    COLOR_RING = (0, 0, 0)
     COLOR_HEART = (255, 100, 100)
     
     screen = SCREEN # Usar la variable global SCREEN
@@ -328,7 +329,7 @@ def jugar():
                 cero_y=cr.cero.positions_y
             elif player_item==item.sword.name:
                 player_pts+=cr.cero.pts
-                COLOR_CERO=COLOR_WALL
+                COLOR_CERO=COLOR_FLOOR
                 player_item=""
                 cero_exist=0
                 if pigarto_exist==1 and raiznegativa_exist==0:
@@ -510,6 +511,12 @@ def jugar():
         pygame.draw.rect(
             screen, COLOR_SHIELD,
             (shield_place_x*cfg.TILE + 6 + cfg.offset_x, shield_place_y*cfg.TILE + 6 +cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
+        )
+        
+        #Anillo
+        pygame.draw.rect(
+            screen, COLOR_RING,
+            (ring_place_x*cfg.TILE + 6 + cfg.offset_x, ring_place_y*cfg.TILE + 6 +cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
         )
         
         # Jugador
