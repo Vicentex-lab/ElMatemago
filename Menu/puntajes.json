@@ -2,5 +2,9 @@
     {
         "nombre": "MAXI",
         "player_pts": 500
+    },
+    {
+        "nombre": "NICE",
+        "player_pts": 2500
     }
 ]
