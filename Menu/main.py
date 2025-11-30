@@ -12,30 +12,39 @@ pygame.init()
 pygame.mixer.init()  # Inicializa el módulo de mezcla de sonido
 
 
-#Inicializamos pngs enemigos/items
-
-#Pigarto
-pigarto_img = pygame.image.load("./assets/pigarto.png").convert_alpha()
-pigarto_img = pygame.transform.scale(pigarto_img, (cfg.TILE, cfg.TILE))
-
-
-#Cero
-
-
-
-#Raiz negativa
-
-
-
-
-
-
-
-
-
 # Define la pantalla en modo Fullscreen
 SCREEN = pygame.display.set_mode((cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA), pygame.FULLSCREEN) 
-pygame.display.set_caption("EL MATEMAGO") 
+pygame.display.set_caption("EL MATEMAGO")
+
+
+#CARGAMOS IMAGENES CRIATURAS 
+
+#Mago
+
+mago_img = pygame.image.load("./assets/MAGO.png").convert_alpha()
+mago_img  = pygame.transform.scale(mago_img , (cfg.TILE, cfg.TILE)) 
+
+#Raiz Negativa
+raiznegativa_img = pygame.image.load("./assets/RAIZNEGATIVA.png").convert_alpha()
+raiznegativa_img  = pygame.transform.scale(raiznegativa_img , (cfg.TILE, cfg.TILE)) 
+
+#Cero
+cero_img = pygame.image.load("./assets/CERO.png").convert_alpha()
+cero_img = pygame.transform.scale(cero_img, (cfg.TILE, cfg.TILE)) 
+
+# Pigarto
+pigarto_img = pygame.image.load("./assets/PIGARTO.png").convert_alpha()
+pigarto_img = pygame.transform.scale(pigarto_img, (cfg.TILE, cfg.TILE)) 
+
+#CARGAMOS IMAGENES ITEMS
+#ESPADA
+espada_img = pygame.image.load("./assets/ESPADA.png").convert_alpha()
+espada_img = pygame.transform.scale(espada_img, (cfg.TILE, cfg.TILE)) 
+
+#ESCUDO
+escudo_img = pygame.image.load("./assets/ESCUDO.png").convert_alpha()
+escudo_img = pygame.transform.scale(escudo_img, (cfg.TILE, cfg.TILE)) 
+
 
 
 # --- FUNCIÓN DE UTILIDAD PARA SALIDA RÁPIDA (ESCAPE / QUIT) ---
