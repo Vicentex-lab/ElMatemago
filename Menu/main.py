@@ -104,6 +104,8 @@ def jugar():
     COLOR_RAIZ = (255, 0, 0)
     COLOR_SWORD = (255, 255, 0)
     COLOR_SHIELD = (255, 165, 0)
+    COLOR_RING = (0, 0, 0)
+    COLOR_HEART = (255, 100, 100)
     
     screen = SCREEN # Usar la variable global SCREEN
     clock = pygame.time.Clock()
@@ -111,6 +113,7 @@ def jugar():
     #Definiciones del jugador
     player_y = cr.player.positions_y
     player_x = cr.player.positions_x
+    player_hp = cr.player.hp
     player_item=""
     inmunidad=0
     player_pts=cr.player.pts
@@ -135,12 +138,20 @@ def jugar():
     sword_place_x=item.sword.places_x[ cont_aux_1]
     
     #Escudo
-    cont_aux_2=random.randint(0, 5)
+    cont_aux_1=random.randint(0, 5)
     while item.shield.places_x==sword_place_x and item.shield.places_y==sword_place_y:
-        cont_aux_2=random.randint(0, 5)
-    print("escudo",  cont_aux_2)
-    shield_place_y=item.shield.places_y[ cont_aux_2]
-    shield_place_x=item.shield.places_x[ cont_aux_2]
+        cont_aux_1=random.randint(0, 5)
+    print("escudo",  cont_aux_1)
+    shield_place_y=item.shield.places_y[cont_aux_1]
+    shield_place_x=item.shield.places_x[cont_aux_1]
+    
+    #Anillo
+    cont_aux_1=random.randint(0, 5)
+    print("anillo", cont_aux_1)
+    while item.ring.places_x==sword_place_x and item.ring.places_y==sword_place_y and item.ring.places_x==shield_place_x and item.ring.places_y==shield_place_y:
+        cont_aux_1=random.randint(0, 5)
+    ring_place_y=item.shield.places_y[cont_aux_1]
+    ring_place_x=item.shield.places_x[cont_aux_1]
     
     def can_move(r, c):
         return 0 <= r < FILAS and 0 <= c < COLUMNAS and colision.maze[r][c] >= 1
@@ -310,27 +321,27 @@ def jugar():
         # COLISIÓN (Lógica de DERROTA)
         # ---------------------------
         #Con CERO
-        if cero_y == player_y and cero_x == player_x:
+        if cero_y == player_y and cero_x == player_x and cero_exist==1:
             if player_item==item.shield.name:
-                inmunidad=0
                 player_item=""
+                inmunidad=0
                 cero_x=cr.cero.positions_x
                 cero_y=cr.cero.positions_y
             elif player_item==item.sword.name:
                 player_pts+=cr.cero.pts
-                COLOR_CERO=COLOR_WALL
+                COLOR_CERO=COLOR_FLOOR
                 player_item=""
                 cero_exist=0
-                cero_x=0
-                cero_y=0
-                cero_ratio=999999999
-                inmunidad=0
                 if pigarto_exist==1 and raiznegativa_exist==0:
                     print("espada: cero")
                     COLOR_SWORD=(255, 255, 0)
                     sword_place_y=cr.cero.positions_y
                     sword_place_x=cr.cero.positions_y
-            elif cero_exist==1 and inmunidad!=1:
+            elif inmunidad!=1 and player_hp-cr.cero.damage>0:
+                player_x=cr.player.positions_x #El matemago muere instantaneamente si no se cambia de lugar
+                player_y=cr.player.positions_y #Ideal siguiente paso es poenr frames de invlunerabilidad, por mientras esto funciona.
+                player_hp-=cr.cero.damage
+            elif inmunidad!=1 and player_hp-cr.cero.damage<=0:
                 print("💀 cero")
                 pygame.mixer.music.stop() 
                 if player_pts > 0:
@@ -340,21 +351,20 @@ def jugar():
                     return low_score_message() # Puntaje 0, mensaje y retorno al menú
 
         #Con Pigarto
-        if pigarto_y[cr.pigarto.pos] == player_y and pigarto_x[cr.pigarto.pos] == player_x:
+        if pigarto_y[cr.pigarto.pos] == player_y and pigarto_x[cr.pigarto.pos] == player_x and pigarto_exist==1:
             if player_item==item.shield.name:
                 cr.pigarto.pos=0
                 inmunidad=0
                 player_item=""
             elif player_item==item.sword.name:
-                if cero_exist==1 or raiznegativa_exist==1:
+                if cero_exist==1 or raiznegativa_exist==1: #Comando normal
                     cr.pigarto.hp=cr.pigarto.hp-item.sword.damage
-                if cero_exist==0 and raiznegativa_exist==0 and pigarto_exist==1:
+                if cero_exist==0 and raiznegativa_exist==0 and pigarto_exist==1: #Comando cuando sólo queda pigarto
                     pigarto_exist=0
                     pigarto_ratio=9999999
                     COLOR_PIGARTO=COLOR_FLOOR
                     player_pts+=cr.pigarto.pts
                 player_item=""
-                inmunidad=0
                 
                 cr.pigarto.pos=0
                 if cr.pigarto.hp<=0:
@@ -364,7 +374,16 @@ def jugar():
                     pigarto_y=0
                     pigarto_ratio=9999999
                     COLOR_PIGARTO=COLOR_WALL
-            elif pigarto_exist==1 and inmunidad!=1:
+            elif player_item==item.ring.name:
+                player_pts+=cr.pigarto.pts
+                COLOR_PIGARTO=COLOR_FLOOR
+                player_item=""
+                pigarto_exist=0
+            elif inmunidad!=1 and player_hp-cr.pigarto.damage>0:
+                player_x=cr.player.positions_x #El matemago muere instantaneamente si no se cambia de lugar
+                player_y=cr.player.positions_y #Ideal siguiente paso es poenr frames de invlunerabilidad, por mientras esto funciona.
+                player_hp-=cr.pigarto.damage
+            elif inmunidad!=1 and player_hp-cr.pigarto.damage<=0:
                 print("💀 pigarto")
                 pygame.mixer.music.stop() 
                 if player_pts > 0:
@@ -374,7 +393,7 @@ def jugar():
                     return low_score_message() # Puntaje 0, mensaje y retorno al menú
             
         #Con Raiz negativa
-        if raiznegativa_y == player_y and raiznegativa_x == player_x:
+        if raiznegativa_y == player_y and raiznegativa_x == player_x and raiznegativa_exist==1:
             if player_item==item.shield.name:
                 player_pts+=cr.raiznegativa.pts
                 COLOR_RAIZ=COLOR_FLOOR
@@ -394,7 +413,6 @@ def jugar():
                 player_item=""
                 raiznegativa_x=cr.raiznegativa.positions_x
                 raiznegativa_y=cr.raiznegativa.positions_y
-                inmunidad=0
                 if cr.raiznegativa.hp<=0:
                     player_pts+=cr.raiznegativa.pts
                     raiznegativa_exist=0
@@ -402,7 +420,11 @@ def jugar():
                     raiznegativa_y=0
                     raiznegativa_ratio=9999999
                     COLOR_RAIZ=COLOR_FLOOR
-            elif raiznegativa_exist==1 and inmunidad!=1:
+            elif inmunidad!=1 and player_hp-cr.raiznegativa.damage>0:
+                player_x=cr.player.positions_x #El matemago muere instantaneamente si no se cambia de lugar
+                player_y=cr.player.positions_y #Ideal siguiente paso es poenr frames de invlunerabilidad, por mientras esto funciona.
+                player_hp-=cr.raiznegativa.damage
+            elif inmunidad!=1 and player_hp-cr.raiznegativa.damage<=0:
                 print("💀 raiz")
                 pygame.mixer.music.stop() 
                 if player_pts > 0:
@@ -415,7 +437,6 @@ def jugar():
         #Espada
         if sword_place_x==player_x and sword_place_y==player_y:
             player_item=item.sword.name
-            inmunidad=1
             sword_place_x=0
             sword_place_y=1
             player_pts+=item.sword.pts
@@ -428,6 +449,12 @@ def jugar():
             shield_place_y=2
             player_pts+=item.shield.pts
             
+        if ring_place_x==player_x and ring_place_y==player_y:
+            player_item=item.ring.name
+            ring_place_x=0
+            ring_place_y=3
+            player_pts+=item.ring.pts
+            
         # DIBUJO
     
         #Mapa
@@ -436,6 +463,23 @@ def jugar():
                 rect = pygame.Rect(c*cfg.TILE + cfg.offset_x, r*cfg.TILE + cfg.offset_y, cfg.TILE, cfg.TILE)
                 color = COLOR_FLOOR if colision.maze[r][c] >= 1 else COLOR_WALL
                 pygame.draw.rect(screen, color, rect)
+                
+        #HUD provisoria
+        if player_hp==1:
+            pygame.draw.rect(
+                screen, COLOR_HEART,
+                (19*cfg.TILE + 6 + cfg.offset_x, 1*cfg.TILE + 6 + cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
+            )
+        if player_hp>1:
+            pygame.draw.rect(
+                screen, COLOR_HEART,
+                (19*cfg.TILE + 6 + cfg.offset_x, 2*cfg.TILE + 6 + cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
+            )
+        if player_hp>2:
+            pygame.draw.rect(
+                screen, COLOR_HEART,
+                (19*cfg.TILE + 6 + cfg.offset_x, 3*cfg.TILE + 6 + cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
+            )
                 
         #Enemigo
         #Cero
@@ -467,6 +511,12 @@ def jugar():
         pygame.draw.rect(
             screen, COLOR_SHIELD,
             (shield_place_x*cfg.TILE + 6 + cfg.offset_x, shield_place_y*cfg.TILE + 6 +cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
+        )
+        
+        #Anillo
+        pygame.draw.rect(
+            screen, COLOR_RING,
+            (ring_place_x*cfg.TILE + 6 + cfg.offset_x, ring_place_y*cfg.TILE + 6 +cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
         )
         
         # Jugador

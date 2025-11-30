@@ -4,6 +4,7 @@
         "player_pts": 500
     },
     {
+<<<<<<< HEAD
         "nombre": "YSYA",
         "player_pts": 750
     },
@@ -14,5 +15,13 @@
     {
         "nombre": "A",
         "player_pts": 750
+=======
+        "nombre": "NICE",
+        "player_pts": 2500
+    },
+    {
+        "nombre": "XD",
+        "player_pts": 2500
+>>>>>>> 1771732751a28e4b13fd972157cc011c67a9cab5
     }
 ]
