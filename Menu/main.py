@@ -555,6 +555,7 @@ def jugar():
                 player_y * cfg.TILE + cfg.offset_y
             )
         )
+        
        
        
         
