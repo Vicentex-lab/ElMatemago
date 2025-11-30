@@ -2,5 +2,17 @@
     {
         "nombre": "MAXI",
         "player_pts": 500
+    },
+    {
+        "nombre": "YSYA",
+        "player_pts": 750
+    },
+    {
+        "nombre": "LEOPESI",
+        "player_pts": 250
+    },
+    {
+        "nombre": "A",
+        "player_pts": 750
     }
 ]
