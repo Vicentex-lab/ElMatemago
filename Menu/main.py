@@ -100,7 +100,7 @@ def jugar():
     COLUMNAS = len(colision.maze[0])
     
     COLOR_WALL = (30,30,30)
-    COLOR_FLOOR = (240,240,240)
+    COLOR_FLOOR = (253, 254, 253)
     COLOR_PLAYER = (0,120,255)
     COLOR_CERO = (0, 0, 255)
     COLOR_PIGARTO = (0, 255, 0)

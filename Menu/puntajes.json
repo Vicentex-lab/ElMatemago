@@ -14,5 +14,9 @@
     {
         "nombre": "VICE",
         "player_pts": 750
+    },
+    {
+        "nombre": "SSSS",
+        "player_pts": 250
     }
 ]
