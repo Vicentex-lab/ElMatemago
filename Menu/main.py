@@ -6,7 +6,7 @@ import criaturas as cr
 import items as item
 import random
 import configuracion as cfg
-
+from sprites import MAGO, CERO, RAIZ, PIGARTO, ESPADA, ESCUDO
 # Inicializa Pygame
 pygame.init() 
 pygame.mixer.init()  # Inicializa el módulo de mezcla de sonido
@@ -15,36 +15,6 @@ pygame.mixer.init()  # Inicializa el módulo de mezcla de sonido
 # Define la pantalla en modo Fullscreen
 SCREEN = pygame.display.set_mode((cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA), pygame.FULLSCREEN) 
 pygame.display.set_caption("EL MATEMAGO")
-
-
-#CARGAMOS IMAGENES CRIATURAS 
-
-#Mago
-
-mago_img = pygame.image.load("./assets/MAGO.png").convert_alpha()
-mago_img  = pygame.transform.scale(mago_img , (cfg.TILE, cfg.TILE)) 
-
-#Raiz Negativa
-raiznegativa_img = pygame.image.load("./assets/RAIZNEGATIVA.png").convert_alpha()
-raiznegativa_img  = pygame.transform.scale(raiznegativa_img , (cfg.TILE, cfg.TILE)) 
-
-#Cero
-cero_img = pygame.image.load("./assets/CERO.png").convert_alpha()
-cero_img = pygame.transform.scale(cero_img, (cfg.TILE, cfg.TILE)) 
-
-# Pigarto
-pigarto_img = pygame.image.load("./assets/PIGARTO.png").convert_alpha()
-pigarto_img = pygame.transform.scale(pigarto_img, (cfg.TILE, cfg.TILE)) 
-
-#CARGAMOS IMAGENES ITEMS
-#ESPADA
-espada_img = pygame.image.load("./assets/ESPADA.png").convert_alpha()
-espada_img = pygame.transform.scale(espada_img, (cfg.TILE, cfg.TILE)) 
-
-#ESCUDO
-escudo_img = pygame.image.load("./assets/ESCUDO.png").convert_alpha()
-escudo_img = pygame.transform.scale(escudo_img, (cfg.TILE, cfg.TILE)) 
-
 
 
 # --- FUNCIÓN DE UTILIDAD PARA SALIDA RÁPIDA (ESCAPE / QUIT) ---
@@ -512,53 +482,85 @@ def jugar():
                 (19*cfg.TILE + 6 + cfg.offset_x, 3*cfg.TILE + 6 + cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
             )
                 
-        #Enemigo
-        #Cero
-        pygame.draw.rect(
-        screen, COLOR_CERO,
-        (cero_x*cfg.TILE + 6 + cfg.offset_x, cero_y*cfg.TILE + 6 +cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
-        )
-
-        #Dibujamos pigarto como png
+       # ============================
+       #   DIBUJAMOS SPRITES
+       # ============================
+       
+       # --- ENEMIGOS ---
+##################
+       
+       # Cero
+        if cero_exist == 1:
+            screen.blit(
+                CERO,
+                (
+                    cero_x * cfg.TILE + cfg.offset_x,
+                    cero_y * cfg.TILE + cfg.offset_y
+                )
+            )
+        
+        # Pigarto
+        if pigarto_exist == 1:
+            screen.blit(
+                PIGARTO,
+                (
+                    pigarto_x[cr.pigarto.pos] * cfg.TILE + cfg.offset_x,
+                    pigarto_y[cr.pigarto.pos] * cfg.TILE + cfg.offset_y
+                )
+            )
+        
+        # Raíz Negativa
+        if raiznegativa_exist == 1:
+            screen.blit(
+                RAIZNEGATIVA,
+                (
+                    raiznegativa_x * cfg.TILE + cfg.offset_x,
+                    raiznegativa_y * cfg.TILE + cfg.offset_y
+                )
+            )
+        
+        # --- ITEMS ---
+        
+        # Espada
         screen.blit(
-            pigarto_img,
+            ESPADA,
             (
-                pigarto_x[cr.pigarto.pos] * cfg.TILE + cfg.offset_x,
-                pigarto_y[cr.pigarto.pos] * cfg.TILE + cfg.offset_y
+                sword_place_x * cfg.TILE + cfg.offset_x,
+                sword_place_y * cfg.TILE + cfg.offset_y
             )
         )
         
-        #Raiz Negativa
-        pygame.draw.rect(
-            screen, COLOR_RAIZ,
-            (raiznegativa_x*cfg.TILE + 6 + cfg.offset_x, raiznegativa_y*cfg.TILE + 6 +cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
-        )
-
-        # Item
-        #Espada
-        pygame.draw.rect(
-            screen, COLOR_SWORD,
-            (sword_place_x*cfg.TILE + 6 + cfg.offset_x, sword_place_y*cfg.TILE + 6 +cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
+        # Escudo
+        screen.blit(
+            ESCUDO,
+            (
+                shield_place_x * cfg.TILE + cfg.offset_x,
+                shield_place_y * cfg.TILE + cfg.offset_y
+            )
         )
         
-        #Escudo
-        pygame.draw.rect(
-            screen, COLOR_SHIELD,
-            (shield_place_x*cfg.TILE + 6 + cfg.offset_x, shield_place_y*cfg.TILE + 6 +cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
+        # Anillo
+        screen.blit(
+            ANILLO,
+            (
+                ring_place_x * cfg.TILE + cfg.offset_x,
+                ring_place_y * cfg.TILE + cfg.offset_y
+            )
         )
         
-        #Anillo
-        pygame.draw.rect(
-            screen, COLOR_RING,
-            (ring_place_x*cfg.TILE + 6 + cfg.offset_x, ring_place_y*cfg.TILE + 6 +cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
-        )
+        # --- JUGADOR ---
         
-        # Jugador
-        pygame.draw.rect(
-            screen,
-            COLOR_PLAYER,
-            (player_x*cfg.TILE + 4 + cfg.offset_x, player_y*cfg.TILE + 4 + cfg.offset_y, cfg.TILE-8, cfg.TILE-8)
+        screen.blit(
+            MAGO,
+            (
+                player_x * cfg.TILE + cfg.offset_x,
+                player_y * cfg.TILE + cfg.offset_y
+            )
         )
+       
+       
+       
+##############
         
         temporizador+=1
         
