@@ -6,14 +6,16 @@ import criaturas as cr
 import items as item
 import random
 import configuracion as cfg
-from sprites import MAGO, CERO, RAIZ, PIGARTO, ESPADA, ESCUDO
 # Inicializa Pygame
 pygame.init() 
 pygame.mixer.init()  # Inicializa el módulo de mezcla de sonido
 
 
 # Define la pantalla en modo Fullscreen
-SCREEN = pygame.display.set_mode((cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA), pygame.FULLSCREEN) 
+SCREEN = pygame.display.set_mode((cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA), pygame.FULLSCREEN)
+
+#Importamos sprites luego definir pantalla Fullscreen
+from sprites import MAGO, CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO
 pygame.display.set_caption("EL MATEMAGO")
 
 
@@ -482,13 +484,9 @@ def jugar():
                 (19*cfg.TILE + 6 + cfg.offset_x, 3*cfg.TILE + 6 + cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
             )
                 
-       # ============================
        #   DIBUJAMOS SPRITES
-       # ============================
        
-       # --- ENEMIGOS ---
-##################
-       
+       # --- ENEMIGOS ---     
        # Cero
         if cero_exist == 1:
             screen.blit(
@@ -559,8 +557,6 @@ def jugar():
         )
        
        
-       
-##############
         
         temporizador+=1
         

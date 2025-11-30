@@ -1,27 +1,14 @@
 [
     {
-        "nombre": "MAXI",
-        "player_pts": 500
-    },
-    {
-<<<<<<< HEAD
-        "nombre": "YSYA",
-        "player_pts": 750
-    },
-    {
-        "nombre": "LEOPESI",
-        "player_pts": 250
+        "nombre": "AAA",
+        "player_pts": 1250
     },
     {
         "nombre": "A",
         "player_pts": 750
-=======
-        "nombre": "NICE",
-        "player_pts": 2500
     },
     {
-        "nombre": "XD",
-        "player_pts": 2500
->>>>>>> 1771732751a28e4b13fd972157cc011c67a9cab5
+        "nombre": "A",
+        "player_pts": 750
     }
 ]

@@ -1,7 +1,7 @@
 import pygame
 import configuracion as cfg
 
-#Hacemos funcion para cargar sprites
+#Creamos funcion para cargar sprites
 
 def load(name):
     path = f"./assets/{name}.png"
@@ -10,7 +10,7 @@ def load(name):
 
 MAGO = load("MAGO")
 CERO = load("CERO")
-RAIZ = load("RAIZNEGATIVA")
+RAIZNEGATIVA = load("RAIZNEGATIVA")
 PIGARTO = load("PIGARTO")
 ESPADA = load("ESPADA")
 ESCUDO = load("ESCUDO")
