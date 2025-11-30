@@ -19,8 +19,8 @@ from sprites import MAGO, CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO
 pygame.display.set_caption("EL MATEMAGO")
 
 #Cargamos fondo menu
-fondo_menu = pygame.image.load("./assets/fondo menu.png").convert()
-fondo_menu = pygame.transform.scale(fondo_menu, (cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA))
+#fondo_menu = pygame.image.load("./assets/fondo menu.jpg").convert()
+#fondo_menu = pygame.transform.scale(fondo_menu, (cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA))
 
 
 
@@ -779,7 +779,7 @@ def menu_principal():
         
         SCREEN.fill((0, 0, 0)) 
         POS_MOUSE_MENU = pygame.mouse.get_pos()
-        SCREEN.blit(fondo_menu, (0, 0))
+        #SCREEN.blit(fondo_menu, (0, 0))
         
         
         # Título del juego
