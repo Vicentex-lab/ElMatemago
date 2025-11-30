@@ -19,6 +19,7 @@ from sprites import MAGO, CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO
 pygame.display.set_caption("EL MATEMAGO")
 
 
+
 # --- FUNCIÓN DE UTILIDAD PARA SALIDA RÁPIDA (ESCAPE / QUIT) ---
 def manejar_salida_menu(event):
     """Maneja eventos de salida directa del juego (QUIT o ESCAPE) en pantallas de menú."""
@@ -813,6 +814,7 @@ def menu_principal():
                     sys.exit()
 
         pygame.display.update()
+
  
 
 menu_principal()
