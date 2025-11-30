@@ -11,6 +11,28 @@ import configuracion as cfg
 pygame.init() 
 pygame.mixer.init()  # Inicializa el módulo de mezcla de sonido
 
+
+#Inicializamos pngs enemigos/items
+
+#Pigarto
+pigarto_img = pygame.image.load("./assets/pigarto.png").convert_alpha()
+pigarto_img = pygame.transform.scale(pigarto_img, (cfg.TILE, cfg.TILE))
+
+
+#Cero
+
+
+
+#Raiz negativa
+
+
+
+
+
+
+
+
+
 # Define la pantalla en modo Fullscreen
 SCREEN = pygame.display.set_mode((cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA), pygame.FULLSCREEN) 
 pygame.display.set_caption("EL MATEMAGO") 
@@ -488,10 +510,13 @@ def jugar():
         (cero_x*cfg.TILE + 6 + cfg.offset_x, cero_y*cfg.TILE + 6 +cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
         )
 
-        #Pigarto
-        pygame.draw.rect(
-        screen, COLOR_PIGARTO,
-        (pigarto_x[cr.pigarto.pos]*cfg.TILE + 6 + cfg.offset_x, pigarto_y[cr.pigarto.pos]*cfg.TILE + 6 + cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
+        #Dibujamos pigarto como png
+        screen.blit(
+            pigarto_img,
+            (
+                pigarto_x[cr.pigarto.pos] * cfg.TILE + cfg.offset_x,
+                pigarto_y[cr.pigarto.pos] * cfg.TILE + cfg.offset_y
+            )
         )
         
         #Raiz Negativa
