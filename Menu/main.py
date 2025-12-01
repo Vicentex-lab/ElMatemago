@@ -23,9 +23,6 @@ fondo_menu = pygame.image.load("./assets/menu_editado.png").convert()
 fondo_menu = pygame.transform.scale(fondo_menu, SCREEN.get_size())
 
 
-#Cargamos fondo pantallas secundarias
-fondo_pantallas = pygame.image.load("./assets/fondo_pantallas.png").convert()
-fondo_pantallas = pygame.transform.scale(fondo_pantallas, SCREEN.get_size())
 
 
 
@@ -616,10 +613,10 @@ def marcadores():
 
     while True:
         POS_MOUSE_MARCADORES = pygame.mouse.get_pos()
-        SCREEN.blit(fondo_pantallas, (0, 0)) 
+        SCREEN.blit(fondo_menu, (0, 0)) 
 
-        TEXTO_TITULO = cfg.get_letra(60).render("MEJORES PUNTAJES", True, "#FFD700") 
-        RECT_TITULO = TEXTO_TITULO.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 280))
+        TEXTO_TITULO = cfg.get_letra(50).render("MARCADORES", True, "#f2c572")
+        RECT_TITULO = TEXTO_TITULO.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 330))
         SCREEN.blit(TEXTO_TITULO, RECT_TITULO)
         
         if top_scores:
@@ -640,7 +637,7 @@ def marcadores():
             SCREEN.blit(TEXTO_SIN_SCORES, RECT_SIN_SCORES)
         
         VOLVER_MARCADORES = Button(image=pygame.image.load("./assets/Options Rect.png"), pos=(cfg.CENTRO_X, y_start + len(top_scores) * line_spacing + 100), 
-                            text_input="VOLVER", font=cfg.get_letra(75), base_color="White", hovering_color="Red")
+                            text_input="VOLVER", font=cfg.get_letra(50), base_color="#e2f3ff", hovering_color="#fff7d1")
         VOLVER_MARCADORES.changeColor(POS_MOUSE_MARCADORES)
         VOLVER_MARCADORES.update(SCREEN)
 
@@ -658,10 +655,10 @@ def manual():
     print("ENTRANDO A LA PANTALLA DE MANUAL")
     while True:
         POS_MOUSE_MANUAL = pygame.mouse.get_pos()
-        SCREEN.blit(fondo_pantallas, (0, 0))
+        SCREEN.blit(fondo_menu, (0, 0))
         # Título del manual
-        TEXTO_MANUAL = cfg.get_letra(45).render("MANUAL EL MATEMAGO.", True, "Black")
-        RECT_MANUAL = TEXTO_MANUAL.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 100))
+        TEXTO_MANUAL = cfg.get_letra(50).render("MANUAL", True, "#f2c572")
+        RECT_MANUAL = TEXTO_MANUAL.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 330))
         SCREEN.blit(TEXTO_MANUAL, RECT_MANUAL)
         #BOTÓN PARA ABRIR EL PDF
         BOTON_PDF = Button(
@@ -671,15 +668,15 @@ def manual():
             pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 0),
             # texto dentro del botón
             text_input="ABRIR PDF",
-            font=cfg.get_letra(55),
-            base_color="Black",
-            hovering_color="Blue"
+            font=cfg.get_letra(50),
+            base_color="#e2f3ff",
+            hovering_color="#fff7d1"
         )
         BOTON_PDF.changeColor(POS_MOUSE_MANUAL)
         BOTON_PDF.update(SCREEN)
 
         VOLVER_MANUAL = Button(image=pygame.image.load("./assets/Options Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 150), 
-                            text_input="VOLVER", font=cfg.get_letra(75), base_color="Black", hovering_color="Red")
+                            text_input="VOLVER", font=cfg.get_letra(50), base_color="#e2f3ff", hovering_color="#fff7d1")
         VOLVER_MANUAL.changeColor(POS_MOUSE_MANUAL)
         VOLVER_MANUAL.update(SCREEN)
 
@@ -713,30 +710,30 @@ def opciones():
     while True:
          # Posición actual del mouse
         POS = pygame.mouse.get_pos()
-        SCREEN.blit(fondo_pantallas, (0, 0))
-        TEXTO_OP = cfg.get_letra(70).render("OPCIONES", True, "Black")
-        SCREEN.blit(TEXTO_OP, TEXTO_OP.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 260)))
+        SCREEN.blit(fondo_menu, (0, 0))
+        TEXTO_OP = cfg.get_letra(50).render("OPCIONES", True, "#f2c572")
+        SCREEN.blit(TEXTO_OP, TEXTO_OP.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 330)))
         
         
         # Texto que muestra el volumen actual en porcentaje
 
-        TEXTO_VOL = cfg.get_letra(40).render(f"VOLUMEN: {int(cfg.VOLUMEN_GLOBAL*100)}%", True, "Black")
+        TEXTO_VOL = cfg.get_letra(40).render(f"VOLUMEN: {int(cfg.VOLUMEN_GLOBAL*100)}%", True, "White")
         SCREEN.blit(TEXTO_VOL, TEXTO_VOL.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 180)))
         
         # --- SLIDER (asume variables cfg.* definidas) ---
         
         #Dibujar la barra del slider (rectángulo gris), configuracion declarada en configuracion.py
-        pygame.draw.rect(SCREEN, "gray", (cfg.SLIDER_X, cfg.SLIDER_Y, cfg.SLIDER_WIDTH, cfg.SLIDER_HEIGHT))
+        pygame.draw.rect(SCREEN, "#e2f3ff", (cfg.SLIDER_X, cfg.SLIDER_Y, cfg.SLIDER_WIDTH, cfg.SLIDER_HEIGHT))
         # Dibujar la bolita del slider (círculo negro)
-        pygame.draw.circle(SCREEN, "black", (cfg.SLIDER_HANDLE_X, cfg.SLIDER_Y + cfg.SLIDER_HEIGHT//2), cfg.HANDLE_RADIUS)
+        pygame.draw.circle(SCREEN, "#f2c572", (cfg.SLIDER_HANDLE_X, cfg.SLIDER_Y + cfg.SLIDER_HEIGHT//2), cfg.HANDLE_RADIUS)
 
         VOLVER = Button(
             image=pygame.image.load("./assets/Play Rect.png"),
             pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 150),
             text_input="VOLVER",
-            font=cfg.get_letra(60),
-            base_color="black",
-            hovering_color="red"
+            font=cfg.get_letra(50),
+            base_color="#e2f3ff",
+            hovering_color="#fff7d1"
         )
         VOLVER.changeColor(POS)
         VOLVER.update(SCREEN)
