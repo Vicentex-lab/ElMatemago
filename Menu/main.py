@@ -23,6 +23,12 @@ fondo_menu = pygame.image.load("./assets/menu_editado.png").convert()
 fondo_menu = pygame.transform.scale(fondo_menu, SCREEN.get_size())
 
 
+#Cargamos fondo pantallas secundarias
+fondo_pantallas = pygame.image.load("./assets/fondo_pantallas.png").convert()
+fondo_pantallas = pygame.transform.scale(fondo_pantallas, SCREEN.get_size())
+
+
+
 
 # --- FUNCIÓN DE UTILIDAD PARA SALIDA RÁPIDA (ESCAPE / QUIT) ---
 def manejar_salida_menu(event):
@@ -610,7 +616,7 @@ def marcadores():
 
     while True:
         POS_MOUSE_MARCADORES = pygame.mouse.get_pos()
-        SCREEN.fill("#333333") 
+        SCREEN.blit(fondo_pantallas, (0, 0)) 
 
         TEXTO_TITULO = cfg.get_letra(60).render("MEJORES PUNTAJES", True, "#FFD700") 
         RECT_TITULO = TEXTO_TITULO.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 280))
@@ -652,7 +658,7 @@ def manual():
     print("ENTRANDO A LA PANTALLA DE MANUAL")
     while True:
         POS_MOUSE_MANUAL = pygame.mouse.get_pos()
-        SCREEN.fill("gray")
+        SCREEN.blit(fondo_pantallas, (0, 0))
         # Título del manual
         TEXTO_MANUAL = cfg.get_letra(45).render("MANUAL EL MATEMAGO.", True, "Black")
         RECT_MANUAL = TEXTO_MANUAL.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 100))
@@ -707,9 +713,10 @@ def opciones():
     while True:
          # Posición actual del mouse
         POS = pygame.mouse.get_pos()
-        SCREEN.fill("white")
+        SCREEN.blit(fondo_pantallas, (0, 0))
         TEXTO_OP = cfg.get_letra(70).render("OPCIONES", True, "Black")
         SCREEN.blit(TEXTO_OP, TEXTO_OP.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 260)))
+        
         
         # Texto que muestra el volumen actual en porcentaje
 
