@@ -14,8 +14,8 @@ pygame.mixer.init()  # Inicializa el módulo de mezcla de sonido
 # Define la pantalla en modo Fullscreen
 SCREEN = pygame.display.set_mode((cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA), pygame.FULLSCREEN)
 
-#Importamos sprites luego definir pantalla Fullscreen
-from sprites import MAGO, CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO
+#Importamos sprites luego de definir pantalla Fullscreen
+from sprites import MAGO, CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO, CORAZON
 pygame.display.set_caption("EL MATEMAGO")
 
 #Cargamos fondo menu
@@ -475,22 +475,16 @@ def jugar():
                 color = COLOR_FLOOR if colision.maze[r][c] >= 1 else COLOR_WALL
                 pygame.draw.rect(screen, color, rect)
                 
-        #HUD provisoria
-        if player_hp==1:
-            pygame.draw.rect(
-                screen, COLOR_HEART,
-                (19*cfg.TILE + 6 + cfg.offset_x, 1*cfg.TILE + 6 + cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
+        # --- HUD DE CORAZONES (NUEVO) ---
+        for i in range(player_hp):
+            screen.blit(
+                CORAZON,
+                (
+                    19 * cfg.TILE + cfg.offset_x,
+                    (1 + i) * cfg.TILE + cfg.offset_y
+                )
             )
-        if player_hp>1:
-            pygame.draw.rect(
-                screen, COLOR_HEART,
-                (19*cfg.TILE + 6 + cfg.offset_x, 2*cfg.TILE + 6 + cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
-            )
-        if player_hp>2:
-            pygame.draw.rect(
-                screen, COLOR_HEART,
-                (19*cfg.TILE + 6 + cfg.offset_x, 3*cfg.TILE + 6 + cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
-            )
+        
                 
        #   DIBUJAMOS SPRITES
        
