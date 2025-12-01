@@ -125,6 +125,9 @@ def jugar():
     player_y = cr.player.positions_y
     player_x = cr.player.positions_x
     player_hp = cr.player.hp
+    # Variables para efecto de flotacion
+    float_offset = 0
+    float_direction = 1
     player_item=""
     inmunidad=0
     player_pts=cr.player.pts
@@ -547,14 +550,19 @@ def jugar():
                 ring_place_y * cfg.TILE + cfg.offset_y
             )
         )
+        # EFECTO DE FLOTACIÓN
+        float_offset += float_direction * 0.2
         
-        # --- JUGADOR ---
-        
+        if float_offset > 2:
+            float_direction = -1
+        elif float_offset < -2:
+            float_direction = 1
+        # DIBUJO DEL MAGO CON EFECTO DE FLOTACION
         screen.blit(
             MAGO,
             (
                 player_x * cfg.TILE + cfg.offset_x,
-                player_y * cfg.TILE + cfg.offset_y
+                player_y * cfg.TILE + cfg.offset_y + float_offset
             )
         )
         
