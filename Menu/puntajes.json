@@ -38,5 +38,49 @@
     {
         "nombre": "AAA",
         "player_pts": 1000
+    },
+    {
+        "nombre": "AAAA",
+        "player_pts": 750
+    },
+    {
+        "nombre": "AA",
+        "player_pts": 2500
+    },
+    {
+        "nombre": "GGGG",
+        "player_pts": 750
+    },
+    {
+        "nombre": "AAAA",
+        "player_pts": 250
+    },
+    {
+        "nombre": "AAAAAA",
+        "player_pts": 250
+    },
+    {
+        "nombre": "AAAAAA",
+        "player_pts": 250
+    },
+    {
+        "nombre": "AAAAA",
+        "player_pts": 250
+    },
+    {
+        "nombre": "JIJIJI",
+        "player_pts": 2500
+    },
+    {
+        "nombre": "JIJI",
+        "player_pts": 2350
+    },
+    {
+        "nombre": "AAAAA",
+        "player_pts": 250
+    },
+    {
+        "nombre": "AAA",
+        "player_pts": 500
     }
 ]
