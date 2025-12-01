@@ -18,6 +18,11 @@ SCREEN = pygame.display.set_mode((cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA), pygame
 from sprites import MAGO, CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO
 pygame.display.set_caption("EL MATEMAGO")
 
+#Cargamos fondo menu
+fondo_menu = pygame.image.load("./assets/menu_editado.png").convert()
+fondo_menu = pygame.transform.scale(fondo_menu, SCREEN.get_size())
+
+
 
 # --- FUNCIÓN DE UTILIDAD PARA SALIDA RÁPIDA (ESCAPE / QUIT) ---
 def manejar_salida_menu(event):
@@ -799,23 +804,25 @@ def menu_principal():
         
         SCREEN.fill((0, 0, 0)) 
         POS_MOUSE_MENU = pygame.mouse.get_pos()
+        SCREEN.blit(fondo_menu, (0, 0))
+        
         
         # Título del juego
-        TEXTO_MENU = cfg.get_letra(85).render("EL MATEMAGO", True, "#b68f40") 
-        RECT_MENU = TEXTO_MENU.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 260))
+        TEXTO_MENU = cfg.get_letra(65).render("EL MATEMAGO", True, "#f2c572") 
+        RECT_MENU = TEXTO_MENU.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 330))
         SCREEN.blit(TEXTO_MENU, RECT_MENU)
         
         # Definición de los botones
-        BOTON_JUGAR = Button(image=pygame.image.load("./assets/Play Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y - 150), 
-                            text_input="JUGAR", font=cfg.get_letra(60), base_color="#d7fcd4", hovering_color="White")
-        BOTON_MARCADORES = Button(image=pygame.image.load("./assets/Options Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y - 50), 
-                            text_input="MARCADORES", font=cfg.get_letra(55), base_color="#d7fcd4", hovering_color="White")
-        BOTON_MANUAL = Button(image=pygame.image.load("./assets/Play Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 50), 
-                            text_input="MANUAL", font=cfg.get_letra(55), base_color="#d7fcd4", hovering_color="White")
-        BOTON_OPCIONES = Button(image=pygame.image.load("./assets/Options Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 150), 
-                            text_input="OPCIONES", font=cfg.get_letra(60), base_color="#d7fcd4", hovering_color="White")
-        BOTON_SALIR = Button(image=pygame.image.load("./assets/Play Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 250), 
-                            text_input="SALIR", font=cfg.get_letra(60), base_color="#d7fcd4", hovering_color="Red")
+        BOTON_JUGAR = Button(image=pygame.image.load("./assets/Play Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y - 180), 
+                            text_input="JUGAR", font=cfg.get_letra(50), base_color="#e2f3ff", hovering_color="#fff7d1")
+        BOTON_MARCADORES = Button(image=pygame.image.load("./assets/Options Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y - 60), 
+                            text_input="MARCADORES", font=cfg.get_letra(50), base_color="#e2f3ff", hovering_color="#fff7d1")
+        BOTON_MANUAL = Button(image=pygame.image.load("./assets/Play Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 60), 
+                            text_input="MANUAL", font=cfg.get_letra(50), base_color="#e2f3ff", hovering_color="#fff7d1")
+        BOTON_OPCIONES = Button(image=pygame.image.load("./assets/Options Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 180), 
+                            text_input="OPCIONES", font=cfg.get_letra(50), base_color="#e2f3ff", hovering_color="#fff7d1")
+        BOTON_SALIR = Button(image=pygame.image.load("./assets/Play Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 300), 
+                            text_input="SALIR", font=cfg.get_letra(50), base_color="#e2f3ff", hovering_color="#fff7d1")
         
         for button in [BOTON_JUGAR, BOTON_MARCADORES, BOTON_MANUAL, BOTON_OPCIONES, BOTON_SALIR]:
             button.changeColor(POS_MOUSE_MENU)
@@ -838,6 +845,7 @@ def menu_principal():
                     sys.exit()
 
         pygame.display.update()
+
  
 
 menu_principal()
