@@ -125,9 +125,12 @@ def jugar():
     player_y = cr.player.positions_y
     player_x = cr.player.positions_x
     player_hp = cr.player.hp
-    # Variables para efecto de flotacion
+    # Variables para efecto de flotacion en mago
     float_offset = 0
     float_direction = 1
+    
+    
+    ##
     player_item=""
     inmunidad=0
     player_pts=cr.player.pts
