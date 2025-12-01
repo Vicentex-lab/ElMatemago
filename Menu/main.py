@@ -81,7 +81,7 @@ def low_score_message():
         
     return menu_principal() # Vuelve al menú principal después de 3 segundos
     
-# --- PANTALLA JUGAR ----- #
+# PANTALLA JUGAR
 
 def jugar():
     # Muestra la pantalla de juego, detiene la música del menú e inicia la música de juego.
@@ -481,7 +481,7 @@ def jugar():
                 color = COLOR_FLOOR if colision.maze[r][c] >= 1 else COLOR_WALL
                 pygame.draw.rect(screen, color, rect)
                 
-        # --- HUD DE CORAZONES (NUEVO) ---
+        #HUD DE CORAZONES 
         for i in range(player_hp):
             screen.blit(
                 CORAZON,
@@ -494,7 +494,7 @@ def jugar():
                 
        #   DIBUJAMOS SPRITES
        
-       # --- ENEMIGOS ---     
+       # ENEMIGOS    
        # Cero
         if cero_exist == 1:
             screen.blit(
@@ -607,7 +607,7 @@ def jugar():
     return menu_principal()
 
 
-# --- PANTALLA MARCADORES (CORREGIDA LA SALIDA) ---
+# PANTALLA MARCADORES 
 
 def marcadores():
     top_scores = cfg.cargar_mejores_puntajes()
@@ -654,7 +654,7 @@ def marcadores():
 
         pygame.display.update()
 
-# --- PANTALLA MANUAL (CORREGIDA LA SALIDA) ---
+# PANTALLA MANUAL 
 
 def manual():
     print("ENTRANDO A LA PANTALLA DE MANUAL")
@@ -707,7 +707,7 @@ def manual():
         
         pygame.display.update()
 
-# --- PANTALLA OPCIONES (CORREGIDA LA SALIDA) ---
+# PANTALLA OPCIONES 
 
 def opciones():
     # Variable de control: indica si el usuario está arrastrando el slider
@@ -725,7 +725,7 @@ def opciones():
         TEXTO_VOL = cfg.get_letra(40).render(f"VOLUMEN: {int(cfg.VOLUMEN_GLOBAL*100)}%", True, "White")
         SCREEN.blit(TEXTO_VOL, TEXTO_VOL.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 180)))
         
-        # --- SLIDER (asume variables cfg.* definidas) ---
+        # SLIDER 
         
         #Dibujar la barra del slider (rectángulo gris), configuracion declarada en configuracion.py
         pygame.draw.rect(SCREEN, "#e2f3ff", (cfg.SLIDER_X, cfg.SLIDER_Y, cfg.SLIDER_WIDTH, cfg.SLIDER_HEIGHT))
@@ -772,7 +772,7 @@ def opciones():
         # Actualizar la pantalla
         pygame.display.update()
 
-# --- BUCLE PRINCIPAL DEL MENÚ (CORREGIDA LA SALIDA) ---
+# BUCLE PRINCIPAL DEL MENÚ 
 
 def menu_principal():
     
