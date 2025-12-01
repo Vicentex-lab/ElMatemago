@@ -235,61 +235,86 @@ def jugar():
     #  MOVIMIENTO DEL JUGADOR 
     # ============================
 
-    dir_x = 0    # La dirección en donde se mueve le personaje en x
-    dir_y = 0    # En y
 
-    move_timer = 0     # acomula tiempo
-    move_delay = 120   # velocidad del personaje 
+    # Dirección actual del jugador
+    dir_x = 0
+    dir_y = 0
+
+    # Dirección deseada (la que el jugador quiere)
+    desired_x = 0
+    desired_y = 0
+
+    # Posición en pixeles
+    pos_x = player_x * cfg.TILE
+    pos_y = player_y * cfg.TILE
+
+    speed = 4  # velocidad (pixeles por frame)
 
     running = True
     while running:
-        tiempof = clock.tick(FPS)  # tiempof es el tiempo en ms desde el ultimo frame
-        screen.fill((0,0,0))
+        dt = clock.tick(FPS)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            
-            # --- AÑADIR MANEJO DE ESCAPE EN JUEGO ---
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    pygame.mixer.music.stop()
-                    running = False # Detiene el bucle para salir o ir a Game Over
 
+            # Guardar dirección DESEADA siempre
+            if event.type == pygame.KEYDOWN:
                 if event.key in (pygame.K_w, pygame.K_UP):
-                    if can_move(player_y - 1, player_x):
-                        dir_x = 0
-                        dir_y = -1
+                    desired_x = 0
+                    desired_y = -1
 
                 if event.key in (pygame.K_s, pygame.K_DOWN):
-                    if can_move(player_y + 1, player_x):
-                        dir_x = 0
-                        dir_y = 1
+                    desired_x = 0
+                    desired_y = 1
 
                 if event.key in (pygame.K_a, pygame.K_LEFT):
-                    if can_move(player_y, player_x - 1):
-                        dir_x = -1
-                        dir_y = 0
+                    desired_x = -1
+                    desired_y = 0
 
                 if event.key in (pygame.K_d, pygame.K_RIGHT):
-                    if can_move(player_y, player_x + 1):
-                        dir_x = 1
-                        dir_y = 0
+                    desired_x = 1
+                    desired_y = 0
 
-        #  Movimiento con velocidad
-        
-        move_timer += tiempof  # se suma el tiempo que paso
+        # -------------------------------
+        # A) Intentar girar si la casilla lo permite
+        # -------------------------------
+        tile_x = round(pos_x / cfg.TILE)
+        tile_y = round(pos_y / cfg.TILE)
 
-        if move_timer >= move_delay:  # cuando pasa cierto tiempo se mueve una casilla
-            move_timer = 0
+        # ¿Está exactamente centrado en una casilla?
+        aligned_x = (pos_x % cfg.TILE) == 0
+        aligned_y = (pos_y % cfg.TILE) == 0
 
-            new_x = player_x + dir_x  # calcula la siguiente casilla hacia donde va el jugador
-            new_y = player_y + dir_y  # eje: vas arriba dir_y = -1, new_y = player_y -1
+        if aligned_x and aligned_y:
+            # Intentar aplicar la dirección deseada
+            next_tx = tile_x + desired_x
+            next_ty = tile_y + desired_y
 
-            if can_move(new_y, new_x):  # comprueba si no hay pared para moverte
-                player_x = new_x        # si hay pared no te mueves a esa direccion pero tampoco te detienes
-                player_y = new_y        # la dir_x e y no cambia 
-                eventos()
+            if can_move(next_ty, next_tx):
+                dir_x = desired_x
+                dir_y = desired_y
+
+            # Verificar la dirección actual
+            next_tx = tile_x + dir_x
+            next_ty = tile_y + dir_y
+
+            if not can_move(next_ty, next_tx):
+                dir_x = 0
+                dir_y = 0
+
+        # -------------------------------
+        # B) Mover en pixeles
+        # -------------------------------
+        pos_x += dir_x * speed
+        pos_y += dir_y * speed
+
+        # Actualizar posición en casillas
+        player_x = round(pos_x / cfg.TILE)
+        player_y = round(pos_y / cfg.TILE)
+
+        eventos()
+
                 
         # ---------------------------
         # MOVER ENEMIGO
