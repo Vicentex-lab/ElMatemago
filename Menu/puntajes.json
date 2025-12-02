@@ -1,137 +1,18 @@
 [
     {
         "nombre": "AAA",
+        "player_pts": 250
+    },
+    {
+        "nombre": "AAAA",
         "player_pts": 1250
     },
     {
-        "nombre": "A",
-        "player_pts": 750
-    },
-    {
-        "nombre": "A",
-        "player_pts": 750
-    },
-    {
-        "nombre": "VICE",
-        "player_pts": 750
-    },
-    {
-        "nombre": "SSSS",
-        "player_pts": 250
-    },
-    {
-        "nombre": "AEEEE",
-        "player_pts": 250
-    },
-    {
-        "nombre": "AAA",
-        "player_pts": 250
-    },
-    {
-        "nombre": "AA",
-        "player_pts": 750
-    },
-    {
-        "nombre": "AAAA",
-        "player_pts": 1750
-    },
-    {
-        "nombre": "AAA",
-        "player_pts": 1000
-    },
-    {
-        "nombre": "AAAA",
-        "player_pts": 750
-    },
-    {
-        "nombre": "AA",
-        "player_pts": 2500
-    },
-    {
-        "nombre": "GGGG",
-        "player_pts": 750
-    },
-    {
-        "nombre": "AAAA",
-        "player_pts": 250
-    },
-    {
-        "nombre": "AAAAAA",
-        "player_pts": 250
-    },
-    {
-        "nombre": "AAAAAA",
-        "player_pts": 250
-    },
-    {
         "nombre": "AAAAA",
-        "player_pts": 250
-    },
-    {
-        "nombre": "JIJIJI",
         "player_pts": 2500
     },
     {
-        "nombre": "JIJI",
-        "player_pts": 2350
-    },
-    {
-        "nombre": "AAAAA",
-        "player_pts": 250
-    },
-    {
-        "nombre": "AAA",
-        "player_pts": 500
-    },
-    {
-    },
-    {
-        "nombre": "U",
+        "nombre": "JEJE",
         "player_pts": 2500
-    },
-    {
-        "nombre": "M",
-        "player_pts": 250
-    },
-    {
-        "nombre": "M",
-        "player_pts": 750
-    },
-    {
-        "nombre": "LOL",
-        "player_pts": 2500
-    },
-    {
-        "nombre": "D",
-        "player_pts": 250
-    },
-    {
-        "nombre": "D",
-        "player_pts": 250
-    },
-    {
-        "nombre": "D",
-        "player_pts": 250
-    },
-    {
-        "nombre": "D",
-        "player_pts": 2750
-    },
-    {
-        "nombre": "D",
-        "player_pts": 250
-    },
-    {
-        "nombre": "BR",
-        "player_pts": 750
-    },
-    {
-        "nombre": "M",
-        "player_pts": 2500
-    },
-    {
-        "nombre": "D",
-        "player_pts": 250
->>>>>>> 222075632de2505b89e076ede343964c8511446e
     }
 ]
