@@ -29,7 +29,7 @@ def jugar(SCREEN):
     
         # Fondo semitransparente
         hud_surface = pygame.Surface((hud_w, hud_h), pygame.SRCALPHA)
-        hud_surface.fill((25, 30, 80, 160))  # azul místico semitransparente
+        hud_surface.fill((25, 30, 80, 160))  
     
         # Borde dorado mágico
         pygame.draw.rect(hud_surface, (255, 210, 60), (0, 0, hud_w, hud_h), 5, border_radius=18)
