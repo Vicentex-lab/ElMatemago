@@ -1,4 +1,5 @@
 import colisiones
+import pygame
 
 class criature:
     def __init__(self, hp, movement_ratio, name, positions_x, positions_y, pos, exist, pts, damage):
@@ -23,14 +24,76 @@ class player(criature):
 #Los monstruos funcionan por tiempo de espera (Milisegundos)
 
 class cero(criature):
-    positions_x=10
-    positions_y=13
-    hp=2
-    movement_ratio=250
-    name="Cero"
-    exist=1
-    pts=500
-    damage=1
+    def __init__(self):
+        # Inicializamos con los valores por defecto
+        super().__init__(
+            hp=2, 
+            movement_ratio=250, 
+            name="Cero", 
+            positions_x=10, 
+            positions_y=13, 
+            pos=0, 
+            exist=1, 
+            pts=500, 
+            damage=1
+        )
+        self.cooldown_timer = 0 # Para controlar el tiempo de movimiento internamente
+
+    def mover(self, target_y, target_x, maze):
+        """Calcula el movimiento hacia el jugador respetando paredes y cooldown"""
+        if not self.exist:
+            return
+
+        ahora = pygame.time.get_ticks()
+        
+        # Verificamos si ya pasó el tiempo para moverse
+        if ahora - self.cooldown_timer >= self.movement_ratio:
+            self.cooldown_timer = ahora
+            
+            pos_y = self.positions_y
+            pos_x = self.positions_x
+            
+            # Lógica de movimiento (Inteligencia artificial simple)
+            moved = False
+            
+            # Helper interno para verificar paredes
+            def can_move(r, c):
+                filas = len(maze)
+                cols = len(maze[0])
+                # Asumiendo que > 0 es suelo transitable
+                return 0 <= r < filas and 0 <= c < cols and maze[r][c] >= 1
+
+            # Intentar moverse verticalmente
+            if target_y < pos_y and can_move(pos_y - 1, pos_x):
+                self.positions_y -= 1
+                moved = True
+            elif target_y > pos_y and can_move(pos_y + 1, pos_x) and not moved:
+                self.positions_y += 1
+                moved = True
+            
+            # Intentar moverse horizontalmente (si no se movió en vertical o quieres diagonal)
+            # El código original usaba elif, así que prioriza eje Y
+            elif target_x < pos_x and can_move(pos_y, pos_x - 1) and not moved:
+                self.positions_x -= 1
+            elif target_x > pos_x and can_move(pos_y, pos_x + 1) and not moved:
+                self.positions_x += 1
+
+    def colisionar(self, player_y, player_x):
+        """Retorna True si Cero está en la misma casilla que el jugador"""
+        if self.exist and self.positions_y == player_y and self.positions_x == player_x:
+            return True
+        return False
+
+    def dibujar(self, screen, sprite, tile_size, offset_x, offset_y):
+        """Se dibuja a sí mismo en la pantalla"""
+        if self.exist:
+            screen.blit(
+                sprite,
+                (
+                    self.positions_x * tile_size + offset_x,
+                    self.positions_y * tile_size + offset_y
+                )
+            )
     
 
 class pigarto(criature):

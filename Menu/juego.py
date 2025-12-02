@@ -65,7 +65,7 @@ def jugar(SCREEN):
     cr.pigarto.exist = 1 # Asumimos que debe empezar vivo
     
     # Cero: Resetea su existencia y posición (si fueron modificados al morir).
-    cr.cero.exist = 1 
+    cero_exist = 1 
     
     # Raíz Negativa: Resetea su existencia
     cr.raiznegativa.exist = 1 
@@ -126,11 +126,12 @@ def jugar(SCREEN):
     # ---------------------------
     # CERO
     # ---------------------------
-    cero_y = cr.cero.positions_y
-    cero_x = cr.cero.positions_x
-    cero_exist=cr.cero.exist
+    cero = cr.cero()
+    cero_y = cero.positions_y
+    cero_x = cero.positions_x
+    cero_exist = cero.exist
     cero_cooldown = 0
-    cero_ratio=cr.cero.movement_ratio
+    cero_ratio = cero.movement_ratio
     
     # ---------------------------
     # Pigarto
@@ -234,9 +235,7 @@ def jugar(SCREEN):
         # ---------------------------
         #Cero
         ahora = pygame.time.get_ticks()
-        if ahora - cero_cooldown >= cero_ratio:
-            cero_y, cero_x = mover_enemigo(cero_y, cero_x, player_y, player_x)
-            cero_cooldown = ahora
+        cero.mover(player_y, player_x, colision.maze)
 
         #Pigarto
         if ahora - pigarto_cooldown >= pigarto_ratio:
@@ -262,27 +261,27 @@ def jugar(SCREEN):
         # COLISIÓN (Lógica de DERROTA)
         # ---------------------------
         #Con CERO
-        if cero_y == player_y and cero_x == player_x and cero_exist==1:
+        if cero.colisionar(player_y, player_x):
             if player_item==item.shield.name:
                 player_item=""
                 inmunidad=0
-                cero_x=cr.cero.positions_x
-                cero_y=cr.cero.positions_y
+                cero_x=cero.positions_x
+                cero_y=cero.positions_y
             elif player_item==item.sword.name:
-                player_pts+=cr.cero.pts
+                player_pts+=cero.pts
                 COLOR_CERO=COLOR_FLOOR
                 player_item=""
                 cero_exist=0
                 if pigarto_exist==1 and raiznegativa_exist==0:
                     print("espada: cero")
                     COLOR_SWORD=(255, 255, 0)
-                    sword_place_y=cr.cero.positions_y
-                    sword_place_x=cr.cero.positions_y
-            elif inmunidad!=1 and player_hp-cr.cero.damage>0:
+                    sword_place_y=cero.positions_y
+                    sword_place_x=cero.positions_y
+            elif inmunidad!=1 and player_hp-cero.damage>0:
                 player_x=cr.player.positions_x #El matemago muere instantaneamente si no se cambia de lugar
                 player_y=cr.player.positions_y #Ideal siguiente paso es poenr frames de invlunerabilidad, por mientras esto funciona.
-                player_hp-=cr.cero.damage
-            elif inmunidad!=1 and player_hp-cr.cero.damage<=0:
+                player_hp-=cero.damage
+            elif inmunidad!=1 and player_hp-cero.damage<=0:
                 print("💀 cero")
                 pygame.mixer.music.stop() 
                 if player_pts > 0:
@@ -347,8 +346,8 @@ def jugar(SCREEN):
                 if pigarto_exist==1 and cero_exist==0:
                     print("espada: cero")
                     COLOR_SWORD=(255, 255, 0)
-                    sword_place_y=cr.cero.positions_y
-                    sword_place_x=cr.cero.positions_y
+                    sword_place_y=cero.positions_y
+                    sword_place_x=cero.positions_y
             elif player_item==item.sword.name:
                 cr.raiznegativa.hp-=item.sword.damage
                 player_item=""
@@ -419,14 +418,7 @@ def jugar(SCREEN):
        
        # ENEMIGOS 
        # Cero
-        if cero_exist == 1:
-            screen.blit(
-                CERO,
-                (
-                    cero_x * cfg.TILE + cfg.offset_x,
-                    cero_y * cfg.TILE + cfg.offset_y
-                )
-            )
+        cero.dibujar(screen, CERO, cfg.TILE, cfg.offset_x, cfg.offset_y)
         
         # Pigarto
         if pigarto_exist == 1:
