@@ -82,5 +82,9 @@
     {
         "nombre": "AAA",
         "player_pts": 500
+    },
+    {
+        "nombre": "PRO",
+        "player_pts": 2500
     }
 ]
