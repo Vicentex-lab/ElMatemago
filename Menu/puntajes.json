@@ -82,5 +82,57 @@
     {
         "nombre": "AAA",
         "player_pts": 500
+    },
+    {
+        "nombre": "M",
+        "player_pts": 750
+    },
+    {
+        "nombre": "U",
+        "player_pts": 2500
+    },
+    {
+        "nombre": "M",
+        "player_pts": 250
+    },
+    {
+        "nombre": "M",
+        "player_pts": 750
+    },
+    {
+        "nombre": "LOL",
+        "player_pts": 2500
+    },
+    {
+        "nombre": "D",
+        "player_pts": 250
+    },
+    {
+        "nombre": "D",
+        "player_pts": 250
+    },
+    {
+        "nombre": "D",
+        "player_pts": 250
+    },
+    {
+        "nombre": "D",
+        "player_pts": 2750
+    },
+    {
+        "nombre": "D",
+        "player_pts": 250
+    },
+    {
+        "nombre": "BR",
+        "player_pts": 750
+    },
+    {
+        "nombre": "M",
+        "player_pts": 2500
+    },
+    {
+        "nombre": "D",
+        "player_pts": 250
     }
 ]
