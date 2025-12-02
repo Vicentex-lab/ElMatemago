@@ -21,67 +21,58 @@ def jugar(SCREEN):
     except pygame.error as e:
         print(f"Error al cargar la música del juego: {e}")
     def dibujar_hud(screen, player_pts, player_hp, player_item):
-                       """Dibuja todo el HUD integrado (Puntaje, Corazones, Ítem activo) en la esquina superior izquierda."""
-                       
-                       # --- 1. CONFIGURACIÓN DE POSICIONES ---
-                       # Posición inicial para el primer elemento (PUNTAJE)
-                       start_x = 50
-                       start_y = 50
-                       
-                       # Espacio entre secciones del HUD
-                       spacing_y = 100
-                       
-                       # --- 2. DIBUJAR PUNTAJE ---
-                       fuente = cfg.get_letra(30)  
-                       texto = fuente.render(f"PUNTAJE: {player_pts}", True, (255, 255, 0)) # Amarillo
-                       screen.blit(texto, (start_x, start_y)) 
-                       
-                       # --- 3. DIBUJAR CORAZONES ---
-                       # Nueva línea de inicio para los corazones
-                       corazones_y = start_y + spacing_y
-                       
-                       # Título para la sección de vida
-                       texto_vida = cfg.get_letra(20).render("VIDA:", True, (255, 255, 255))
-                       screen.blit(texto_vida, (start_x, corazones_y))
-                       
-                       # Dibuja los corazones horizontalmente después del texto "VIDA:"
-                       corazon_x = start_x + 120 # Desplazamiento después del texto
-                       
-                       # Usamos un tamaño más pequeño para el HUD si es necesario (ej: 24x24)
-                       CORAZON_HUD = pygame.transform.scale(CORAZON, (24, 24))
-                       
-                       for i in range(player_hp):
-                           screen.blit(
-                               CORAZON_HUD,
-                               (corazon_x + i * 30, corazones_y) # 30 pixeles de separación entre corazones
-                           )
-                           
-                       # --- 4. DIBUJAR ÍTEM ACTIVO ---
-                       # Nueva línea de inicio para el ítem
-                       item_y = corazones_y + spacing_y
-                       
-                       # Título para la sección de ítem
-                       texto_item = cfg.get_letra(20).render("ITEM:", True, (255, 255, 255))
-                       screen.blit(texto_item, (start_x, item_y))
-                       
-                       # Dibuja el sprite del ítem
-                       item_sprite = None
-                       
-                       if player_item == item.sword.name:
-                           item_sprite = ESPADA
-                       elif player_item == item.shield.name:
-                           item_sprite = ESCUDO
-                       elif player_item == item.ring.name:
-                           item_sprite = ANILLO
-                           
-                       if item_sprite:
-                           # Usamos un tamaño más grande (ej: 40x40) para que el ítem destaque
-                           ITEM_HUD = pygame.transform.scale(item_sprite, (40, 40))
-                           screen.blit(ITEM_HUD, (start_x + 120, item_y - 8)) # Ajustamos la posición para centrar el sprite verticalmente
-                       else:
-                           # Muestra "NADA" si no tiene ítem
-                           texto_ninguno = cfg.get_letra(20).render("NINGUNO", True, (150, 150, 150))
-                           screen.blit(texto_ninguno, (start_x + 120, item_y))
+        # --- CONFIGURACIÓN DEL MARCO ---
+        hud_x = 40           # posición del HUD
+        hud_y = 40
+        hud_w = 320          # ancho
+        hud_h = 260          # alto
+    
+        # Fondo semitransparente
+        hud_surface = pygame.Surface((hud_w, hud_h), pygame.SRCALPHA)
+        hud_surface.fill((25, 30, 80, 160))  # azul místico semitransparente
+    
+        # Borde dorado mágico
+        pygame.draw.rect(hud_surface, (255, 210, 60), (0, 0, hud_w, hud_h), 5, border_radius=18)
+    
+        # Dibujar HUD en pantalla
+        screen.blit(hud_surface, (hud_x, hud_y))
+    
+        #SECCIÓN: PUNTAJE
+        fuente = cfg.get_letra(22)
+        txt_pts = fuente.render(f"PUNTAJE: {player_pts}", True, (255, 255, 120))
+        screen.blit(txt_pts, (hud_x + 30, hud_y + 20))
+    
+        # SECCIÓN: VIDA 
+        fuente_vida = cfg.get_letra(22)
+        txt_vida = fuente_vida.render("VIDA:", True, (255, 255, 255))
+        screen.blit(txt_vida, (hud_x + 30, hud_y + 90))
+    
+        CORAZON_HUD = pygame.transform.scale(CORAZON, (28, 28))
+        for i in range(player_hp):
+            screen.blit(CORAZON_HUD, (hud_x + 150 + i*32, hud_y + 88))
+    
+        # SECCIÓN: ITEM
+        fuente_item = cfg.get_letra(22)
+        txt_item = fuente_item.render("ITEM:", True, (255, 255, 255))
+        screen.blit(txt_item, (hud_x + 30, hud_y + 160))
+    
+        # Selección del sprite del ítem
+        if player_item == item.sword.name:
+            sprite = ESPADA
+        elif player_item == item.shield.name:
+            sprite = ESCUDO
+        elif player_item == item.ring.name:
+            sprite = ANILLO
+        else:
+            sprite = None
+    
+        if sprite:
+            ITEM_HUD = pygame.transform.scale(sprite, (40, 40))
+            screen.blit(ITEM_HUD, (hud_x + 160, hud_y + 160))
+        else:
+            txt_none = fuente_item.render("NINGUNO", True, (160, 160, 160))
+            screen.blit(txt_none, (hud_x + 160, hud_y + 160))
+    
 
     FPS = 60
     

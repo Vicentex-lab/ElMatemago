@@ -14,5 +14,25 @@
     {
         "nombre": "JEJE",
         "player_pts": 2500
+    },
+    {
+        "nombre": "AAAA",
+        "player_pts": 1250
+    },
+    {
+        "nombre": "AAAA",
+        "player_pts": 750
+    },
+    {
+        "nombre": "AAA",
+        "player_pts": 250
+    },
+    {
+        "nombre": "AAA",
+        "player_pts": 750
+    },
+    {
+        "nombre": "AAA",
+        "player_pts": 1250
     }
 ]
