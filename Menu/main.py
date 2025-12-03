@@ -119,7 +119,7 @@ def marcadores():
                 RECT_SCORE = TEXTO_SCORE.get_rect(center=(x_pos, y_start + i * line_spacing))
                 SCREEN.blit(TEXTO_SCORE, RECT_SCORE)
         else:
-            TEXTO_SIN_SCORES = cfg.get_letra(30).render("Aún no hay puntajes registrados.", True, "White")
+            TEXTO_SIN_SCORES = cfg.get_letra(30).render("AÚN NO HAY PUNTAJES REGISTRADOS.", True, "White")
             RECT_SIN_SCORES = TEXTO_SIN_SCORES.get_rect(center=(x_pos, y_start))
             SCREEN.blit(TEXTO_SIN_SCORES, RECT_SIN_SCORES)
         
