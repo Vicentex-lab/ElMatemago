@@ -4,7 +4,7 @@ import configuracion as cfg
 import colisiones as colision 
 import criaturas as cr         
 import items as item           
-from sprites import MAGO, CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO, CORAZON
+from sprites import MAGO, CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO, CORAZON, WALL, FLOOR
 
 
 def jugar(SCREEN):
@@ -525,9 +525,13 @@ def jugar(SCREEN):
         #Mapa
         for r in range(FILAS):
             for c in range(COLUMNAS):
-                rect = pygame.Rect(c*cfg.TILE + cfg.offset_x, r*cfg.TILE + cfg.offset_y, cfg.TILE, cfg.TILE)
-                color = COLOR_FLOOR if colision.maze[r][c] >= 1 else COLOR_WALL
-                pygame.draw.rect(screen, color, rect)
+                x = c * cfg.TILE + cfg.offset_x
+                y = r * cfg.TILE + cfg.offset_y
+        
+                if colision.maze[r][c] == 0:
+                    screen.blit(WALL, (x, y))      # DIBUJAR PARED
+                else:
+                    screen.blit(FLOOR, (x, y))     # DIBUJAR SUELO
           
        #   DIBUJAMOS SPRITES
        
