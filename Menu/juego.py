@@ -353,6 +353,7 @@ def jugar(SCREEN):
             sword_place_x=0
             sword_place_y=1
             player_pts+=item.sword.pts
+            inmunidad=0
             
         #Escudo
         if shield_place_x==player_x and shield_place_y==player_y:
@@ -361,12 +362,14 @@ def jugar(SCREEN):
             shield_place_x=0
             shield_place_y=2
             player_pts+=item.shield.pts
-            
+        
+        #Anillo
         if ring_place_x==player_x and ring_place_y==player_y:
             player_item=item.ring.name
             ring_place_x=0
             ring_place_y=3
             player_pts+=item.ring.pts
+            inmunidad=0
             
         # DIBUJO
     
@@ -386,7 +389,7 @@ def jugar(SCREEN):
                     (1 + i) * cfg.TILE + cfg.offset_y
                 )
             )
-        print(player_hp)
+        #print(player_hp)
         
        #   DIBUJAMOS SPRITES
        
