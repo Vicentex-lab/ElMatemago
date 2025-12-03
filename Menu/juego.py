@@ -283,7 +283,7 @@ def jugar(SCREEN):
         #Con Pigarto
         if pigarto.colisionar(player_y, player_x):
             if player_item==item.shield.name:
-                pigarto.pos=0
+                pigarto.resetear_ruta()
                 inmunidad=0
                 player_item=""
             elif player_item==item.sword.name:
@@ -294,7 +294,7 @@ def jugar(SCREEN):
                     player_pts+=pigarto.pts
                 player_item=""
                 
-                pigarto.pos=0
+                pigarto.resetear_ruta()
                 if pigarto.hp<=0:
                     player_pts+=pigarto.pts
                     pigarto_exist=0
