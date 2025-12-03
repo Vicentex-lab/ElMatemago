@@ -62,16 +62,6 @@ def jugar(SCREEN):
     player_pts=cr.player.pts
     temporizador=0
     
-    # Pigarto: Resetea el índice de posición en su camino y su existencia. 
-    pigarto_exist = 1 # Asumimos que debe empezar vivo
-    
-    # Cero: Resetea su existencia y posición (si fueron modificados al morir).
-    cero_exist = 1 
-    
-    # Raíz Negativa: Resetea su existencia
-    raiznegativa_exist = 1 
-
-    
     #Spawnear Item
     #Espada
     cont_aux_1=random.randint(0, 5)
@@ -134,7 +124,6 @@ def jugar(SCREEN):
     cero = cr.cero()
     cero_y = cero.positions_y
     cero_x = cero.positions_x
-    cero_exist = cero.exist
     cero_cooldown = 0
     cero_ratio = cero.movement_ratio
     
@@ -142,20 +131,10 @@ def jugar(SCREEN):
     # Pigarto
     # ---------------------------
     pigarto=cr.pigarto()
-    pigarto_y = pigarto.positions_y
-    pigarto_x = pigarto.positions_x
-    pigarto_cooldown = 0
-    pigarto_exist=pigarto.exist
-    pigarto_ratio=pigarto.movement_ratio
     # ---------------------------
     # Raíz Negativa
     # ---------------------------
     raiznegativa=cr.raiznegativa()
-    raiznegativa_y = raiznegativa.positions_y
-    raiznegativa_x = raiznegativa.positions_x
-    raiznegativa_ratio=raiznegativa.movement_ratio
-    raiznegativa_cooldown = 0
-    raiznegativa_exist=raiznegativa.exist
 
     def mover_enemigo(f, c, f_obj, c_obj):
         """Mueve al enemigo acercándose al jugador"""
@@ -262,8 +241,8 @@ def jugar(SCREEN):
             elif player_item==item.sword.name:
                 player_pts+=cero.pts
                 player_item=""
-                cero_exist=0
-                if pigarto_exist==1 and raiznegativa_exist==0:
+                cero.exist=0
+                if pigarto.exist==1 and raiznegativa.exist==0:
                     print("espada: cero")
                     sword_place_y=cero.positions_y
                     sword_place_x=cero.positions_y
@@ -287,21 +266,21 @@ def jugar(SCREEN):
                 inmunidad=0
                 player_item=""
             elif player_item==item.sword.name:
-                if cero_exist==1 or raiznegativa_exist==1: #Comando normal
+                if cero.exist==1 or raiznegativa.exist==1: #Comando normal
                     pigarto.hp=pigarto.hp-item.sword.damage
-                if cero_exist==0 and raiznegativa_exist==0 and pigarto_exist==1: #Comando cuando sólo queda pigarto
-                    pigarto_exist=0
+                if cero.exist==0 and raiznegativa.exist==0 and pigarto.exist==1: #Comando cuando sólo queda pigarto
+                    pigarto.exist=0
                     player_pts+=pigarto.pts
                 player_item=""
                 
                 pigarto.resetear_ruta()
                 if pigarto.hp<=0:
                     player_pts+=pigarto.pts
-                    pigarto_exist=0
+                    pigarto.exist=0
             elif player_item==item.ring.name:
                 player_pts+=pigarto.pts
                 player_item=""
-                pigarto_exist=0
+                pigarto.exist=0
             elif inmunidad!=1 and player_hp-pigarto.damage>0:
                 player_x=cr.player.positions_x #El matemago muere instantaneamente si no se cambia de lugar
                 player_y=cr.player.positions_y #Ideal siguiente paso es poenr frames de invlunerabilidad, por mientras esto funciona.
@@ -320,9 +299,9 @@ def jugar(SCREEN):
             if player_item==item.shield.name:
                 player_pts+=raiznegativa.pts
                 player_item=""
-                raiznegativa_exist=0
+                raiznegativa.exist=0
                 inmunidad=0
-                if pigarto_exist==1 and cero_exist==0:
+                if pigarto.exist==1 and cero.exist==0:
                     print("espada: cero")
                     sword_place_y=cero.positions_y
                     sword_place_x=cero.positions_y
@@ -464,7 +443,7 @@ def jugar(SCREEN):
         temporizador+=1
         
         # Lógica de VICTORIA
-        if pigarto_exist==0 and cero_exist==0 and raiznegativa_exist==0:
+        if pigarto.exist==0 and cero.exist==0 and raiznegativa.exist==0:
             running = False
             print("Puntaje sin bonus por tiempo:", player_pts)
             print("Segundos", temporizador/60)
