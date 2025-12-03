@@ -34,5 +34,13 @@
     {
         "nombre": "AAA",
         "player_pts": 1250
+    },
+    {
+        "nombre": "AAA",
+        "player_pts": 1250
+    },
+    {
+        "nombre": "AAAA",
+        "player_pts": 250
     }
 ]
