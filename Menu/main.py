@@ -117,7 +117,7 @@ def marcadores():
     """
     
     # Llama a la función de utilidad para cargar y ordenar el Top 3.
-    top_scores = cfg.cargar_mejores_puntajes()
+    top_puntaje = cfg.cargar_mejores_puntajes()
     
     # Variables de posicionamiento para centrar los puntajes.
     x_pos = cfg.CENTRO_X
@@ -133,18 +133,18 @@ def marcadores():
         RECT_TITULO = TEXTO_TITULO.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 330))
         SCREEN.blit(TEXTO_TITULO, RECT_TITULO)
         
-        if top_scores:
+        if top_puntaje:
             # Si hay puntajes guardados, itera sobre la lista.
-            for i, score_data in enumerate(top_scores):
+            for i, datos_puntaje in enumerate(top_puntaje):
                 # Extrae nombre y puntaje (con valores por defecto por seguridad).
-                nombre = score_data.get("nombre", "N/A") #Si falta la clave nombre en algún registro, .get se encarga de asignar un valor por defecto (N/A) y que no se cierre el programa
-                puntaje = score_data.get("player_pts", 0)
+                nombre = datos_puntaje.get("nombre", "N/A") #Si falta la clave nombre en algún registro, .get se encarga de asignar un valor por defecto (N/A) y que no se cierre el programa
+                puntaje = datos_puntaje.get("player_pts", 0)
                 
                 # Formatea la línea: [Ranking]. [Nombre] - [Puntaje]
-                score_text = f"{i+1}. {nombre} - {puntaje}"
+                text_puntaje = f"{i+1}. {nombre} - {puntaje}"
                 
                 # Posiciona cada puntaje hacia abajo usando el índice (i) y el espaciado.
-                TEXTO_SCORE = cfg.get_letra(40).render(score_text, True, "White")
+                TEXTO_SCORE = cfg.get_letra(40).render(text_puntaje, True, "White")
                 
                 RECT_SCORE = TEXTO_SCORE.get_rect(center=(x_pos, y_start + i * line_spacing))
                 SCREEN.blit(TEXTO_SCORE, RECT_SCORE)
@@ -155,7 +155,7 @@ def marcadores():
             SCREEN.blit(TEXTO_SIN_SCORES, RECT_SIN_SCORES)
         
         # Botón para volver al menú principal.
-        VOLVER_MARCADORES = Button(image=pygame.image.load("./assets/Options Rect.png"), pos=(cfg.CENTRO_X, y_start + len(top_scores) * line_spacing + 100), 
+        VOLVER_MARCADORES = Button(image=pygame.image.load("./assets/Options Rect.png"), pos=(cfg.CENTRO_X, y_start + len(top_puntaje) * line_spacing + 100), 
                             text_input="VOLVER", font=cfg.get_letra(50), base_color="#e2f3ff", hovering_color="#fff7d1")
         VOLVER_MARCADORES.changeColor(POS_MOUSE_MARCADORES)
         VOLVER_MARCADORES.update(SCREEN)
