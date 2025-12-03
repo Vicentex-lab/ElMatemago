@@ -245,20 +245,19 @@ def jugar():
     dir_x = 0
     dir_y = 0
 
-    # Dirección deseada (la que el jugador quiere)
-    desired_x = 0
-    desired_y = 0
+    # Dirección deseada por el jugador
+    deseada_x = 0   
+    deseada_y = 0
 
     # Posición en pixeles
-    pos_x = player_x * cfg.TILE
+    pos_x = player_x * cfg.TILE   #cfg.tile es el tamaño de una casilla en pixeles
     pos_y = player_y * cfg.TILE
 
-    speed = 4  # velocidad (pixeles por frame)
+    speed = 1  # velocidad (pixeles por frame)
 
     running = True
     while running:
-        dt = clock.tick(FPS)
-
+       
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -266,39 +265,38 @@ def jugar():
             # Guardar dirección DESEADA siempre
             if event.type == pygame.KEYDOWN:
                 if event.key in (pygame.K_w, pygame.K_UP):
-                    desired_x = 0
-                    desired_y = -1
+                    deseada_x = 0
+                    deseada_y = -1
 
                 if event.key in (pygame.K_s, pygame.K_DOWN):
-                    desired_x = 0
-                    desired_y = 1
+                    deseada_x = 0
+                    deseada_y = 1
 
                 if event.key in (pygame.K_a, pygame.K_LEFT):
-                    desired_x = -1
-                    desired_y = 0
+                    deseada_x = -1
+                    deseada_y = 0
 
                 if event.key in (pygame.K_d, pygame.K_RIGHT):
-                    desired_x = 1
-                    desired_y = 0
+                    deseada_x = 1
+                    deseada_y = 0
 
-        # -------------------------------
-        # A) Intentar girar si la casilla lo permite
-        # -------------------------------
+   
+        # Convierte la posición de píxeles a casilla
+   
         tile_x = round(pos_x / cfg.TILE)
         tile_y = round(pos_y / cfg.TILE)
 
-        # ¿Está exactamente centrado en una casilla?
-        aligned_x = (pos_x % cfg.TILE) == 0
-        aligned_y = (pos_y % cfg.TILE) == 0
+        # Calcula si esta el jugador esta centrado
+        alineado_x = (pos_x % cfg.TILE) == 0   # Si el resto es 0 esta alineado
+        alineado_y = (pos_y % cfg.TILE) == 0
 
-        if aligned_x and aligned_y:
-            # Intentar aplicar la dirección deseada
-            next_tx = tile_x + desired_x
-            next_ty = tile_y + desired_y
+        if alineado_x and alineado_y:
+            next_tx = tile_x + deseada_x
+            next_ty = tile_y + deseada_y
 
-            if can_move(next_ty, next_tx):
-                dir_x = desired_x
-                dir_y = desired_y
+            if can_move(next_ty, next_tx): 
+                dir_x = deseada_x
+                dir_y = deseada_y
 
             # Verificar la dirección actual
             next_tx = tile_x + dir_x
@@ -308,14 +306,13 @@ def jugar():
                 dir_x = 0
                 dir_y = 0
 
-        # -------------------------------
-        # B) Mover en pixeles
-        # -------------------------------
-        pos_x += dir_x * speed
+        # Mover en pixeles
+        # Actualiza la posición en píxeles
+        pos_x += dir_x * speed  
         pos_y += dir_y * speed
 
-        # Actualizar posición en casillas
-        player_x = round(pos_x / cfg.TILE)
+        # Actualiza la posición en casillas
+        player_x = round(pos_x / cfg.TILE) # round es para elegir la posicion mas cercana a la actual
         player_y = round(pos_y / cfg.TILE)
 
         eventos()
@@ -846,6 +843,6 @@ def menu_principal():
 
         pygame.display.update()
 
- 
+
 
 menu_principal()
