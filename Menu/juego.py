@@ -21,38 +21,49 @@ def jugar(SCREEN):
     except pygame.error as e:
         print(f"Error al cargar la música del juego: {e}")
     def dibujar_hud(screen, player_pts, player_hp, player_item):
-        # --- CONFIGURACIÓN DEL MARCO ---
-        hud_x = 40           # posición del HUD
-        hud_y = 40
-        hud_w = 320          # ancho
-        hud_h = 260          # alto
+        # CONFIGURACIÓN DEL MARCO 
+        hud_x = 40           # posicion del hud en eje x
+        hud_y = 40            #posicion del hud en eje y
+        hud_w = 320          # ancho del hud
+        hud_h = 260          # alto del hud
     
-        # Fondo semitransparente
+        # Se crea una superficie especial para el HUD con transparencia.
+        # Esto permite tener un recuadro semitransparente encima del juego
         hud_surface = pygame.Surface((hud_w, hud_h), pygame.SRCALPHA)
-        hud_surface.fill((25, 30, 80, 160))  
+        hud_surface.fill((25, 30, 80, 160))  # Color oscuro + transparencia (160)
     
-        # Borde dorado mágico
-        pygame.draw.rect(hud_surface, (255, 210, 60), (0, 0, hud_w, hud_h), 5, border_radius=18)
+        #Se dibuja un borde dorado alrededor del HUD
+        pygame.draw.rect(hud_surface, (255, 210, 60),  # Color dorado
+                         (0, 0, hud_w, hud_h),   # Tamaño del rectángulo
+                         5,                   # Grosor del borde
+                         border_radius=18)     #Bordes redondeados
     
-        # Dibujar HUD en pantalla
+        # Finalmente se coloca el HUD completo en la pantalla principal.
         screen.blit(hud_surface, (hud_x, hud_y))
     
+        
+        
+        
         #SECCIÓN: PUNTAJE
-        fuente = cfg.get_letra(22)
-        txt_pts = fuente.render(f"PUNTAJE: {player_pts}", True, (255, 255, 120))
-        screen.blit(txt_pts, (hud_x + 30, hud_y + 20))
+        fuente = cfg.get_letra(22)   #Fuente para el texto
+        txt_pts = fuente.render(f"PUNTAJE: {player_pts}", True, (255, 255, 120))   # Texto en color amarillo suave
+        screen.blit(txt_pts, (hud_x + 30, hud_y + 20))  # Se dibuja dentro del HUD
     
+        
+        
+        
         # SECCIÓN: VIDA 
         fuente_vida = cfg.get_letra(22)
         txt_vida = fuente_vida.render("VIDA:", True, (255, 255, 255))
         screen.blit(txt_vida, (hud_x + 30, hud_y + 90))
     
-        CORAZON_HUD = pygame.transform.scale(CORAZON, (28, 28))
+        CORAZON_HUD = pygame.transform.scale(CORAZON, (28, 28)) # Escalamos el corazón para que encaje con el tamaño del HUD 
+        # Dibujamos un corazón por cada punto de vida
         for i in range(player_hp):
-            screen.blit(CORAZON_HUD, (hud_x + 150 + i*32, hud_y + 88))
+            screen.blit(CORAZON_HUD, (hud_x + 150 + i*32, hud_y + 88)) # Cada corazón se dibuja un poco más a la derecha
     
         # SECCIÓN: ITEM
-        fuente_item = cfg.get_letra(22)
+        fuente_item = cfg.get_letra(22)  
         txt_item = fuente_item.render("ITEM:", True, (255, 255, 255))
         screen.blit(txt_item, (hud_x + 30, hud_y + 160))
     
@@ -64,12 +75,13 @@ def jugar(SCREEN):
         elif player_item == item.ring.name:
             sprite = ANILLO
         else:
-            sprite = None
+            sprite = None # Si no tiene ítem, no hay imagen que mostrar
     
         if sprite:
-            ITEM_HUD = pygame.transform.scale(sprite, (40, 40))
+            ITEM_HUD = pygame.transform.scale(sprite, (40, 40)) # Tamaño ideal para el HUD
             screen.blit(ITEM_HUD, (hud_x + 160, hud_y + 160))
         else:
+             # Si NO hay un ítem equipado, se escribe la palabra "NINGUNO"
             txt_none = fuente_item.render("NINGUNO", True, (160, 160, 160))
             screen.blit(txt_none, (hud_x + 160, hud_y + 160))
     
@@ -523,14 +535,16 @@ def jugar(SCREEN):
             ring_place_y=3
             player_pts+=item.ring.pts
             
-        # DIBUJO
+        # DIBUJO DE todo LO QUE SE VE EN PANTALLA
     
         #Mapa
+        # Recorremos cada fila (r) y cada columna (c) del laberinto.
         for r in range(FILAS):
+            # Convertimos la posición en la matriz a coordenadas reales de pantalla
             for c in range(COLUMNAS):
                 x = c * cfg.TILE + cfg.offset_x
                 y = r * cfg.TILE + cfg.offset_y
-        
+                # Si la celda vale 0 → es una pared.
                 if colision.maze[r][c] == 0:
                     screen.blit(WALL, (x, y))      # DIBUJAR PARED
                 else:
@@ -539,6 +553,7 @@ def jugar(SCREEN):
        #   DIBUJAMOS SPRITES
        
        # ENEMIGOS 
+       # Solo se dibuja si está vivo (existencia = 1).
        # Cero
         if cero_exist == 1:
             screen.blit(
@@ -550,6 +565,8 @@ def jugar(SCREEN):
             )
         
         # Pigarto
+        # Pigarto se mueve siguiendo una lista de posiciones predefinidas.
+        # cr.pigarto.pos indica el índice actual de su posición.
         if pigarto_exist == 1:
             screen.blit(
                 PIGARTO,
@@ -560,6 +577,7 @@ def jugar(SCREEN):
             )
         
         # Raíz Negativa
+        # Igual que Cero: se dibuja si sigue vivo.
         if raiznegativa_exist == 1:
             screen.blit(
                 RAIZNEGATIVA,
@@ -569,7 +587,8 @@ def jugar(SCREEN):
                 )
             )
         
-        # --- ITEMS ---
+        #ITEMS
+        #Cada ítem se dibuja en su posición correspondiente del mapa.
         
         # Espada
         screen.blit(
@@ -598,14 +617,19 @@ def jugar(SCREEN):
             )
         )
         
-        # EFECTO DE FLOTACIÓN
+        # EFECTO DE FLOTACIÓN DEL MAGO
+       
+       
+       
+       # Modifica el desplazamiento vertical del mago para que suba y baje suavemente.
         float_offset += float_direction * 0.2
-        
+        # Si el mago sube demasiado, empieza a bajar.
         if float_offset > 2:
             float_direction = -1
+        # Si baja demasiado, empieza a subir.
         elif float_offset < -2:
             float_direction = 1
-        # DIBUJO DEL MAGO CON EFECTO DE FLOTACION
+        # Se dibuja aplicando el efecto de flotación (sumado a la posición Y real)
         screen.blit(
             MAGO,
             (
