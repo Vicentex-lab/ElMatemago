@@ -5,7 +5,7 @@ import configuracion as cfg
 
 def load(name):
     path = f"./assets/{name}.png"
-    img = pygame.image.load(path) #No convertir a alpha() acá ya que en juego.py se cargan los sprites antes de definir la pantalla
+    img = pygame.image.load(path) 
     return pygame.transform.scale(img, (cfg.TILE, cfg.TILE))
 
 MAGO = load("MAGO")
