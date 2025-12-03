@@ -8,9 +8,7 @@ import random
 import configuracion as cfg
 from juego import jugar as iniciar_juego # Importa la función principal del juego desde 'juego.py'
 
-# --------------------------------------------------------------------------------
-# --- INICIALIZACIÓN DE PYGAME Y PANTALLA ---
-# --------------------------------------------------------------------------------
+# INICIALIZACIÓN DE PYGAME Y PANTALLA 
 
 # Inicializa todos los módulos necesarios de Pygame
 pygame.init() 
@@ -19,9 +17,8 @@ pygame.mixer.init()  # Inicializa el módulo de mezcla de sonido (necesario para
 # Define la pantalla en modo Fullscreen utilizando las dimensiones obtenidas en 'configuracion.py'.
 SCREEN = pygame.display.set_mode((cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA), pygame.FULLSCREEN)
 
-# --------------------------------------------------------------------------------
-# --- CARGA Y CONFIGURACIÓN DE ASSETS (SPRITES) ---
-# --------------------------------------------------------------------------------
+#  CARGA Y CONFIGURACIÓN DE ASSETS (SPRITES) 
+
 
 #Importamos sprites luego de definir la pantalla (SCREEN)
 from sprites import MAGO, CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO, CORAZON
@@ -50,7 +47,7 @@ def manejar_salida_menu(event):
      Maneja eventos de salida directa del juego (QUIT o ESCAPE) en pantallas de menú.
      
      Args:
-         event (pygame.event.Event): El objeto evento de Pygame.
+         event (pygame.event.Event): El objeto evento de Pygame (necesita event par determinar el tipo de evento que se le pasa a la función y ver qué acción tomar)
      """
     if event.type == pygame.QUIT:
         # El usuario hace clic en el botón de cerrar de la ventana.
@@ -77,10 +74,10 @@ def bajo_puntaje():
     FPS = 60
     
     # Inicia un temporizador para controlar cuánto tiempo se muestra la pantalla.
-    start_time = pygame.time.get_ticks()
-    display_time = 3000 # Mostrar por 3 segundos
+    tiempo_inicio = pygame.time.get_ticks() #Devuelve los milisegundos que han transcurrido desde que se inicia el programa. Tiempo inicio se iguala a pygame.time.get_ticks() en ese preciso instante
+    tiempo_mostrar = 3000 # Mostrar por 3 segundos
     
-    while pygame.time.get_ticks() - start_time < display_time:
+    while pygame.time.get_ticks() - tiempo_inicio < tiempo_mostrar: #Se muestra mientras la diferencia entre el tiempo en que se inicia el programa y tiempo_inicio sea mayor a 3 segundos (el tiempo en que se inició el programa aumenta a cada momento)
         
         # 2. Limitar la velocidad del bucle a 60 cuadros por segundo
         clock.tick(FPS) 
@@ -140,7 +137,7 @@ def marcadores():
             # Si hay puntajes guardados, itera sobre la lista.
             for i, score_data in enumerate(top_scores):
                 # Extrae nombre y puntaje (con valores por defecto por seguridad).
-                nombre = score_data.get("nombre", "N/A")
+                nombre = score_data.get("nombre", "N/A") #Si falta la clave nombre en algún registro, .get se encarga de asignar un valor por defecto (N/A) y que no se cierre el programa
                 puntaje = score_data.get("player_pts", 0)
                 
                 # Formatea la línea: [Ranking]. [Nombre] - [Puntaje]
@@ -217,10 +214,11 @@ def manual():
                 #Abrir pdf
                 if BOTON_PDF.checkForInput(POS_MOUSE_MANUAL):
                     # Crea la ruta completa al archivo PDF.
-                    ruta_pdf = os.path.join("assets", "Manual de Matemago.pdf")
+                    ruta_pdf = os.path.join("assets", "Manual de Matemago.pdf") #Detecta automáticamente el separador del sistema operativo (en Windows \ y en Linux o MacOS /)
                     print("ABRIENDO PDF:", ruta_pdf)
                     
-                    # Intenta abrir el archivo usando comandos específicos del sistema operativo.
+                    # Intenta abrir el archivo usando comandos específicos del sistema operativo
+                    # Se usa try/except porque si no estamos en Windows, estamos en Linux o MacOS
                 
                     # En Windows: abre el PDF con el programa predeterminado.
                     try:
@@ -229,7 +227,7 @@ def manual():
                         # En Mac o Linux: usa el comando "open" para abrir el archivo
                         os.system(f"open {ruta_pdf}")
                         
-
+                    
                 if VOLVER_MANUAL.checkForInput(POS_MOUSE_MANUAL):
                     return menu_principal() # Usar return para volver
         

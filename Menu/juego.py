@@ -228,6 +228,9 @@ def jugar(SCREEN):
     move_delay = 120   # velocidad del personaje 
     
     def reiniciar_juego():
+        #nonlocal le dice a Python que no son variables locales de reiniciar_juego() si no que
+        #se refiere a las variables definidas en la función superior, jugar()
+        #Esto permite que el reinicio se aplique al estado global del juego 
         nonlocal player_y, player_x, player_hp, player_item, inmunidad, temporizador
         nonlocal cero_y, cero_x, cero_exist, cero_cooldown, cero_ratio  
         nonlocal pigarto_y, pigarto_x, pigarto_cooldown, pigarto_exist, pigarto_ratio

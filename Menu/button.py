@@ -21,7 +21,7 @@ class Button():
             
         # 4. Creación de Rectángulos (Áreas de Colisión/Posición)
         # self.rect es el rectángulo que define el área de la imagen/botón.
-        # Se usa para el cálculo de la posición y la detección de colisiones del ratón.
+        # Se usa para el cálculo de la posición y la detección de colisiones del mouse.
         self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
         
         # self.text_rect es el rectángulo que define el área del texto.
@@ -36,19 +36,19 @@ class Button():
         # Dibuja el texto renderizado encima de la imagen (o solo el texto si image es None).
         screen.blit(self.text, self.text_rect)
 
-    # Método para verificar si el cursor del ratón está sobre el botón
+    # Método para verificar si el cursor del mouse está sobre el botón
     def checkForInput(self, position):
-        # position es la tupla (x, y) del cursor del ratón.
+        # position es la tupla (x, y) del cursor del mouse.
         
-        # Comprueba si la coordenada X del ratón está dentro del rango horizontal del rectángulo.
-        # Y si la coordenada Y del ratón está dentro del rango vertical del rectángulo.
+        # Comprueba si la coordenada X del mouse está dentro del rango horizontal del rectángulo.
+        # Y si la coordenada Y del mouse está dentro del rango vertical del rectángulo.
         if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
-            return True # El ratón está sobre el botón (o ha hecho clic en él).
-        return False # El ratón está fuera del botón.
+            return True # El mouse está sobre el botón (o ha hecho clic en él).
+        return False # El mouse está fuera del botón.
 
-    # Método para cambiar el color del texto si el ratón está encima (efecto hover)
+    # Método para cambiar el color del texto si el mouse está encima (efecto hover)
     def changeColor(self, position):
-        # Comprueba si el ratón está sobre el área del botón.
+        # Comprueba si el mouse está sobre el área del botón.
         if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
             # Si está encima, renderiza el texto usando el color de "hovering".
             self.text = self.font.render(self.text_input, True, self.hovering_color)
