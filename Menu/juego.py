@@ -102,7 +102,7 @@ def jugar(SCREEN):
     float_offset = 0
     float_direction = 1
     
-    #Rest de definiciones del jugador
+    #Resto de definiciones del jugador
     player_item=""
     inmunidad=0
     player_pts=cr.player.pts
@@ -226,8 +226,84 @@ def jugar(SCREEN):
 
     move_timer = 0     # acomula tiempo
     move_delay = 120   # velocidad del personaje 
+    
+    def reiniciar_juego():
+        nonlocal player_y, player_x, player_hp, player_item, inmunidad, temporizador
+        nonlocal cero_y, cero_x, cero_exist, cero_cooldown, cero_ratio  
+        nonlocal pigarto_y, pigarto_x, pigarto_cooldown, pigarto_exist, pigarto_ratio
+        nonlocal raiznegativa_y, raiznegativa_x, raiznegativa_ratio, raiznegativa_cooldown, raiznegativa_exist  
+        nonlocal sword_place_y, sword_place_x, shield_place_y, shield_place_x, ring_place_y, ring_place_x
+        nonlocal float_offset, float_direction, move_cooldown, dir_x, dir_y, move_timer
+    
+        # Reinicio del jugador (excepto player_pts, que se mantiene)
+        player_y = cr.player.positions_y
+        player_x = cr.player.positions_x
+        player_hp = cr.player.hp
+        player_item = ""
+        inmunidad = 0
+        temporizador = 0  # Reinicia el temporizador para el nuevo "nivel"
+    
+        # Reinicio de enemigos
+        cr.pigarto.pos = 0
+        cr.pigarto.exist = 1
+        cr.cero.exist = 1
+        cr.raiznegativa.exist = 1
+    
+        # Reinicio de variables locales de existencia
+        cero_exist = cr.cero.exist
+        pigarto_exist = cr.pigarto.exist 
+        raiznegativa_exist = cr.raiznegativa.exist
+    
+        # Variables de movimiento de enemigos
+        cero_y = cr.cero.positions_y
+        cero_x = cr.cero.positions_x
+        cero_cooldown = 0
+        cero_ratio = cr.cero.movement_ratio
+    
+        pigarto_y = cr.pigarto.positions_y
+        pigarto_x = cr.pigarto.positions_x
+        pigarto_cooldown = 0
+        pigarto_ratio = cr.pigarto.movement_ratio
+    
+        raiznegativa_y = cr.raiznegativa.positions_y
+        raiznegativa_x = cr.raiznegativa.positions_x
+        raiznegativa_ratio = cr.raiznegativa.movement_ratio
+        raiznegativa_cooldown = 0
+    
+        # Reinicio de spawneo de items (aleatorio)
+        cont_aux_1 = random.randint(0, 5)
+        sword_place_y = item.sword.places_y[cont_aux_1]
+        sword_place_x = item.sword.places_x[cont_aux_1]
+    
+        cont_aux_1 = random.randint(0, 5)
+        # Asegura que el escudo no spawnee donde la espada
+        while item.shield.places_x[cont_aux_1] == sword_place_x and item.shield.places_y[cont_aux_1] == sword_place_y:
+            cont_aux_1 = random.randint(0, 5)
+        shield_place_y = item.shield.places_y[cont_aux_1]
+        shield_place_x = item.shield.places_x[cont_aux_1]
+    
+        cont_aux_1 = random.randint(0, 5)
+        # Asegura que el anillo no spawnee donde la espada ni el escudo
+        while (item.ring.places_x[cont_aux_1] == sword_place_x and item.ring.places_y[cont_aux_1] == sword_place_y) or \
+              (item.ring.places_x[cont_aux_1] == shield_place_x and item.ring.places_y[cont_aux_1] == shield_place_y):
+            cont_aux_1 = random.randint(0, 5)
+        ring_place_y = item.ring.places_y[cont_aux_1]
+        ring_place_x = item.ring.places_x[cont_aux_1]
+    
+        # Reinicio de otras variables
+        float_offset = 0
+        float_direction = 1
+        move_cooldown = True
+        dir_x = 0
+        dir_y = 0
+        move_timer = 0
+        
+    reiniciar_juego()  # Inicialización inicial
 
     running = True
+    mostrando_mensaje_victoria = False  # Nueva variable para controlar el mensaje
+    mensaje_temporizador = 0  # Temporizador para el mensaje (en frames)
+    
     while running:
         tiempof = clock.tick(FPS)  # tiempof es el tiempo en ms desde el ultimo frame
         screen.fill((0,0,0))
@@ -241,6 +317,7 @@ def jugar(SCREEN):
                 if event.key == pygame.K_ESCAPE:
                     pygame.mixer.music.stop()
                     running = False # Detiene el bucle para salir o ir a Game Over
+                    return True 
 
                 if event.key in (pygame.K_w, pygame.K_UP):
                     if can_move(player_y - 1, player_x):
@@ -295,7 +372,7 @@ def jugar(SCREEN):
                 cr.pigarto.pos=0
                 pigarto_cooldown=ahora
                 
-        #Raiz negativa
+        #Raíz negativa
         if ahora - raiznegativa_cooldown >= raiznegativa_ratio:
             raiznegativa_y, raiznegativa_x = mover_enemigo(raiznegativa_y, raiznegativa_x, player_y, player_x)
             raiznegativa_cooldown = ahora
@@ -322,7 +399,6 @@ def jugar(SCREEN):
                 player_item=""
                 cero_exist=0
                 if pigarto_exist==1 and raiznegativa_exist==0:
-                    print("espada: cero")
                     COLOR_SWORD=(255, 255, 0)
                     sword_place_y=cr.cero.positions_y
                     sword_place_x=cr.cero.positions_y
@@ -346,7 +422,8 @@ def jugar(SCREEN):
                 inmunidad=0
                 player_item=""
             elif player_item==item.sword.name:
-                if cero_exist==1 or raiznegativa_exist==1: #Comando normal
+                # Comportamiento único: Pigarto recibe daño normal a menos que sea el último
+                if cero_exist==1 or raiznegativa_exist==1: 
                     cr.pigarto.hp=cr.pigarto.hp-item.sword.damage
                 if cero_exist==0 and raiznegativa_exist==0 and pigarto_exist==1: #Comando cuando sólo queda pigarto
                     pigarto_exist=0
@@ -393,7 +470,6 @@ def jugar(SCREEN):
                 raiznegativa_y=0
                 raiznegativa_ratio=9999999
                 if pigarto_exist==1 and cero_exist==0:
-                    print("espada: cero")
                     COLOR_SWORD=(255, 255, 0)
                     sword_place_y=cr.cero.positions_y
                     sword_place_x=cr.cero.positions_y
@@ -532,15 +608,10 @@ def jugar(SCREEN):
         )
         
         
-        
-       
-       
-        
         temporizador+=1
         
         # Lógica de VICTORIA
         if pigarto_exist==0 and cero_exist==0 and raiznegativa_exist==0:
-            running = False
             print("Puntaje sin bonus por tiempo:", player_pts)
             print("Segundos", temporizador/60)
             if temporizador/60<=12:
@@ -557,11 +628,30 @@ def jugar(SCREEN):
             elif temporizador/60>60:
                 player_pts+=0
                                 
-            pygame.mixer.music.stop() 
-            # Llama a guardar puntaje con el orden corregido (screen, player_pts)
-            cfg.guardar_nuevo_puntaje(SCREEN, player_pts) 
             print("Puntaje total:", player_pts)
-            return True # Indica que debe ir al menú principal
+            mostrando_mensaje_victoria = True
+            mensaje_temporizador = 180  # 3 segundos a 60 FPS (60 * 3)
+            reiniciar_juego()
+       
+        # Manejo del mensaje de victoria
+        if mostrando_mensaje_victoria:
+            mensaje_temporizador -= 1
+            if mensaje_temporizador <= 0:
+                reiniciar_juego()  # Ahora sí resetea después del mensaje
+                mostrando_mensaje_victoria = False
+            else:
+                # Dibuja el mensaje de victoria (fondo negro y texto)
+                overlay = pygame.Surface((cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA), pygame.SRCALPHA)
+                overlay.fill((0, 0, 0, 255))  # Fondo negro 
+                screen.blit(overlay, (0, 0))
+                
+                fuente_titulo = cfg.get_letra(60)
+                fuente_sub = cfg.get_letra(30)
+                texto_titulo = fuente_titulo.render("¡NIVEL COMPLETADO!", True, (255, 255, 0))  # Amarillo
+                texto_puntaje = fuente_sub.render(f"PUNTAJE ACUMULADO: {player_pts}", True, (255, 255, 255))  # Blanco
+                
+                screen.blit(texto_titulo, texto_titulo.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 50)))
+                screen.blit(texto_puntaje, texto_puntaje.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y + 50)))
     
         dibujar_hud(screen, player_pts, player_hp, player_item)
         pygame.display.flip()

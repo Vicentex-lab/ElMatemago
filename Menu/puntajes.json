@@ -34,5 +34,93 @@
     {
         "nombre": "AAA",
         "player_pts": 1250
+    },
+    {
+        "nombre": "DD",
+        "player_pts": 750
+    },
+    {
+        "nombre": "D",
+        "player_pts": 750
+    },
+    {
+        "nombre": "EPIC",
+        "player_pts": 2500
+    },
+    {
+        "nombre": "D",
+        "player_pts": 250
+    },
+    {
+        "nombre": "D",
+        "player_pts": 2500
+    },
+    {
+        "nombre": "D",
+        "player_pts": 2500
+    },
+    {
+        "nombre": "DDD",
+        "player_pts": 2750
+    },
+    {
+        "nombre": "M",
+        "player_pts": 2500
+    },
+    {
+        "nombre": "D",
+        "player_pts": 2750
+    },
+    {
+        "nombre": "BRUH",
+        "player_pts": 6750
+    },
+    {
+        "nombre": "M",
+        "player_pts": 250
+    },
+    {
+        "nombre": "A",
+        "player_pts": 7750
+    },
+    {
+        "nombre": "BBBB",
+        "player_pts": 750
+    },
+    {
+        "nombre": "M",
+        "player_pts": 250
+    },
+    {
+        "nombre": "S",
+        "player_pts": 250
+    },
+    {
+        "nombre": "S",
+        "player_pts": 250
+    },
+    {
+        "nombre": "D",
+        "player_pts": 5750
+    },
+    {
+        "nombre": "D",
+        "player_pts": 3500
+    },
+    {
+        "nombre": "D",
+        "player_pts": 750
+    },
+    {
+        "nombre": "E",
+        "player_pts": 1000
+    },
+    {
+        "nombre": "M",
+        "player_pts": 750
+    },
+    {
+        "nombre": "M",
+        "player_pts": 3250
     }
 ]
