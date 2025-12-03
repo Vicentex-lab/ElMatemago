@@ -22,9 +22,14 @@ CENTRO_Y = ALTO_PANTALLA // 2
 
 # --- CONFIGURACIÓN DEL LABERINTO ---
 TILE = 32  # Tamaño en píxeles de cada celda (o 'tile') del laberinto. Estándar para pixel art.
-# Obtiene el número de filas del laberinto desde la matriz definida en 'colisiones.py'.
+
+# Obtiene el número de filas del laberinto (dimensión vertical), definida en colisiones.py
+# Esto se logra midiendo la longitud de la lista principal (que contiene todas las filas).
 FILAS_LABERINTO = len(colisiones.maze)
-# Obtiene el número de columnas del laberinto.
+
+# Obtiene el número de columnas del laberinto (dimensión horizontal).
+# Se accede al primer elemento de la lista principal (colisiones.maze[0]),
+# que es la primera fila, y se mide su longitud.
 COLUMNAS_LABERINTO = len(colisiones.maze[0])
 
 # --- CÁLCULO PARA CENTRAR EL LABERINTO EN PANTALLA COMPLETA ---
@@ -46,7 +51,7 @@ offset_y = CENTRO_Y - (ALTO_LABERINTO // 2)
 VOLUMEN_GLOBAL = 0.5 # Nivel inicial de volumen (50%).
 RUTA_MUSICA_MENU = "./assets/Matemago_Menu_Song.mp3" 
 RUTA_MUSICA_JUEGO = "./assets/Matemago_Dungeon_Song.mp3"
-# Obtiene el directorio base del archivo actual, útil para referencias relativas.
+# Obtiene el directorio base del archivo actual (configuracion.py), útil para referencias relativas.
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Construye la ruta completa al archivo JSON de puntajes de forma segura.
 RUTA_PUNTAJES = os.path.join(BASE_DIR, "puntajes.json")
@@ -107,7 +112,7 @@ def cargar_mejores_puntajes():
             puntajes_ordenados = sorted(puntajes, key=lambda x: x["player_pts"], reverse=True)
             
             # 4. Devuelve los primeros 3 elementos de la lista ordenada (el Top 3).
-            return puntajes_ordenados[:3] # Devuelve solo los 3 mejores
+            return puntajes_ordenados[:3] # Devuelve solo los 3 mejores (hace un slicing de la lista, inicia en 0 y se detiene antes del índice 3)
         
     # Maneja errores si el archivo existe pero el JSON está mal formado o hay un error de E/S (devuelve lista vacía).    
     except (json.JSONDecodeError, FileNotFoundError):
@@ -166,7 +171,9 @@ def obtener_nombre(screen, player_pts):
                         print("❌ Nombre inválido. Solo letras y no vacío.")
                 elif event.key == pygame.K_BACKSPACE:
                     # Elimina el último carácter de la cadena del nombre.
-                    nombre = nombre[:-1]
+                    nombre = nombre[:-1] #Hace un slicing (en Python el -1 representa el último carácter de la lista/cadena)
+                    #Por lo que al presionar la tecla de retroceso, el slicing toma la cadena desde el primer caracter y
+                    #considera todo lo que está antes del último carácter
                 else:
                     # Captura la tecla presionada (event.unicode)
                     key_name = event.unicode
@@ -258,6 +265,9 @@ def guardar_nuevo_puntaje(screen, player_pts):
     try:
         # Verifica si el archivo JSON existe.
         if os.path.exists(RUTA_PUNTAJES):
+            #Se utiliza with ya que al terminar el bloque de código dentro de with Python automáticamente
+            #llama al método archivo.close(), que de lo contrario habría que hacerlo manualmente y además garantiza
+            #que siempre se cierre
             with open(RUTA_PUNTAJES, "r") as archivo:
                 # Carga la lista completa de puntajes.
                 todos_los_puntajes = json.load(archivo)
@@ -276,7 +286,7 @@ def guardar_nuevo_puntaje(screen, player_pts):
     try:
         # Abre el archivo en modo escritura ('w') y lo sobrescribe.
         with open(RUTA_PUNTAJES, "w") as archivo:
-            # Escribe la lista completa de Python como una cadena JSON, usando 'indent=4' para formato legible.
+            # Escribe la lista completa de Python como una cadena JSON, usando 'indent=4' para formato legible (sangría de 4 espacios).
             json.dump(todos_los_puntajes, archivo, indent=4)
         print("Puntaje guardado exitosamente.")
     except IOError:
