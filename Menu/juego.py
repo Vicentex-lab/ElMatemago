@@ -80,20 +80,24 @@ def jugar(SCREEN):
     sword_place_x=item.sword.places_x[ cont_aux_1]
     
     #Escudo
-    cont_aux_1=random.randint(0, 5)
-    while item.shield.places_x==sword_place_x and item.shield.places_y==sword_place_y:
+    while True: #Ciclo para que evite spawnear en el mismo lugar que otro item
         cont_aux_1=random.randint(0, 5)
-    print("escudo",  cont_aux_1)
-    shield_place_y=item.shield.places_y[cont_aux_1]
-    shield_place_x=item.shield.places_x[cont_aux_1]
+        print("escudo",  cont_aux_1)
+        shield_place_y=item.shield.places_y[cont_aux_1]
+        shield_place_x=item.shield.places_x[cont_aux_1]
+        if item.shield.places_x==sword_place_x and item.shield.places_y==sword_place_y:
+            continue #Vuelve al inicio del while mientras se cumpla 
+        break #Si logra salir del if sin que se cumpla, temrina el while
     
     #Anillo
-    cont_aux_1=random.randint(0, 5)
-    print("anillo", cont_aux_1)
-    while item.ring.places_x==sword_place_x and item.ring.places_y==sword_place_y and item.ring.places_x==shield_place_x and item.ring.places_y==shield_place_y:
+    while True: #Ciclo para que evite spawnear en el mismo lugar que otro item
         cont_aux_1=random.randint(0, 5)
-    ring_place_y=item.shield.places_y[cont_aux_1]
-    ring_place_x=item.shield.places_x[cont_aux_1]
+        print("anillo", cont_aux_1)
+        ring_place_y=item.shield.places_y[cont_aux_1]
+        ring_place_x=item.shield.places_x[cont_aux_1]
+        if ring_place_x==sword_place_x and ring_place_y==sword_place_y and ring_place_x==shield_place_x and ring_place_y==shield_place_y:
+            continue #Vuelve al inicio del while mientras se cumpla
+        break #Si logra salir del if sin que se cumpla, temrina el while
     
     def can_move(r, c):
         return 0 <= r < FILAS and 0 <= c < COLUMNAS and colision.maze[r][c] >= 1
@@ -253,16 +257,14 @@ def jugar(SCREEN):
             if player_item==item.shield.name:
                 player_item=""
                 inmunidad=0
-                cero_x=cero.positions_x
-                cero_y=cero.positions_y
+                cr.cero.positions_x=cero.positions_x
+                cr.cero.positions_y=cero.positions_y
             elif player_item==item.sword.name:
                 player_pts+=cero.pts
-                COLOR_CERO=COLOR_FLOOR
                 player_item=""
                 cero_exist=0
                 if pigarto_exist==1 and raiznegativa_exist==0:
                     print("espada: cero")
-                    COLOR_SWORD=(255, 255, 0)
                     sword_place_y=cero.positions_y
                     sword_place_x=cero.positions_y
             elif inmunidad!=1 and player_hp-cero.damage>0:
@@ -289,8 +291,6 @@ def jugar(SCREEN):
                     pigarto.hp=pigarto.hp-item.sword.damage
                 if cero_exist==0 and raiznegativa_exist==0 and pigarto_exist==1: #Comando cuando sólo queda pigarto
                     pigarto_exist=0
-                    pigarto_ratio=9999999
-                    COLOR_PIGARTO=COLOR_FLOOR
                     player_pts+=pigarto.pts
                 player_item=""
                 
@@ -298,13 +298,8 @@ def jugar(SCREEN):
                 if pigarto.hp<=0:
                     player_pts+=pigarto.pts
                     pigarto_exist=0
-                    pigarto_x=0
-                    pigarto_y=0
-                    pigarto_ratio=9999999
-                    COLOR_PIGARTO=COLOR_WALL
             elif player_item==item.ring.name:
                 player_pts+=pigarto.pts
-                COLOR_PIGARTO=COLOR_FLOOR
                 player_item=""
                 pigarto_exist=0
             elif inmunidad!=1 and player_hp-pigarto.damage>0:
@@ -324,26 +319,20 @@ def jugar(SCREEN):
         if raiznegativa.colisionar(player_y, player_x):
             if player_item==item.shield.name:
                 player_pts+=raiznegativa.pts
-                COLOR_RAIZ=COLOR_FLOOR
                 player_item=""
                 raiznegativa_exist=0
                 inmunidad=0
-                raiznegativa_x=0
-                raiznegativa_y=0
-                raiznegativa_ratio=9999999
                 if pigarto_exist==1 and cero_exist==0:
                     print("espada: cero")
-                    COLOR_SWORD=(255, 255, 0)
                     sword_place_y=cero.positions_y
                     sword_place_x=cero.positions_y
             elif player_item==item.sword.name:
                 raiznegativa.hp-=item.sword.damage
                 player_item=""
-                raiznegativa_x=raiznegativa.positions_x
-                raiznegativa_y=raiznegativa.positions_y
+                cr.raiznegativa.positions_x=raiznegativa.positions_x
+                cr.raiznegativa.positions_y=raiznegativa.positions_y
                 if raiznegativa.hp<=0:
                     player_pts+=raiznegativa.pts
-                    COLOR_RAIZ=COLOR_FLOOR
             elif inmunidad!=1 and player_hp-raiznegativa.damage>0:
                 player_x=cr.player.positions_x #El matemago muere instantaneamente si no se cambia de lugar
                 player_y=cr.player.positions_y #Ideal siguiente paso es poenr frames de invlunerabilidad, por mientras esto funciona.
