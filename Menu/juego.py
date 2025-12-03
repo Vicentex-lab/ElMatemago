@@ -61,34 +61,28 @@ def jugar(SCREEN):
     inmunidad=0
     player_pts=cr.player.pts
     temporizador=0
+    invul_frames=2*60 #segundos*FPS para frames
+    colision_detected=True
     
     #Spawnear Item
     #Espada
-    cont_aux_1=random.randint(0, 5)
-    print("espada",  cont_aux_1)
-    sword_place_y=item.sword.places_y[ cont_aux_1]
-    sword_place_x=item.sword.places_x[ cont_aux_1]
+    sword=item.sword()
+    sword.spawn()
     
     #Escudo
-    while True: #Ciclo para que evite spawnear en el mismo lugar que otro item
-        cont_aux_1=random.randint(0, 5)
-        print("escudo",  cont_aux_1)
-        shield_place_y=item.shield.places_y[cont_aux_1]
-        shield_place_x=item.shield.places_x[cont_aux_1]
-        if item.shield.places_x==sword_place_x and item.shield.places_y==sword_place_y:
-            continue #Vuelve al inicio del while mientras se cumpla 
-        break #Si logra salir del if sin que se cumpla, temrina el while
-    
+    shield=item.shield()
+    while True:
+        shield.spawn()
+        if shield.actual_x!=sword.actual_x and shield.actual_y!=sword.actual_y:
+            break
+        
     #Anillo
-    while True: #Ciclo para que evite spawnear en el mismo lugar que otro item
-        cont_aux_1=random.randint(0, 5)
-        print("anillo", cont_aux_1)
-        ring_place_y=item.shield.places_y[cont_aux_1]
-        ring_place_x=item.shield.places_x[cont_aux_1]
-        if ring_place_x==sword_place_x and ring_place_y==sword_place_y and ring_place_x==shield_place_x and ring_place_y==shield_place_y:
-            continue #Vuelve al inicio del while mientras se cumpla
-        break #Si logra salir del if sin que se cumpla, temrina el while
-    
+    ring=item.ring()
+    while True:
+        ring.spawn()
+        if ring.actual_x!=sword.actual_x and ring.actual_y!=sword.actual_y and ring.actual_x!=shield.actual_x and ring.actual_y!=shield.actual_y:
+            break
+        
     def can_move(r, c):
         return 0 <= r < FILAS and 0 <= c < COLUMNAS and colision.maze[r][c] >= 1
     
@@ -117,15 +111,11 @@ def jugar(SCREEN):
                             player_x=9
                             print("Matemagicamente Teletransportado")
     
-    #MOVIMIENTO DEL ENEMIGO
+    #Instanciar ENEMIGO
     # ---------------------------
     # CERO
     # ---------------------------
     cero = cr.cero()
-    cero_y = cero.positions_y
-    cero_x = cero.positions_x
-    cero_cooldown = 0
-    cero_ratio = cero.movement_ratio
     
     # ---------------------------
     # Pigarto
@@ -135,26 +125,6 @@ def jugar(SCREEN):
     # Raíz Negativa
     # ---------------------------
     raiznegativa=cr.raiznegativa()
-
-    def mover_enemigo(f, c, f_obj, c_obj):
-        """Mueve al enemigo acercándose al jugador"""
-
-        # Vertical
-        if f_obj < f and can_move(f - 1, c):
-            f -= 1
-        elif f_obj > f and can_move(f + 1, c):
-            f += 1
-
-        # Horizontal
-        elif c_obj < c and can_move(f, c - 1):
-            c -= 1
-        elif c_obj > c and can_move(f, c + 1):
-            c += 1
-
-        return f, c
- 
-    
-    move_cooldown = True   # evita que avance varias casillas al dejar presionada una tecla
     
     # ============================
     #  MOVIMIENTO DEL JUGADOR 
@@ -232,20 +202,21 @@ def jugar(SCREEN):
         # COLISIÓN (Lógica de DERROTA)
         # ---------------------------
         #Con CERO
-        if cero.colisionar(player_y, player_x):
-            if player_item==item.shield.name:
+        if cero.colisionar(player_y, player_x) and colision_detected==False:
+            colision_detected=True
+            if player_item==shield.name:
+                cero.positions_x=10
+                cero.positions_y=13
                 player_item=""
                 inmunidad=0
-                cr.cero.positions_x=cero.positions_x
-                cr.cero.positions_y=cero.positions_y
-            elif player_item==item.sword.name:
+            elif player_item==sword.name:
                 player_pts+=cero.pts
                 player_item=""
                 cero.exist=0
                 if pigarto.exist==1 and raiznegativa.exist==0:
                     print("espada: cero")
-                    sword_place_y=cero.positions_y
-                    sword_place_x=cero.positions_y
+                    sword.actual_y=cero.positions_y
+                    sword.actual_x=cero.positions_y
             elif inmunidad!=1 and player_hp-cero.damage>0:
                 player_x=cr.player.positions_x #El matemago muere instantaneamente si no se cambia de lugar
                 player_y=cr.player.positions_y #Ideal siguiente paso es poenr frames de invlunerabilidad, por mientras esto funciona.
@@ -260,14 +231,15 @@ def jugar(SCREEN):
                     return False # Indica que debe ir a bajo_puntaje
             
         #Con Pigarto
-        if pigarto.colisionar(player_y, player_x):
-            if player_item==item.shield.name:
+        if pigarto.colisionar(player_y, player_x) and colision_detected==False:
+            colision_detected=True
+            if player_item==shield.name:
                 pigarto.resetear_ruta()
                 inmunidad=0
                 player_item=""
-            elif player_item==item.sword.name:
+            elif player_item==sword.name:
                 if cero.exist==1 or raiznegativa.exist==1: #Comando normal
-                    pigarto.hp=pigarto.hp-item.sword.damage
+                    pigarto.hp=pigarto.hp-sword.damage
                 if cero.exist==0 and raiznegativa.exist==0 and pigarto.exist==1: #Comando cuando sólo queda pigarto
                     pigarto.exist=0
                     player_pts+=pigarto.pts
@@ -277,7 +249,7 @@ def jugar(SCREEN):
                 if pigarto.hp<=0:
                     player_pts+=pigarto.pts
                     pigarto.exist=0
-            elif player_item==item.ring.name:
+            elif player_item==ring.name:
                 player_pts+=pigarto.pts
                 player_item=""
                 pigarto.exist=0
@@ -295,23 +267,27 @@ def jugar(SCREEN):
                     return False # Indica que debe ir a bajo_puntaje
             
         #Con Raiz negativa
-        if raiznegativa.colisionar(player_y, player_x):
-            if player_item==item.shield.name:
+        if raiznegativa.colisionar(player_y, player_x) and colision_detected==False:
+            colision_detected=True
+            if player_item==shield.name:
                 player_pts+=raiznegativa.pts
                 player_item=""
                 raiznegativa.exist=0
                 inmunidad=0
                 if pigarto.exist==1 and cero.exist==0:
                     print("espada: cero")
-                    sword_place_y=cero.positions_y
-                    sword_place_x=cero.positions_y
-            elif player_item==item.sword.name:
-                raiznegativa.hp-=item.sword.damage
+                    sword.actual_y=cr.cero.positions_y
+                    sword.actual_x=cr.cero.positions_x
+            elif player_item==sword.name:
+                raiznegativa.hp-=sword.damage
+                raiznegativa.positions_x=10
+                raiznegativa.positions_y=9
                 player_item=""
-                cr.raiznegativa.positions_x=raiznegativa.positions_x
-                cr.raiznegativa.positions_y=raiznegativa.positions_y
                 if raiznegativa.hp<=0:
+                    raiznegativa.exist=0
                     player_pts+=raiznegativa.pts
+                else:
+                    player_pts+=100
             elif inmunidad!=1 and player_hp-raiznegativa.damage>0:
                 player_x=cr.player.positions_x #El matemago muere instantaneamente si no se cambia de lugar
                 player_y=cr.player.positions_y #Ideal siguiente paso es poenr frames de invlunerabilidad, por mientras esto funciona.
@@ -327,27 +303,27 @@ def jugar(SCREEN):
         
         #COLISIÓN CON ITEMS
         #Espada
-        if sword_place_x==player_x and sword_place_y==player_y:
-            player_item=item.sword.name
-            sword_place_x=0
-            sword_place_y=1
-            player_pts+=item.sword.pts
+        if sword.colision(player_y, player_x):
+            player_item=sword.name
+            sword.actual_x=0
+            sword.actual_y=1
+            player_pts+=sword.pts
             inmunidad=0
             
         #Escudo
-        if shield_place_x==player_x and shield_place_y==player_y:
-            player_item=item.shield.name
+        if shield.colision(player_y, player_x):
+            player_item=shield.name
             inmunidad=1
-            shield_place_x=0
-            shield_place_y=2
-            player_pts+=item.shield.pts
+            shield.actual_x=0
+            shield.actual_y=2
+            player_pts+=shield.pts
         
         #Anillo
-        if ring_place_x==player_x and ring_place_y==player_y:
-            player_item=item.ring.name
-            ring_place_x=0
-            ring_place_y=3
-            player_pts+=item.ring.pts
+        if ring.colision(player_y, player_x):
+            player_item=ring.name
+            ring.actual_x=0
+            ring.actual_y=3
+            player_pts+=ring.pts
             inmunidad=0
             
         # DIBUJO
@@ -385,31 +361,13 @@ def jugar(SCREEN):
         # --- ITEMS ---
         
         # Espada
-        screen.blit(
-            ESPADA,
-            (
-                sword_place_x * cfg.TILE + cfg.offset_x,
-                sword_place_y * cfg.TILE + cfg.offset_y
-            )
-        )
+        sword.draw(screen)
         
         # Escudo
-        screen.blit(
-            ESCUDO,
-            (
-                shield_place_x * cfg.TILE + cfg.offset_x,
-                shield_place_y * cfg.TILE + cfg.offset_y
-            )
-        )
+        shield.draw(screen)
         
         # Anillo
-        screen.blit(
-            ANILLO,
-            (
-                ring_place_x * cfg.TILE + cfg.offset_x,
-                ring_place_y * cfg.TILE + cfg.offset_y
-            )
-        )
+        ring.draw(screen)
         
         # EFECTO DE FLOTACIÓN
         float_offset += float_direction * 0.2
@@ -441,6 +399,12 @@ def jugar(SCREEN):
        
         
         temporizador+=1
+        if colision_detected==True:
+            if invul_frames>0:
+                invul_frames-=1
+            elif invul_frames<=0:
+                invul_frames=2*60
+                colision_detected=False
         
         # Lógica de VICTORIA
         if pigarto.exist==0 and cero.exist==0 and raiznegativa.exist==0:
