@@ -105,7 +105,7 @@ def jugar(SCREEN):
     invul_frames=2*60 #segundos*FPS para frames
     colision_detected=True
     
-    # Nueva bandera para evitar acumulación de bonus de victoria
+    # Bandera para evitar acumulación de bonus de victoria
     victoria_detectada = False
     
     #Spawnear Item
@@ -216,7 +216,7 @@ def jugar(SCREEN):
         pigarto = cr.pigarto()
         raiznegativa = cr.raiznegativa()
         
-        # Resetear bandera de victoria
+        # Resetear bandera de victoria (evita la acumulación de puntaje)
         victoria_detectada = False
         
         print("Juego reiniciado")
@@ -490,7 +490,7 @@ def jugar(SCREEN):
        
         # Manejo del mensaje de victoria
         if mostrando_mensaje_victoria:
-            mensaje_temporizador -= 1 
+            mensaje_temporizador -= 1 # Por cada frame del juego, se va restando 1 hasta que se cumplan los 3 segundos
             if mensaje_temporizador <= 0:
                 reiniciar_juego()  # Reinicia todo después del mensaje
                 mostrando_mensaje_victoria = False
@@ -498,18 +498,18 @@ def jugar(SCREEN):
                 # Dibuja el mensaje de victoria (fondo negro y texto)
                 overlay = pygame.Surface((cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA), pygame.SRCALPHA)
                 overlay.fill((0, 0, 0, 255))  # Fondo negro 
-                screen.blit(overlay, (0, 0))
+                screen.blit(overlay, (0, 0)) # Comienza a dibujar desde la esquina izquierda
                 
                 fuente_titulo = cfg.get_letra(60)
                 fuente_sub = cfg.get_letra(30)
                 texto_titulo = fuente_titulo.render("¡NIVEL COMPLETADO!", True, (255, 255, 0))  # Amarillo
                 texto_puntaje = fuente_sub.render(f"PUNTAJE ACUMULADO: {player_pts}", True, (255, 255, 255))  # Blanco
                 
-                screen.blit(texto_titulo, texto_titulo.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 50)))
-                screen.blit(texto_puntaje, texto_puntaje.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y + 50)))
+                screen.blit(texto_titulo, texto_titulo.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 50))) # Dibujar en la pantalla
+                screen.blit(texto_puntaje, texto_puntaje.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y + 50))) # Dibujar en la pantalla
     
-        dibujar_hud(screen, player_pts, player_hp, player_item)
-        pygame.display.flip()
+        dibujar_hud(screen, player_pts, player_hp, player_item) 
+        pygame.display.flip() # Actualizar la pantalla
 
     # Si sale del bucle 'while running' por QUIT o ESCAPE, regresa al menú
     return True # Indica que debe ir al menú principal
