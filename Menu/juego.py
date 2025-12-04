@@ -102,7 +102,8 @@ def jugar(SCREEN):
     inmunidad=0
     player_pts=cr.player.pts
     temporizador=0
-    invul_frames=2*60 #segundos*FPS para frames
+    invul_base=1*60 #segundos*FPS para frame
+    invul_frames=invul_base #segundos*FPS para frames
     colision_detected=True
     
     # Nueva bandera para evitar acumulación de bonus de victoria
@@ -462,7 +463,7 @@ def jugar(SCREEN):
             if invul_frames>0:
                 invul_frames-=1
             elif invul_frames<=0:
-                invul_frames=2*60
+                invul_frames=invul_base #Invul_frame vuelve a la constante original
                 colision_detected=False
         
 # Lógica de VICTORIA
