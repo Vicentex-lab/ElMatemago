@@ -37,7 +37,7 @@ ANILLO = ANILLO.convert_alpha()
 CORAZON = CORAZON.convert_alpha()
 
 #Cargamos imagen de fondo para el menú
-fondo_menu = pygame.image.load("./assets/menu_editado.png").convert() #metodo .convert convierte la imagen al mismo formato de color de pantall
+fondo_menu = pygame.image.load("./assets/menu_editado.png").convert() #metodo .convert convierte la imagen al mismo formato de color de pantalla
                                                                         #otra forma de optimizar y mas eficiencia
 # Escala el fondo para que ocupe todo el tamaño de la pantalla. tenemos escala actual y la transformamos a (ancho, altura pantalla)
 fondo_menu = pygame.transform.scale(fondo_menu, SCREEN.get_size())

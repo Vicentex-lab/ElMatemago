@@ -179,7 +179,7 @@ def jugar(SCREEN):
     def reiniciar_juego():
         nonlocal player_y, player_x, player_hp, player_item, inmunidad, temporizador, invul_frames, colision_detected
         nonlocal dir_x, dir_y, move_timer, float_offset, float_direction
-        nonlocal player_pts  # Conservar el puntaje
+        nonlocal player_pts  # Ignorar para conservar el puntaje
         nonlocal cero, pigarto, raiznegativa  # Instancias de enemigos que se reasignan
         nonlocal victoria_detectada  # Resetear la bandera
         
@@ -330,10 +330,6 @@ def jugar(SCREEN):
                 player_pts+=cero.pts
                 player_item=""
                 cero.exist=0
-                if pigarto.exist==1 and raiznegativa.exist==0:
-                    print("espada: cero")
-                    sword.actual_y=cero.positions_y
-                    sword.actual_x=cero.positions_x
             elif inmunidad!=1 and player_hp-cero.damage>0:
                 player_x=cr.player.positions_x
                 player_y=cr.player.positions_y
@@ -343,9 +339,9 @@ def jugar(SCREEN):
                 pygame.mixer.music.stop() 
                 if player_pts > 0:
                     cfg.guardar_nuevo_puntaje(screen, player_pts)
-                    return True
+                    return True #Volver al menú
                 else:
-                    return False
+                    return False #Mostrar pantalla bajo puntaje
             
         #Con Pigarto
         if pigarto.colisionar(player_y, player_x) and colision_detected==False:
@@ -379,9 +375,9 @@ def jugar(SCREEN):
                 pygame.mixer.music.stop() 
                 if player_pts > 0:
                     cfg.guardar_nuevo_puntaje(screen, player_pts)
-                    return True
+                    return True #Volver al menú
                 else:
-                    return False
+                    return False #Mostrar pantalla bajo puntaje
             
         #Con Raiz negativa
         if raiznegativa.colisionar(player_y, player_x) and colision_detected==False:
@@ -391,10 +387,6 @@ def jugar(SCREEN):
                 player_item=""
                 raiznegativa.exist=0
                 inmunidad=0
-                if pigarto.exist==1 and cero.exist==0:
-                    print("espada: cero")
-                    sword.actual_y=cero.positions_y
-                    sword.actual_x=cero.positions_x
             elif player_item==sword.name:
                 raiznegativa.hp-=sword.damage
                 raiznegativa.positions_x=10
@@ -414,9 +406,9 @@ def jugar(SCREEN):
                 pygame.mixer.music.stop() 
                 if player_pts > 0:
                     cfg.guardar_nuevo_puntaje(screen, player_pts)
-                    return True
+                    return True #Volver al menú 
                 else:
-                    return False
+                    return False #Mostrar pantalla bajo puntaje
         
         #COLISIÓN CON ITEMS
         #Espada
@@ -547,7 +539,7 @@ def jugar(SCREEN):
         if mostrando_mensaje_victoria:
             mensaje_temporizador -= 1 # Por cada frame del juego, se va restando 1 hasta que se cumplan los 3 segundos
             if mensaje_temporizador <= 0:
-                reiniciar_juego()  # Reinicia todo después del mensaje
+                reiniciar_juego()  # Reinicia todo excepto el puntaje después del mensaje
                 mostrando_mensaje_victoria = False
             else:
                 # Dibuja el mensaje de victoria (fondo negro y texto)
