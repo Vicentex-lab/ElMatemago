@@ -224,7 +224,6 @@ def jugar(SCREEN):
         # Reiniciar movimiento
         dir_x = 0
         dir_y = 0
-        move_timer = 0
         
         # Reiniciar efecto de flotación
         float_offset = 0
