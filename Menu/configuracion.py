@@ -106,7 +106,7 @@ def cargar_mejores_puntajes():
             puntajes = json.load(archivo)
             
             # 3. Ordena la lista de diccionarios.
-            #'key=lambda x: x["player_pts"]' indica que el criterio de ordenamiento
+            #'key=lambda x: x["player_pts"]' indica que el criterio de ordenamiento --> (lambda es una función sin nombre que se define en una sola línea)
             # es el valor asociado a la clave "player_pts" en cada diccionario.
             # 'reverse=True' indica que el orden debe ser descendente (de mayor a menor).
             puntajes_ordenados = sorted(puntajes, key=lambda x: x["player_pts"], reverse=True)
@@ -164,7 +164,7 @@ def obtener_nombre(screen, player_pts):
                 if event.key == pygame.K_RETURN:
                     # Al presionar ENTER, se valida el nombre:
                     # Debe tener al menos un carácter que no sea espacio en blanco (`nombre.strip() != ""`)
-                    # Y todos sus caracteres deben ser letras (`nombre.replace(' ', '').isalpha()`).
+                    # Y todos sus caracteres deben ser letras (`nombre.replace(' ', '').isalpha()`). (Se reemplazan espacios por cadena vacía y verifica si el carácter añadido es una letra)
                     if nombre.strip() != "" and nombre.replace(' ', '').isalpha():
                         textbox = False # Nombre válido: sale del bucle
                     else:
@@ -276,7 +276,7 @@ def guardar_nuevo_puntaje(screen, player_pts):
         print("Error: RUTA_PUNTAJES no está definida. No se guardará el puntaje.")
         return
     except (json.JSONDecodeError, FileNotFoundError, IOError):
-        # Ignora errores y simplemente usa la lista vacía 'todos_los_puntajes = []'.
+        # Ignora errores en la lectura y simplemente usa la lista vacía 'todos_los_puntajes = []'.
         pass
 
     # 3. Añade el nuevo puntaje con el nombre y el puntaje obtenido.
@@ -286,9 +286,9 @@ def guardar_nuevo_puntaje(screen, player_pts):
     try:
         # Abre el archivo en modo escritura ('w') y lo sobrescribe.
         with open(RUTA_PUNTAJES, "w") as archivo:
-            # Escribe la lista completa de Python como una cadena JSON, usando 'indent=4' para formato legible (sangría de 4 espacios).
+            # Escribe la lista completa de Python como una cadena JSON, usando 'indent=4' para formato legible (sangría de 4 espacios y salto de línea automático).
             json.dump(todos_los_puntajes, archivo, indent=4)
         print("Puntaje guardado exitosamente.")
-    except IOError:
+    except IOError: # Cubre si es que hay otros problemas aparte de que el archivo no exista al momento de la escritura, IOError es un error de entrada y salida, evita que se cierre el programa
         print(f"Error al escribir en el archivo: {RUTA_PUNTAJES}")
 
