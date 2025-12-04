@@ -6,679 +6,187 @@ import criaturas as cr
 import items as item
 import random
 import configuracion as cfg
-# Inicializa Pygame
+from juego import jugar as iniciar_juego # Importa la función principal del juego desde 'juego.py'
+
+# INICIALIZACIÓN DE PYGAME Y PANTALLA 
+
+# Inicializa todos los módulos necesarios de Pygame
 pygame.init() 
-pygame.mixer.init()  # Inicializa el módulo de mezcla de sonido
+pygame.mixer.init()  # Inicializa el módulo de mezcla de sonido (necesario para la música y efectos).
 
-
-# Define la pantalla en modo Fullscreen
+# Define la pantalla en modo Fullscreen utilizando las dimensiones obtenidas en 'configuracion.py'.
 SCREEN = pygame.display.set_mode((cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA), pygame.FULLSCREEN)
 
-#Importamos sprites luego definir pantalla Fullscreen
-from sprites import MAGO, CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO
-pygame.display.set_caption("EL MATEMAGO")
+#  CARGA Y CONFIGURACIÓN DE ASSETS (SPRITES) 
 
-#Cargamos fondo menu
-fondo_menu = pygame.image.load("./assets/menu_editado.png").convert()
+
+#Importamos sprites luego de definir la pantalla (SCREEN)
+from sprites import MAGO, CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO, CORAZON
+pygame.display.set_caption("EL MATEMAGO") #Establece el título de la ventana
+
+#Utilizamos .convert_alpha() una vez definida SCREEN
+# Optimiza las imágenes cargadas para un dibujo más rápido en la pantalla y mantiene la transparencia de las imágenes.
+#Forma general de optimizacion
+MAGO = MAGO.convert_alpha()
+CERO = CERO.convert_alpha()
+RAIZNEGATIVA = RAIZNEGATIVA.convert_alpha()
+PIGARTO = PIGARTO.convert_alpha()
+ESPADA = ESPADA.convert_alpha()
+ESCUDO = ESCUDO.convert_alpha()
+ANILLO = ANILLO.convert_alpha()
+CORAZON = CORAZON.convert_alpha()
+
+#Cargamos imagen de fondo para el menú
+fondo_menu = pygame.image.load("./assets/menu_editado.png").convert() #metodo .convert convierte la imagen al mismo formato de color de pantalla
+                                                                        #otra forma de optimizar y mas eficiencia
+# Escala el fondo para que ocupe todo el tamaño de la pantalla. tenemos escala actual y la transformamos a (ancho, altura pantalla)
 fondo_menu = pygame.transform.scale(fondo_menu, SCREEN.get_size())
 
 
-
-# --- FUNCIÓN DE UTILIDAD PARA SALIDA RÁPIDA (ESCAPE / QUIT) ---
+# FUNCIÓN DE UTILIDAD PARA SALIDA RÁPIDA (ESCAPE / QUIT)
 def manejar_salida_menu(event):
-    """Maneja eventos de salida directa del juego (QUIT o ESCAPE) en pantallas de menú."""
+    """
+     Maneja eventos de salida directa del juego (QUIT o ESCAPE) en pantallas de menú.
+     
+     Args:
+         event (pygame.event.Event): El objeto evento de Pygame (necesita event par determinar el tipo de evento que se le pasa a la función y ver qué acción tomar)
+     """
     if event.type == pygame.QUIT:
+        # El usuario hace clic en el botón de cerrar de la ventana.
         pygame.quit()
         sys.exit()
     if event.type == pygame.KEYDOWN:
         if event.key == pygame.K_ESCAPE:
+            # El usuario presiona la tecla ESC.
             pygame.quit()
             sys.exit()
 
-def low_score_message():
-    """Muestra un mensaje indicando que el puntaje es demasiado bajo para guardar y vuelve al menú."""
+# PANTALLA DE PUNTAJE BAJO (bajo_puntaje) 
+def bajo_puntaje():
+    """
+       Muestra un mensaje de advertencia de 3 segundos si el puntaje final es 0. 
+       Impide guardar puntajes de cero.
+    """
     
     # Detiene cualquier música que quede sonando
     pygame.mixer.music.stop() 
     
-    # 1. Crear un reloj local y definir FPS 
+    # 1. Crea un reloj local y define FPS 
     clock = pygame.time.Clock() 
     FPS = 60
     
-    start_time = pygame.time.get_ticks()
-    display_time = 3000 # Mostrar por 3 segundos
+    # Inicia un temporizador para controlar cuánto tiempo se muestra la pantalla.
+    tiempo_inicio = pygame.time.get_ticks() #Devuelve los milisegundos que han transcurrido desde que se inicia el programa. Tiempo inicio se iguala a pygame.time.get_ticks() en ese preciso instante
+    tiempo_mostrar = 3000 # Mostrar por 3 segundos
     
-    while pygame.time.get_ticks() - start_time < display_time:
+    while pygame.time.get_ticks() - tiempo_inicio < tiempo_mostrar: #Se muestra mientras la diferencia entre el tiempo en que se inicia el programa y tiempo_inicio sea mayor a 3 segundos (el tiempo en que se inició el programa aumenta a cada momento)
         
-        # 2. Limitar la velocidad del bucle
+        # 2. Limitar la velocidad del bucle a 60 cuadros por segundo
         clock.tick(FPS) 
         
         # Manejo de eventos para permitir salir con QUIT/ESCAPE
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+                manejar_salida_menu(event) # Utiliza la función de utilidad para QUIT/ESCAPE.
             # Permitir salir antes de tiempo presionando ESCAPE
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                return menu_principal() 
+                return menu_principal() #Vuelve al menú principal
         
         # DIBUJO DEL MENSAJE 
         SCREEN.fill("#111111") # Fondo oscuro
 
-        # Título
+        # Renderiza el texto del título y el mensaje de advertencia, usando fuentes de cfg.
         TEXTO_TITULO = cfg.get_letra(60).render("¡FIN DEL JUEGO!", True, "#FF0000") 
         RECT_TITULO = TEXTO_TITULO.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 50))
         SCREEN.blit(TEXTO_TITULO, RECT_TITULO)
         
+        #Subtitulos
         TEXTO_SUB = cfg.get_letra(20).render("TU PUNTAJE ES 0. NECESITAS MÁS DE 0 PUNTOS PARA PODER GUARDARLO.", True, "#FFFFFF")
         RECT_SUB = TEXTO_SUB.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y + 50))
         SCREEN.blit(TEXTO_SUB, RECT_SUB)
         
+        # Actualiza toda la pantalla para mostrar los cambios.
         pygame.display.update() 
         
     return menu_principal() # Vuelve al menú principal después de 3 segundos
     
-# --- PANTALLA JUGAR ----- #
 
-def jugar():
-    # Muestra la pantalla de juego, detiene la música del menú e inicia la música de juego.
-    
-    # 1. Detiene la música actual (la del menú)
-    pygame.mixer.music.stop()
-    
-    # 2. Carga y reproduce la música del juego en loop
-    try:
-        pygame.mixer.music.load(cfg.RUTA_MUSICA_JUEGO) 
-        pygame.mixer.music.play(-1)
-        pygame.mixer.music.set_volume(cfg.VOLUMEN_GLOBAL) 
-    except pygame.error as e:
-        print(f"Error al cargar la música del juego: {e}")
-
-    def mostrar_puntaje(player_pts):
-        fuente = cfg.get_letra(30)  
-        texto = fuente.render(f"PUNTAJE: {player_pts}", True, (255, 255, 0)) 
-        SCREEN.blit(texto, (50,50)) # Usar SCREEN global
-
-    FPS = 60
-    
-    FILAS = len(colision.maze)
-    COLUMNAS = len(colision.maze[0])
-    
-    COLOR_WALL = (30,30,30)
-    COLOR_FLOOR = (253, 254, 253)
-    COLOR_PLAYER = (0,120,255)
-    COLOR_CERO = (0, 0, 255)
-    COLOR_PIGARTO = (0, 255, 0)
-    COLOR_RAIZ = (255, 0, 0)
-    COLOR_SWORD = (255, 255, 0)
-    COLOR_SHIELD = (255, 165, 0)
-    COLOR_RING = (0, 0, 0)
-    COLOR_HEART = (255, 100, 100)
-    
-    screen = SCREEN # Usar la variable global SCREEN
-    clock = pygame.time.Clock()
-    
-    #Definiciones del jugador
-    player_y = cr.player.positions_y
-    player_x = cr.player.positions_x
-    player_hp = cr.player.hp
-    player_item=""
-    inmunidad=0
-    player_pts=cr.player.pts
-    temporizador=0
-    
-    # Pigarto: Resetea el índice de posición en su camino y su existencia.
-    cr.pigarto.pos = 0 
-    cr.pigarto.exist = 1 # Asumimos que debe empezar vivo
-    
-    # Cero: Resetea su existencia y posición (si fueron modificados al morir).
-    cr.cero.exist = 1 
-    
-    # Raíz Negativa: Resetea su existencia
-    cr.raiznegativa.exist = 1 
-
-    
-    #Spawnear Item
-    #Espada
-    cont_aux_1=random.randint(0, 5)
-    print("espada",  cont_aux_1)
-    sword_place_y=item.sword.places_y[ cont_aux_1]
-    sword_place_x=item.sword.places_x[ cont_aux_1]
-    
-    #Escudo
-    cont_aux_1=random.randint(0, 5)
-    while item.shield.places_x==sword_place_x and item.shield.places_y==sword_place_y:
-        cont_aux_1=random.randint(0, 5)
-    print("escudo",  cont_aux_1)
-    shield_place_y=item.shield.places_y[cont_aux_1]
-    shield_place_x=item.shield.places_x[cont_aux_1]
-    
-    #Anillo
-    cont_aux_1=random.randint(0, 5)
-    print("anillo", cont_aux_1)
-    while item.ring.places_x==sword_place_x and item.ring.places_y==sword_place_y and item.ring.places_x==shield_place_x and item.ring.places_y==shield_place_y:
-        cont_aux_1=random.randint(0, 5)
-    ring_place_y=item.shield.places_y[cont_aux_1]
-    ring_place_x=item.shield.places_x[cont_aux_1]
-    
-    def can_move(r, c):
-        return 0 <= r < FILAS and 0 <= c < COLUMNAS and colision.maze[r][c] >= 1
-    
-    def eventos(): #Etiquetas para la matriz
-            nonlocal player_y
-            nonlocal player_x
-            if colision.maze[player_y][player_x] == 2: #Teletransportación Matemagica 1
-                        if player_y==14 and player_x==0:
-                            player_y=13
-                            player_x=18
-                            print("Matemagicamente Teletransportado")
-                            
-                        if player_y==13 and player_x==19:
-                            player_y=14
-                            player_x=1
-                            print("Matemagicamente Teletransportado")
-                            
-            if colision.maze[player_y][player_x] == 3: #Teletransportación Matemagica 2
-                        if player_y==0 and player_x==9:
-                            player_y=26
-                            player_x=10
-                            print("Matemagicamente Teletransportado")
-                            
-                        if player_y==27 and player_x==10:
-                            player_y=1
-                            player_x=9
-                            print("Matemagicamente Teletransportado")
-    
-    #MOVIMIENTO DEL ENEMIGO
-    # ---------------------------
-    # CERO
-    # ---------------------------
-    cero_y = cr.cero.positions_y
-    cero_x = cr.cero.positions_x
-    cero_exist=cr.cero.exist
-    cero_cooldown = 0
-    cero_ratio=cr.cero.movement_ratio
-    
-    # ---------------------------
-    # Pigarto
-    # ---------------------------
-    pigarto_y = cr.pigarto.positions_y
-    pigarto_x = cr.pigarto.positions_x
-    pigarto_cooldown = 0
-    pigarto_exist=cr.pigarto.exist
-    pigarto_ratio=cr.pigarto.movement_ratio
-    # ---------------------------
-    # Raíz Negativa
-    # ---------------------------
-    raiznegativa_y = cr.raiznegativa.positions_y
-    raiznegativa_x = cr.raiznegativa.positions_x
-    raiznegativa_ratio=cr.raiznegativa.movement_ratio
-    raiznegativa_cooldown = 0
-    raiznegativa_exist=cr.raiznegativa.exist
-
-    def mover_enemigo(f, c, f_obj, c_obj):
-        """Mueve al enemigo acercándose al jugador"""
-
-        # Vertical
-        if f_obj < f and can_move(f - 1, c):
-            f -= 1
-        elif f_obj > f and can_move(f + 1, c):
-            f += 1
-
-        # Horizontal
-        elif c_obj < c and can_move(f, c - 1):
-            c -= 1
-        elif c_obj > c and can_move(f, c + 1):
-            c += 1
-
-        return f, c
- 
-    
-    move_cooldown = True   # evita que avance varias casillas al dejar presionada una tecla
-    
-    # ============================
-    #  MOVIMIENTO DEL JUGADOR 
-    # ============================
-
-
-    # Dirección actual del jugador
-    dir_x = 0
-    dir_y = 0
-
-    # Dirección deseada por el jugador
-    deseada_x = 0   
-    deseada_y = 0
-
-    # Posición en pixeles
-    pos_x = player_x * cfg.TILE   #cfg.tile es el tamaño de una casilla en pixeles
-    pos_y = player_y * cfg.TILE
-
-    speed = 1  # velocidad (pixeles por frame)
-
-    running = True
-    while running:
-       
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
-            # Guardar dirección DESEADA siempre
-            if event.type == pygame.KEYDOWN:
-                if event.key in (pygame.K_w, pygame.K_UP):
-                    deseada_x = 0
-                    deseada_y = -1
-
-                if event.key in (pygame.K_s, pygame.K_DOWN):
-                    deseada_x = 0
-                    deseada_y = 1
-
-                if event.key in (pygame.K_a, pygame.K_LEFT):
-                    deseada_x = -1
-                    deseada_y = 0
-
-                if event.key in (pygame.K_d, pygame.K_RIGHT):
-                    deseada_x = 1
-                    deseada_y = 0
-
-   
-        # Convierte la posición de píxeles a casilla
-   
-        tile_x = round(pos_x / cfg.TILE)
-        tile_y = round(pos_y / cfg.TILE)
-
-        # Calcula si esta el jugador esta centrado
-        alineado_x = (pos_x % cfg.TILE) == 0   # Si el resto es 0 esta alineado
-        alineado_y = (pos_y % cfg.TILE) == 0
-
-        if alineado_x and alineado_y:
-            next_tx = tile_x + deseada_x
-            next_ty = tile_y + deseada_y
-
-            if can_move(next_ty, next_tx): 
-                dir_x = deseada_x
-                dir_y = deseada_y
-
-            # Verificar la dirección actual
-            next_tx = tile_x + dir_x
-            next_ty = tile_y + dir_y
-
-            if not can_move(next_ty, next_tx):
-                dir_x = 0
-                dir_y = 0
-
-        # Mover en pixeles
-        # Actualiza la posición en píxeles
-        pos_x += dir_x * speed  
-        pos_y += dir_y * speed
-
-        # Actualiza la posición en casillas
-        player_x = round(pos_x / cfg.TILE) # round es para elegir la posicion mas cercana a la actual
-        player_y = round(pos_y / cfg.TILE)
-
-        eventos()
-
-                
-        # ---------------------------
-        # MOVER ENEMIGO
-        # ---------------------------
-        #Cero
-        ahora = pygame.time.get_ticks()
-        if ahora - cero_cooldown >= cero_ratio:
-            cero_y, cero_x = mover_enemigo(cero_y, cero_x, player_y, player_x)
-            cero_cooldown = ahora
-
-        #Pigarto
-        if ahora - pigarto_cooldown >= pigarto_ratio:
-            if cr.pigarto.pos<106:
-                cr.pigarto.pos = cr.pigarto.pos+1
-                pigarto_cooldown=ahora
-            if cr.pigarto.pos>=106:
-                cr.pigarto.pos=0
-                pigarto_cooldown=ahora
-                
-        #Raiz negativa
-        if ahora - raiznegativa_cooldown >= raiznegativa_ratio:
-            raiznegativa_y, raiznegativa_x = mover_enemigo(raiznegativa_y, raiznegativa_x, player_y, player_x)
-            raiznegativa_cooldown = ahora
-            #ESTOCADA INTEGRADA EN  MAIN
-            if raiznegativa_x==player_x:
-                raiznegativa_ratio=cr.raiznegativa.movement_ratio-150
-            elif raiznegativa_y==player_y:
-                raiznegativa_ratio=cr.raiznegativa.movement_ratio-150
-            else:
-                raiznegativa_ratio=cr.raiznegativa.movement_ratio
-        # ---------------------------
-        # COLISIÓN (Lógica de DERROTA)
-        # ---------------------------
-        #Con CERO
-        if cero_y == player_y and cero_x == player_x and cero_exist==1:
-            if player_item==item.shield.name:
-                player_item=""
-                inmunidad=0
-                cero_x=cr.cero.positions_x
-                cero_y=cr.cero.positions_y
-            elif player_item==item.sword.name:
-                player_pts+=cr.cero.pts
-                COLOR_CERO=COLOR_FLOOR
-                player_item=""
-                cero_exist=0
-                if pigarto_exist==1 and raiznegativa_exist==0:
-                    print("espada: cero")
-                    COLOR_SWORD=(255, 255, 0)
-                    sword_place_y=cr.cero.positions_y
-                    sword_place_x=cr.cero.positions_y
-            elif inmunidad!=1 and player_hp-cr.cero.damage>0:
-                player_x=cr.player.positions_x #El matemago muere instantaneamente si no se cambia de lugar
-                player_y=cr.player.positions_y #Ideal siguiente paso es poenr frames de invlunerabilidad, por mientras esto funciona.
-                player_hp-=cr.cero.damage
-            elif inmunidad!=1 and player_hp-cr.cero.damage<=0:
-                print("💀 cero")
-                pygame.mixer.music.stop() 
-                if player_pts > 0:
-                    cfg.guardar_nuevo_puntaje(screen, player_pts)
-                    return menu_principal() 
-                else:
-                    return low_score_message() # Puntaje 0, mensaje y retorno al menú
-
-        #Con Pigarto
-        if pigarto_y[cr.pigarto.pos] == player_y and pigarto_x[cr.pigarto.pos] == player_x and pigarto_exist==1:
-            if player_item==item.shield.name:
-                cr.pigarto.pos=0
-                inmunidad=0
-                player_item=""
-            elif player_item==item.sword.name:
-                if cero_exist==1 or raiznegativa_exist==1: #Comando normal
-                    cr.pigarto.hp=cr.pigarto.hp-item.sword.damage
-                if cero_exist==0 and raiznegativa_exist==0 and pigarto_exist==1: #Comando cuando sólo queda pigarto
-                    pigarto_exist=0
-                    pigarto_ratio=9999999
-                    COLOR_PIGARTO=COLOR_FLOOR
-                    player_pts+=cr.pigarto.pts
-                player_item=""
-                
-                cr.pigarto.pos=0
-                if cr.pigarto.hp<=0:
-                    player_pts+=cr.pigarto.pts
-                    pigarto_exist=0
-                    pigarto_x=0
-                    pigarto_y=0
-                    pigarto_ratio=9999999
-                    COLOR_PIGARTO=COLOR_WALL
-            elif player_item==item.ring.name:
-                player_pts+=cr.pigarto.pts
-                COLOR_PIGARTO=COLOR_FLOOR
-                player_item=""
-                pigarto_exist=0
-            elif inmunidad!=1 and player_hp-cr.pigarto.damage>0:
-                player_x=cr.player.positions_x #El matemago muere instantaneamente si no se cambia de lugar
-                player_y=cr.player.positions_y #Ideal siguiente paso es poenr frames de invlunerabilidad, por mientras esto funciona.
-                player_hp-=cr.pigarto.damage
-            elif inmunidad!=1 and player_hp-cr.pigarto.damage<=0:
-                print("💀 pigarto")
-                pygame.mixer.music.stop() 
-                if player_pts > 0:
-                    cfg.guardar_nuevo_puntaje(screen, player_pts)
-                    return menu_principal() 
-                else:
-                    return low_score_message() # Puntaje 0, mensaje y retorno al menú
-            
-        #Con Raiz negativa
-        if raiznegativa_y == player_y and raiznegativa_x == player_x and raiznegativa_exist==1:
-            if player_item==item.shield.name:
-                player_pts+=cr.raiznegativa.pts
-                COLOR_RAIZ=COLOR_FLOOR
-                player_item=""
-                raiznegativa_exist=0
-                inmunidad=0
-                raiznegativa_x=0
-                raiznegativa_y=0
-                raiznegativa_ratio=9999999
-                if pigarto_exist==1 and cero_exist==0:
-                    print("espada: cero")
-                    COLOR_SWORD=(255, 255, 0)
-                    sword_place_y=cr.cero.positions_y
-                    sword_place_x=cr.cero.positions_y
-            elif player_item==item.sword.name:
-                cr.raiznegativa.hp-=item.sword.damage
-                player_item=""
-                raiznegativa_x=cr.raiznegativa.positions_x
-                raiznegativa_y=cr.raiznegativa.positions_y
-                if cr.raiznegativa.hp<=0:
-                    player_pts+=cr.raiznegativa.pts
-                    raiznegativa_exist=0
-                    raiznegativa_x=0
-                    raiznegativa_y=0
-                    raiznegativa_ratio=9999999
-                    COLOR_RAIZ=COLOR_FLOOR
-            elif inmunidad!=1 and player_hp-cr.raiznegativa.damage>0:
-                player_x=cr.player.positions_x #El matemago muere instantaneamente si no se cambia de lugar
-                player_y=cr.player.positions_y #Ideal siguiente paso es poenr frames de invlunerabilidad, por mientras esto funciona.
-                player_hp-=cr.raiznegativa.damage
-            elif inmunidad!=1 and player_hp-cr.raiznegativa.damage<=0:
-                print("💀 raiz")
-                pygame.mixer.music.stop() 
-                if player_pts > 0:
-                    cfg.guardar_nuevo_puntaje(screen, player_pts)
-                    return menu_principal() 
-                else:
-                    return low_score_message() # Puntaje 0, mensaje y retorno al menú
-        
-        #COLISIÓN CON ITEMS
-        #Espada
-        if sword_place_x==player_x and sword_place_y==player_y:
-            player_item=item.sword.name
-            sword_place_x=0
-            sword_place_y=1
-            player_pts+=item.sword.pts
-            
-        #Escudo
-        if shield_place_x==player_x and shield_place_y==player_y:
-            player_item=item.shield.name
-            inmunidad=1
-            shield_place_x=0
-            shield_place_y=2
-            player_pts+=item.shield.pts
-            
-        if ring_place_x==player_x and ring_place_y==player_y:
-            player_item=item.ring.name
-            ring_place_x=0
-            ring_place_y=3
-            player_pts+=item.ring.pts
-            
-        # DIBUJO
-    
-        #Mapa
-        for r in range(FILAS):
-            for c in range(COLUMNAS):
-                rect = pygame.Rect(c*cfg.TILE + cfg.offset_x, r*cfg.TILE + cfg.offset_y, cfg.TILE, cfg.TILE)
-                color = COLOR_FLOOR if colision.maze[r][c] >= 1 else COLOR_WALL
-                pygame.draw.rect(screen, color, rect)
-                
-        #HUD provisoria
-        if player_hp==1:
-            pygame.draw.rect(
-                screen, COLOR_HEART,
-                (19*cfg.TILE + 6 + cfg.offset_x, 1*cfg.TILE + 6 + cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
-            )
-        if player_hp>1:
-            pygame.draw.rect(
-                screen, COLOR_HEART,
-                (19*cfg.TILE + 6 + cfg.offset_x, 2*cfg.TILE + 6 + cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
-            )
-        if player_hp>2:
-            pygame.draw.rect(
-                screen, COLOR_HEART,
-                (19*cfg.TILE + 6 + cfg.offset_x, 3*cfg.TILE + 6 + cfg.offset_y, cfg.TILE-12, cfg.TILE-12)
-            )
-                
-       #   DIBUJAMOS SPRITES
-       
-       # --- ENEMIGOS ---     
-       # Cero
-        if cero_exist == 1:
-            screen.blit(
-                CERO,
-                (
-                    cero_x * cfg.TILE + cfg.offset_x,
-                    cero_y * cfg.TILE + cfg.offset_y
-                )
-            )
-        
-        # Pigarto
-        if pigarto_exist == 1:
-            screen.blit(
-                PIGARTO,
-                (
-                    pigarto_x[cr.pigarto.pos] * cfg.TILE + cfg.offset_x,
-                    pigarto_y[cr.pigarto.pos] * cfg.TILE + cfg.offset_y
-                )
-            )
-        
-        # Raíz Negativa
-        if raiznegativa_exist == 1:
-            screen.blit(
-                RAIZNEGATIVA,
-                (
-                    raiznegativa_x * cfg.TILE + cfg.offset_x,
-                    raiznegativa_y * cfg.TILE + cfg.offset_y
-                )
-            )
-        
-        # --- ITEMS ---
-        
-        # Espada
-        screen.blit(
-            ESPADA,
-            (
-                sword_place_x * cfg.TILE + cfg.offset_x,
-                sword_place_y * cfg.TILE + cfg.offset_y
-            )
-        )
-        
-        # Escudo
-        screen.blit(
-            ESCUDO,
-            (
-                shield_place_x * cfg.TILE + cfg.offset_x,
-                shield_place_y * cfg.TILE + cfg.offset_y
-            )
-        )
-        
-        # Anillo
-        screen.blit(
-            ANILLO,
-            (
-                ring_place_x * cfg.TILE + cfg.offset_x,
-                ring_place_y * cfg.TILE + cfg.offset_y
-            )
-        )
-        
-        # --- JUGADOR ---
-        
-        screen.blit(
-            MAGO,
-            (
-                player_x * cfg.TILE + cfg.offset_x,
-                player_y * cfg.TILE + cfg.offset_y
-            )
-        )
-        
-       
-       
-        
-        temporizador+=1
-        
-        # Lógica de VICTORIA
-        if pigarto_exist==0 and cero_exist==0 and raiznegativa_exist==0:
-            running = False
-            print("Puntaje sin bonus por tiempo:", player_pts)
-            print("Segundos", temporizador/60)
-            if temporizador/60<=12:
-                player_pts+=2000
-                print("TIEMPO INHUMANO") 
-            elif temporizador/60<=15:
-                player_pts+=1000
-            elif temporizador/60<=20:
-                player_pts+=500
-            elif temporizador/60<=40:
-                player_pts+=250
-            elif temporizador/60<=60:
-                player_pts+=100
-            elif temporizador/60>60:
-                player_pts+=0
-                                
-            pygame.mixer.music.stop() 
-            # Llama a guardar puntaje con el orden corregido (screen, player_pts)
-            cfg.guardar_nuevo_puntaje(SCREEN, player_pts) 
-            print("Puntaje total:", player_pts)
-            return menu_principal() # Regresa al menú principal
-    
-        
-        mostrar_puntaje(player_pts)
-        pygame.display.flip()
-
-    # Si sale del bucle 'while running' por QUIT o ESCAPE, regresa al menú
-    return menu_principal()
-
-
-# --- PANTALLA MARCADORES (CORREGIDA LA SALIDA) ---
+# PANTALLA MARCADORES 
 
 def marcadores():
-    top_scores = cfg.cargar_mejores_puntajes()
+    """
+        Muestra la lista de los mejores puntajes cargados desde el archivo JSON.
+    """
     
+    # Llama a la función de utilidad para cargar y ordenar el Top 3.
+    top_puntaje = cfg.cargar_mejores_puntajes()
+    
+    # Variables de posicionamiento para centrar los puntajes.
     x_pos = cfg.CENTRO_X
     y_start = cfg.CENTRO_Y - 140
     line_spacing = 70
 
     while True:
         POS_MOUSE_MARCADORES = pygame.mouse.get_pos()
-        SCREEN.fill("#333333") 
-
-        TEXTO_TITULO = cfg.get_letra(60).render("MEJORES PUNTAJES", True, "#FFD700") 
-        RECT_TITULO = TEXTO_TITULO.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 280))
+        SCREEN.blit(fondo_menu, (0, 0)) 
+        
+        # Título de la pantalla.
+        TEXTO_TITULO = cfg.get_letra(50).render("MARCADORES", True, "#f2c572")
+        RECT_TITULO = TEXTO_TITULO.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 330))
         SCREEN.blit(TEXTO_TITULO, RECT_TITULO)
         
-        if top_scores:
-            for i, score_data in enumerate(top_scores):
-                # Usamos .get() para seguridad
-                nombre = score_data.get("nombre", "N/A")
-                puntaje = score_data.get("player_pts", 0)
+        if top_puntaje:
+            # Si hay puntajes guardados, itera sobre la lista.
+            for i, datos_puntaje in enumerate(top_puntaje):
+                # Extrae nombre y puntaje (con valores por defecto por seguridad).
+                nombre = datos_puntaje.get("nombre", "N/A") #Si falta la clave nombre en algún registro, .get se encarga de asignar un valor por defecto (N/A) y que no se cierre el programa
+                puntaje = datos_puntaje.get("player_pts", 0)
                 
-                score_text = f"{i+1}. {nombre} - {puntaje}"
+                # Formatea la línea: [Ranking]. [Nombre] - [Puntaje]
+                text_puntaje = f"{i+1}. {nombre} - {puntaje}"
                 
-                TEXTO_SCORE = cfg.get_letra(40).render(score_text, True, "White")
+                # Posiciona cada puntaje hacia abajo usando el índice (i) y el espaciado.
+                TEXTO_SCORE = cfg.get_letra(40).render(text_puntaje, True, "White")
                 
                 RECT_SCORE = TEXTO_SCORE.get_rect(center=(x_pos, y_start + i * line_spacing))
                 SCREEN.blit(TEXTO_SCORE, RECT_SCORE)
         else:
-            TEXTO_SIN_SCORES = cfg.get_letra(30).render("Aún no hay puntajes registrados.", True, "White")
+            # Si la lista está vacía, muestra un mensaje por defecto.
+            TEXTO_SIN_SCORES = cfg.get_letra(30).render("AÚN NO HAY PUNTAJES REGISTRADOS.", True, "White")
             RECT_SIN_SCORES = TEXTO_SIN_SCORES.get_rect(center=(x_pos, y_start))
             SCREEN.blit(TEXTO_SIN_SCORES, RECT_SIN_SCORES)
         
-        VOLVER_MARCADORES = Button(image=pygame.image.load("./assets/Options Rect.png"), pos=(cfg.CENTRO_X, y_start + len(top_scores) * line_spacing + 100), 
-                            text_input="VOLVER", font=cfg.get_letra(75), base_color="White", hovering_color="Red")
+        # Botón para volver al menú principal.
+        VOLVER_MARCADORES = Button(image=pygame.image.load("./assets/Options Rect.png"), pos=(cfg.CENTRO_X, y_start + len(top_puntaje) * line_spacing + 100), 
+                            text_input="VOLVER", font=cfg.get_letra(50), base_color="#e2f3ff", hovering_color="#fff7d1")
         VOLVER_MARCADORES.changeColor(POS_MOUSE_MARCADORES)
         VOLVER_MARCADORES.update(SCREEN)
 
+        # Manejo de eventos.
         for event in pygame.event.get():
             manejar_salida_menu(event) 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if VOLVER_MARCADORES.checkForInput(POS_MOUSE_MARCADORES):
-                    return menu_principal() # Usar return para volver
+                    return menu_principal() # Usar return para volver al menú principal
 
         pygame.display.update()
 
-# --- PANTALLA MANUAL (CORREGIDA LA SALIDA) ---
+# PANTALLA MANUAL 
 
 def manual():
+    """
+       Muestra la pantalla del manual y proporciona un botón para abrir el PDF.
+    """
     print("ENTRANDO A LA PANTALLA DE MANUAL")
     while True:
         POS_MOUSE_MANUAL = pygame.mouse.get_pos()
-        SCREEN.fill("gray")
+        SCREEN.blit(fondo_menu, (0, 0))
+        
         # Título del manual
-        TEXTO_MANUAL = cfg.get_letra(45).render("MANUAL EL MATEMAGO.", True, "Black")
-        RECT_MANUAL = TEXTO_MANUAL.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 100))
+        TEXTO_MANUAL = cfg.get_letra(50).render("MANUAL", True, "#f2c572")
+        RECT_MANUAL = TEXTO_MANUAL.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 330))
         SCREEN.blit(TEXTO_MANUAL, RECT_MANUAL)
+        
         #BOTÓN PARA ABRIR EL PDF
         BOTON_PDF = Button(
             # imagen del botón
@@ -687,71 +195,112 @@ def manual():
             pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 0),
             # texto dentro del botón
             text_input="ABRIR PDF",
-            font=cfg.get_letra(55),
-            base_color="Black",
-            hovering_color="Blue"
+            font=cfg.get_letra(50),
+            base_color="#e2f3ff",
+            hovering_color="#fff7d1"
         )
         BOTON_PDF.changeColor(POS_MOUSE_MANUAL)
         BOTON_PDF.update(SCREEN)
 
+        # Botón para volver.
         VOLVER_MANUAL = Button(image=pygame.image.load("./assets/Options Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 150), 
-                            text_input="VOLVER", font=cfg.get_letra(75), base_color="Black", hovering_color="Red")
+                            text_input="VOLVER", font=cfg.get_letra(50), base_color="#e2f3ff", hovering_color="#fff7d1")
         VOLVER_MANUAL.changeColor(POS_MOUSE_MANUAL)
         VOLVER_MANUAL.update(SCREEN)
 
+        # Manejo de eventos.
         for event in pygame.event.get():
             manejar_salida_menu(event) 
             # Detectar clic del mouse
             if event.type == pygame.MOUSEBUTTONDOWN:
                 #Abrir pdf
                 if BOTON_PDF.checkForInput(POS_MOUSE_MANUAL):
-                    # Ruta del archivo PDF dentro de la carpeta assets
-                    ruta_pdf = os.path.join("assets", "Manual de Matemago.pdf")
-                    print("ABRIENDO PDF:", ruta_pdf)
-                    # En Windows: abre el PDF con el programa predeterminado (Adobe, E
+                    #Libreria os permite trabajar con sistema operativo/Archivos
+                    
+                    #trabajamos con modulo os y metodo .path es para manejar rutas archivos y .join une correctamente partes ruta\,/
+                    ruta_pdf = os.path.join("assets", "Manual de Matemago.pdf") 
+                    
+                    # Ahora se Intenta abrir el archivo 
+                    # Se usa try/except porque si no estamos en Windows, estamos en Linux o MacOS
+                    # En Windows: abre el PDF con el programa predeterminado.
+                    #startfile() viene de modulo os y es especifico para abrir archivos en windows
                     try:
                         os.startfile(ruta_pdf)  
                     except:
                         # En Mac o Linux: usa el comando "open" para abrir el archivo
                         os.system(f"open {ruta_pdf}")
                         
-
+                    
                 if VOLVER_MANUAL.checkForInput(POS_MOUSE_MANUAL):
                     return menu_principal() # Usar return para volver
         
         pygame.display.update()
 
-# --- PANTALLA OPCIONES (CORREGIDA LA SALIDA) ---
+# PANTALLA OPCIONES 
 
 def opciones():
-    # Variable de control: indica si el usuario está arrastrando el slider
+    """
+       Muestra la pantalla de opciones, permitiendo al usuario ajustar el volumen 
+       mediante un control deslizante (slider).
+    """
+    # Variable de control: indica si el usuario está arrastrando el slider, de base es False y se hara True cuando se presione
     mouse_held = False
     while True:
-         # Posición actual del mouse
-        POS = pygame.mouse.get_pos()
-        SCREEN.fill("white")
-        TEXTO_OP = cfg.get_letra(70).render("OPCIONES", True, "Black")
-        SCREEN.blit(TEXTO_OP, TEXTO_OP.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 260)))
-        
-        # Texto que muestra el volumen actual en porcentaje
+        """#
+        VOLUMEN_GLOBAL = 0.5 # Nivel inicial de volumen (50%).
+        --- CONFIGURACIÓN DEL SLIDER DE VOLUMEN ---
+SLIDER_WIDTH = 500 # Anchura de la línea del slider
+SLIDER_HEIGHT = 10 #Altura de la línea del slider (es una línea horizontal).
 
-        TEXTO_VOL = cfg.get_letra(40).render(f"VOLUMEN: {int(cfg.VOLUMEN_GLOBAL*100)}%", True, "Black")
+# Posición X calculada como central inicialmente 
+#con esto centramos slider, restando la mitad del ancho a centro ventana
+SLIDER_X = CENTRO_X - (SLIDER_WIDTH // 2)  
+SLIDER_Y = CENTRO_Y - 80 # Posición Y fija, un poco arriba del centro.
+
+# Posición inicial del manejador (círculo) del slider.
+# Se calcula multiplicando el ancho total por el volumen actual (0.5),
+# y sumando eso a la posición inicial X del slider.
+SLIDER_HANDLE_X = SLIDER_X + int(SLIDER_WIDTH * VOLUMEN_GLOBAL)
+
+#tamaño circulo
+HANDLE_RADIUS = 15"""
+         # Posición actual del mouse (x,y)
+        POS = pygame.mouse.get_pos()
+        # Dibujamos el fondo del menú de opciones.
+        SCREEN.blit(fondo_menu, (0, 0))
+        
+        # Renderizamos el texto "OPCIONES" con una fuente grande (50 px)
+        # #.render convierte string en surface, True es para bordes suaves no pixelados
+        TEXTO_OP = cfg.get_letra(50).render("OPCIONES", True, "#f2c572")
+         # y lo centramos en una posición superior de la pantalla.
+        # con surface ya creada con texto "Volumen" creamos rectangulo para envolverlo
+        #center coloca en centro cordenadas de centro pantalla (centro_x y centro_y -330 para que este arriba)
+        SCREEN.blit(TEXTO_OP, TEXTO_OP.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 330)))
+        
+        
+        # Texto que muestra el volumen actual en porcentaje (usando VOLUMEN_GLOBAL de .cfg)
+        #.render convierte string en surface para trabajarla, True es antialiasing para bordes suaves texto
+        TEXTO_VOL = cfg.get_letra(40).render(f"VOLUMEN: {int(cfg.VOLUMEN_GLOBAL*100)}%", True, "White")
+        
+        #Dibujamos texto volumen (surface) y el rectangulo que lo envuelve, centramos ambos en su posicion
         SCREEN.blit(TEXTO_VOL, TEXTO_VOL.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 180)))
         
-        # --- SLIDER (asume variables cfg.* definidas) ---
+        # DIBUJO DEL SLIDER 
         
-        #Dibujar la barra del slider (rectángulo gris), configuracion declarada en configuracion.py
-        pygame.draw.rect(SCREEN, "gray", (cfg.SLIDER_X, cfg.SLIDER_Y, cfg.SLIDER_WIDTH, cfg.SLIDER_HEIGHT))
+        # Dibuja la barra de la línea del slider (rectángulo) con las dimensiones de cfg.
+        pygame.draw.rect(SCREEN, "#e2f3ff", (cfg.SLIDER_X, cfg.SLIDER_Y, cfg.SLIDER_WIDTH, cfg.SLIDER_HEIGHT))
+        
         # Dibujar la bolita del slider (círculo negro)
-        pygame.draw.circle(SCREEN, "black", (cfg.SLIDER_HANDLE_X, cfg.SLIDER_Y + cfg.SLIDER_HEIGHT//2), cfg.HANDLE_RADIUS)
+        pygame.draw.circle(SCREEN, "#f2c572", (cfg.SLIDER_HANDLE_X, cfg.SLIDER_Y + cfg.SLIDER_HEIGHT//2), cfg.HANDLE_RADIUS)
 
+        # Botón para volver.
         VOLVER = Button(
             image=pygame.image.load("./assets/Play Rect.png"),
             pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 150),
             text_input="VOLVER",
-            font=cfg.get_letra(60),
-            base_color="black",
-            hovering_color="red"
+            font=cfg.get_letra(50),
+            base_color="#e2f3ff",
+            hovering_color="#fff7d1"
         )
         VOLVER.changeColor(POS)
         VOLVER.update(SCREEN)
@@ -762,33 +311,47 @@ def opciones():
             # Cuando el usuario hace clic con el mouse
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # Detecta si el clic ocurrió sobre la bolita del slider
-                #Revisa si la posición horizontal del mouse está dentro del área de la bolita del slider.
-                #centro menos el radio
+                # Revisa si la posición horizontal del mouse está dentro del área de la bolita del slider.
+                # centro menos el radio
                 if (cfg.SLIDER_HANDLE_X - cfg.HANDLE_RADIUS <= POS[0] <= cfg.SLIDER_HANDLE_X + cfg.HANDLE_RADIUS
                     and cfg.SLIDER_Y - 10 <= POS[1] <= cfg.SLIDER_Y + 30):
                      # El usuario está agarrando el slider -> activar arrastre
                     mouse_held = True
                 if VOLVER.checkForInput(POS):
-                    return menu_principal() # Usar return para volver
-                 # Cuando el usuario suelta el clic -> dejar de arrastrar
+                    return menu_principal() # Usar return para volver al menú principal
+            
+            # Cuando el usuario suelta el clic -> dejar de arrastrar
             if event.type == pygame.MOUSEBUTTONUP:
                 mouse_held = False
+       
         #Configuracion mientras se arrastra
         
-        # Mover la bolita con el mouse pero sin salirse de la barra
+        # Mover la bolita con el mouse pero sin salirse de la barra, ej  Si el mouse está más a la derecha del límite, el mango se queda en el borde.
         if mouse_held:
+            #resumen min() y max ()
+            #min determina valor mas pequeño entre (a y b)
+            #max determina valor mas grande entre (a y b)
+            
+            
             cfg.SLIDER_HANDLE_X = max(cfg.SLIDER_X, min(POS[0], cfg.SLIDER_X + cfg.SLIDER_WIDTH))
              # Convertir la posición de la bolita en un valor entre 0.0 y 1.0
             cfg.VOLUMEN_GLOBAL = (cfg.SLIDER_HANDLE_X - cfg.SLIDER_X) / cfg.SLIDER_WIDTH
          # Aplicar el volumen actualizado a la música
         pygame.mixer.music.set_volume(cfg.VOLUMEN_GLOBAL)
-        # Actualizar la pantalla
+        # Actualizar la pantalla para mostrar el slider en su nueva posición.
         pygame.display.update()
 
-# --- BUCLE PRINCIPAL DEL MENÚ (CORREGIDA LA SALIDA) ---
+# BUCLE PRINCIPAL DEL MENÚ 
 
 def menu_principal():
     
+    """
+       Función principal que dibuja el menú, maneja los botones de navegación 
+       y gestiona la música de fondo.
+    """
+    
+    # 1. Gestión de música de inicio:
+    # Si no hay música sonando, carga y reproduce la música del menú en loop (-1).
     if not pygame.mixer.music.get_busy():
         pygame.mixer.music.load(cfg.RUTA_MUSICA_MENU)
         pygame.mixer.music.play(-1) 
@@ -797,8 +360,18 @@ def menu_principal():
     SCREEN.fill((0, 0, 0))
     pygame.display.update()
     
+    
+    #Bucle infinito del menú principal.
     while True:
         
+        # 2. Gestión de música durante el bucle
+        # Se asegura de que la música de fondo se reinicie si se detiene por alguna razón.
+        if not pygame.mixer.music.get_busy():
+            pygame.mixer.music.load(cfg.RUTA_MUSICA_MENU)
+            pygame.mixer.music.play(-1)
+            pygame.mixer.music.set_volume(cfg.VOLUMEN_GLOBAL)
+            
+        # 3. Dibujo del fondo y del título
         SCREEN.fill((0, 0, 0)) 
         POS_MOUSE_MENU = pygame.mouse.get_pos()
         SCREEN.blit(fondo_menu, (0, 0))
@@ -809,7 +382,9 @@ def menu_principal():
         RECT_MENU = TEXTO_MENU.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 330))
         SCREEN.blit(TEXTO_MENU, RECT_MENU)
         
-        # Definición de los botones
+        # 4. Definición de los botones
+        # Cada botón requiere una imagen, posición central, texto, fuente, y colores.
+
         BOTON_JUGAR = Button(image=pygame.image.load("./assets/Play Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y - 180), 
                             text_input="JUGAR", font=cfg.get_letra(50), base_color="#e2f3ff", hovering_color="#fff7d1")
         BOTON_MARCADORES = Button(image=pygame.image.load("./assets/Options Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y - 60), 
@@ -821,28 +396,42 @@ def menu_principal():
         BOTON_SALIR = Button(image=pygame.image.load("./assets/Play Rect.png"), pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 300), 
                             text_input="SALIR", font=cfg.get_letra(50), base_color="#e2f3ff", hovering_color="#fff7d1")
         
-        for button in [BOTON_JUGAR, BOTON_MARCADORES, BOTON_MANUAL, BOTON_OPCIONES, BOTON_SALIR]:
-            button.changeColor(POS_MOUSE_MENU)
-            button.update(SCREEN)
         
-        # Manejo de eventos
+        # 5. Dibujo de botones:
+        for button in [BOTON_JUGAR, BOTON_MARCADORES, BOTON_MANUAL, BOTON_OPCIONES, BOTON_SALIR]:
+            button.changeColor(POS_MOUSE_MENU) # Actualiza el color si el mouse está encima.
+            button.update(SCREEN) # Dibuja el botón en la pantalla.
+        
+        # 6. Manejo de eventos
         for event in pygame.event.get():
             manejar_salida_menu(event) 
             if event.type == pygame.MOUSEBUTTONDOWN:
+                
                 if BOTON_JUGAR.checkForInput(POS_MOUSE_MENU):
-                    jugar()
+                    # Llama a la función principal del juego.
+                    resultado_juego = iniciar_juego(SCREEN)
+                    # Si el juego devuelve False (puntaje cero), llama a bajo_puntaje().
+                    if resultado_juego == False:
+                        bajo_puntaje()
+                    #Si devuelve True, la ejecución simplemente continúa con el menú
+                    #(ya que menu_principal() está en un bucle infinito `while True:`)
+                        
                 if BOTON_MARCADORES.checkForInput(POS_MOUSE_MENU):
-                    marcadores()
+                    marcadores() # Va a la pantalla de marcadores.
+                    
                 if BOTON_MANUAL.checkForInput(POS_MOUSE_MENU):
-                    manual()
+                    manual() # Va a la pantalla del manual.
+                    
                 if BOTON_OPCIONES.checkForInput(POS_MOUSE_MENU):
-                    opciones()
+                    opciones() # Va a la pantalla de opciones.
+                    
                 if BOTON_SALIR.checkForInput(POS_MOUSE_MENU):
+                    # Cierra Pygame y sale del sistema.
                     pygame.quit()
                     sys.exit()
 
-        pygame.display.update()
+        pygame.display.update() # Actualiza la pantalla para mostrar el menú.
 
 
-
+ # La línea final llama a la función principal del menú, iniciando el bucle del juego.
 menu_principal()

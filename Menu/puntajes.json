@@ -1,42 +1,6 @@
 [
     {
-        "nombre": "AAA",
-        "player_pts": 1250
-    },
-    {
-        "nombre": "A",
-        "player_pts": 750
-    },
-    {
-        "nombre": "A",
-        "player_pts": 750
-    },
-    {
-        "nombre": "VICE",
-        "player_pts": 750
-    },
-    {
-        "nombre": "SSSS",
-        "player_pts": 250
-    },
-    {
-        "nombre": "AEEEE",
-        "player_pts": 250
-    },
-    {
-        "nombre": "AAA",
-        "player_pts": 250
-    },
-    {
-        "nombre": "AA",
-        "player_pts": 750
-    },
-    {
-        "nombre": "A",
-        "player_pts": 2750
-    },
-    {
-        "nombre": "A",
-        "player_pts": 250
+        "nombre": "VICENTE",
+        "player_pts": 2500
     }
 ]

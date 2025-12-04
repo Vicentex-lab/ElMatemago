@@ -1,7 +1,7 @@
 import pygame
 import sys
 import colisiones as colision
-
+from sprites import WALL,FLOOR
 
 # CONFIG
 TILE = 32
@@ -104,10 +104,11 @@ while running:
     # DIBUJO DEL LABERINTO
    
     for r in range(FILAS):
-        for c in range(COLUMNAS):
-            rect = pygame.Rect(c*TILE, r*TILE, TILE, TILE)
-            color = COLOR_FLOOR if colision.maze[r][c] >= 1 else COLOR_WALL
-            pygame.draw.rect(screen, color, rect)
+            for c in range(COLUMNAS):
+                if colision.maze[r][c] == 0:
+                    screen.blit(WALL, (c*TILE, r*TILE))
+                else:
+                    screen.blit(FLOOR, (c*TILE, r*TILE))
 
     # Jugador
     pygame.draw.rect(
