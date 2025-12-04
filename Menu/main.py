@@ -243,20 +243,46 @@ def opciones():
        Muestra la pantalla de opciones, permitiendo al usuario ajustar el volumen 
        mediante un control deslizante (slider).
     """
-    # Variable de control: indica si el usuario está arrastrando el slider
+    # Variable de control: indica si el usuario está arrastrando el slider, de base es False y se hara True cuando se presione
     mouse_held = False
     while True:
-         # Posición actual del mouse
+        """#
+        VOLUMEN_GLOBAL = 0.5 # Nivel inicial de volumen (50%).
+        --- CONFIGURACIÓN DEL SLIDER DE VOLUMEN ---
+SLIDER_WIDTH = 500 # Anchura de la línea del slider
+SLIDER_HEIGHT = 10 #Altura de la línea del slider (es una línea horizontal).
+
+# Posición X calculada como central inicialmente 
+#con esto centramos slider, restando la mitad del ancho a centro ventana
+SLIDER_X = CENTRO_X - (SLIDER_WIDTH // 2)  
+SLIDER_Y = CENTRO_Y - 80 # Posición Y fija, un poco arriba del centro.
+
+# Posición inicial del manejador (círculo) del slider.
+# Se calcula multiplicando el ancho total por el volumen actual (0.5),
+# y sumando eso a la posición inicial X del slider.
+SLIDER_HANDLE_X = SLIDER_X + int(SLIDER_WIDTH * VOLUMEN_GLOBAL)
+
+#tamaño circulo
+HANDLE_RADIUS = 15"""
+         # Posición actual del mouse (x,y)
         POS = pygame.mouse.get_pos()
+        # Dibujamos el fondo del menú de opciones.
         SCREEN.blit(fondo_menu, (0, 0))
         
-        # Título de la pantalla.
+        # Renderizamos el texto "OPCIONES" con una fuente grande (50 px)
+        # #.render convierte string en surface, True es para bordes suaves no pixelados
         TEXTO_OP = cfg.get_letra(50).render("OPCIONES", True, "#f2c572")
+         # y lo centramos en una posición superior de la pantalla.
+        # con surface ya creada con texto "Volumen" creamos rectangulo para envolverlo
+        #center coloca en centro cordenadas de centro pantalla (centro_x y centro_y -330 para que este arriba)
         SCREEN.blit(TEXTO_OP, TEXTO_OP.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 330)))
         
         
         # Texto que muestra el volumen actual en porcentaje (usando VOLUMEN_GLOBAL de .cfg)
+        #.render convierte string en surface para trabajarla, True es antialiasing para bordes suaves texto
         TEXTO_VOL = cfg.get_letra(40).render(f"VOLUMEN: {int(cfg.VOLUMEN_GLOBAL*100)}%", True, "White")
+        
+        #Dibujamos texto volumen (surface) y el rectangulo que lo envuelve, centramos ambos en su posicion
         SCREEN.blit(TEXTO_VOL, TEXTO_VOL.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 180)))
         
         # DIBUJO DEL SLIDER 
@@ -300,8 +326,13 @@ def opciones():
        
         #Configuracion mientras se arrastra
         
-        # Mover la bolita con el mouse pero sin salirse de la barra
+        # Mover la bolita con el mouse pero sin salirse de la barra, ej  Si el mouse está más a la derecha del límite, el mango se queda en el borde.
         if mouse_held:
+            #resumen min() y max ()
+            #min determina valor mas pequeño entre (a y b)
+            #max determina valor mas grande entre (a y b)
+            
+            
             cfg.SLIDER_HANDLE_X = max(cfg.SLIDER_X, min(POS[0], cfg.SLIDER_X + cfg.SLIDER_WIDTH))
              # Convertir la posición de la bolita en un valor entre 0.0 y 1.0
             cfg.VOLUMEN_GLOBAL = (cfg.SLIDER_HANDLE_X - cfg.SLIDER_X) / cfg.SLIDER_WIDTH
