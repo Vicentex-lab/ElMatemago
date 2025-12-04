@@ -26,6 +26,7 @@ pygame.display.set_caption("EL MATEMAGO") #Establece el título de la ventana
 
 #Utilizamos .convert_alpha() una vez definida SCREEN
 # Optimiza las imágenes cargadas para un dibujo más rápido en la pantalla y mantiene la transparencia de las imágenes.
+#Forma general de optimizacion
 MAGO = MAGO.convert_alpha()
 CERO = CERO.convert_alpha()
 RAIZNEGATIVA = RAIZNEGATIVA.convert_alpha()
@@ -36,8 +37,9 @@ ANILLO = ANILLO.convert_alpha()
 CORAZON = CORAZON.convert_alpha()
 
 #Cargamos imagen de fondo para el menú
-fondo_menu = pygame.image.load("./assets/menu_editado.png").convert()
-# Escala el fondo para que ocupe todo el tamaño de la pantalla.
+fondo_menu = pygame.image.load("./assets/menu_editado.png").convert() #metodo .convert convierte la imagen al mismo formato de color de pantall
+                                                                        #otra forma de optimizar y mas eficiencia
+# Escala el fondo para que ocupe todo el tamaño de la pantalla. tenemos escala actual y la transformamos a (ancho, altura pantalla)
 fondo_menu = pygame.transform.scale(fondo_menu, SCREEN.get_size())
 
 
@@ -213,14 +215,15 @@ def manual():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 #Abrir pdf
                 if BOTON_PDF.checkForInput(POS_MOUSE_MANUAL):
-                    # Crea la ruta completa al archivo PDF.
-                    ruta_pdf = os.path.join("assets", "Manual de Matemago.pdf") #Detecta automáticamente el separador del sistema operativo (en Windows \ y en Linux o MacOS /)
-                    print("ABRIENDO PDF:", ruta_pdf)
+                    #Libreria os permite trabajar con sistema operativo/Archivos
                     
-                    # Intenta abrir el archivo usando comandos específicos del sistema operativo
+                    #trabajamos con modulo os y metodo .path es para manejar rutas archivos y .join une correctamente partes ruta\,/
+                    ruta_pdf = os.path.join("assets", "Manual de Matemago.pdf") 
+                    
+                    # Ahora se Intenta abrir el archivo 
                     # Se usa try/except porque si no estamos en Windows, estamos en Linux o MacOS
-                
                     # En Windows: abre el PDF con el programa predeterminado.
+                    #startfile() viene de modulo os y es especifico para abrir archivos en windows
                     try:
                         os.startfile(ruta_pdf)  
                     except:
