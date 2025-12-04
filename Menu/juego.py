@@ -152,33 +152,49 @@ def jugar(SCREEN):
         return 0 <= r < FILAS and 0 <= c < COLUMNAS and colision.maze[r][c] >= 1
     
     def eventos(): #Etiquetas para la matriz
-            nonlocal player_y
-            nonlocal player_x
-            if colision.maze[player_y][player_x] == 2: #Teletransportación Matemagica 1
-                        if player_y==14 and player_x==0:
-                            player_y=13
-                            player_x=18
-                            print("Matemagicamente Teletransportado")
-                            
-                        if player_y==13 and player_x==19:
-                            player_y=14
-                            player_x=1
-                            print("Matemagicamente Teletransportado")
-                            
-            if colision.maze[player_y][player_x] == 3: #Teletransportación Matemagica 2
-                        if player_y==0 and player_x==9:
-                            player_y=26
-                            player_x=10
-                            print("Matemagicamente Teletransportado")
-                            
-                        if player_y==27 and player_x==10:
-                            player_y=1
-                            player_x=9
-                            print("Matemagicamente Teletransportado")
+        nonlocal player_y
+        nonlocal player_x
+        nonlocal pos_x, pos_y  
+        nonlocal dir_x, dir_y  
+        
+        if colision.maze[player_y][player_x] == 2: #Teletransportación Matemagica 1
+            if player_y == 14 and player_x == 0:
+                player_y = 13
+                player_x = 18
+                # Sincroniza posiciones en píxeles y resetea dirección
+                pos_x = player_x * cfg.TILE
+                pos_y = player_y * cfg.TILE
+                print("Matemagicamente Teletransportado")
+
+                
+            elif player_y == 13 and player_x == 19:  
+                player_y = 14
+                player_x = 1
+                pos_x = player_x * cfg.TILE
+                pos_y = player_y * cfg.TILE
+                print("Matemagicamente Teletransportado")
+
+                
+        if colision.maze[player_y][player_x] == 3: #Teletransportación Matemagica 2
+            if player_y == 0 and player_x == 9:
+                player_y = 26
+                player_x = 10
+                pos_x = player_x * cfg.TILE
+                pos_y = player_y * cfg.TILE
+                print("Matemagicamente Teletransportado")
+                        
+                      
+            elif player_y == 27 and player_x == 10:  
+                player_y = 1
+                player_x = 9
+                pos_x = player_x * cfg.TILE
+                pos_y = player_y * cfg.TILE
+                print("Matemagicamente Teletransportado")
+
     
     def reiniciar_juego():
         nonlocal player_y, player_x, player_hp, player_item, inmunidad, temporizador, invul_frames, colision_detected
-        nonlocal dir_x, dir_y, move_timer, float_offset, float_direction
+        nonlocal dir_x, dir_y, float_offset, float_direction
         nonlocal player_pts  # Ignorar para conservar el puntaje
         nonlocal cero, pigarto, raiznegativa  # Instancias de enemigos que se reasignan
         nonlocal victoria_detectada  # Resetear la bandera
@@ -250,19 +266,27 @@ def jugar(SCREEN):
     # ============================
     #  MOVIMIENTO DEL JUGADOR 
     # ============================
-    dir_x = 0    # La dirección en donde se mueve le personaje en x
-    dir_y = 0    # En y
-    move_timer = 0     # acomula tiempo
-    move_delay = 120   # velocidad del personaje 
-    
+    # Dirección actual del jugador
+    dir_x = 0
+    dir_y = 0
+
+    # Dirección deseada por el jugador
+    deseada_x = 0   
+    deseada_y = 0
+
+    # Posición en pixeles
+    pos_x = player_x * cfg.TILE   #cfg.tile es el tamaño de una casilla en pixeles
+    pos_y = player_y * cfg.TILE
+
+    speed = 2  # velocidad (pixeles por frame)
+ 
     running = True
     mostrando_mensaje_victoria = False  
     mensaje_temporizador = 0  # Temporizador para el mensaje (en frames)
     
+    
     while running:
-        tiempof = clock.tick(FPS)  # tiempof es el tiempo en ms desde el ultimo frame
-        screen.fill((0,0,0))
-
+       
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -274,39 +298,60 @@ def jugar(SCREEN):
                     running = False # Detiene el bucle para salir o ir a Game Over
                     return True 
 
+                # Guardar dirección DESEADA siempre
+            if event.type == pygame.KEYDOWN:
                 if event.key in (pygame.K_w, pygame.K_UP):
-                    if can_move(player_y - 1, player_x):
-                        dir_x = 0
-                        dir_y = -1
+                    deseada_x = 0
+                    deseada_y = -1
 
                 if event.key in (pygame.K_s, pygame.K_DOWN):
-                    if can_move(player_y + 1, player_x):
-                        dir_x = 0
-                        dir_y = 1
+                    deseada_x = 0
+                    deseada_y = 1
 
                 if event.key in (pygame.K_a, pygame.K_LEFT):
-                    if can_move(player_y, player_x - 1):
-                        dir_x = -1
-                        dir_y = 0
+                    deseada_x = -1
+                    deseada_y = 0
 
                 if event.key in (pygame.K_d, pygame.K_RIGHT):
-                    if can_move(player_y, player_x + 1):
-                        dir_x = 1
-                        dir_y = 0
+                    deseada_x = 1
+                    deseada_y = 0
 
-        #  Movimiento con velocidad
-        move_timer += tiempof  # se suma el tiempo que paso
+   
+        # Convierte la posición de píxeles a casilla
+   
+        tile_x = round(pos_x / cfg.TILE) 
+        tile_y = round(pos_y / cfg.TILE)
 
-        if move_timer >= move_delay:  # cuando pasa cierto tiempo se mueve una casilla
-            move_timer = 0
+        # Calcula si esta el jugador esta centrado
+        alineado_x = (pos_x % cfg.TILE) == 0   # Si el resto es 0 esta alineado
+        alineado_y = (pos_y % cfg.TILE) == 0   # tile = 32
 
-            new_x = player_x + dir_x  # calcula la siguiente casilla hacia donde va el jugador
-            new_y = player_y + dir_y  # eje: vas arriba dir_y = -1, new_y = player_y -1
+        if alineado_x and alineado_y:
+            next_tx = tile_x + deseada_x
+            next_ty = tile_y + deseada_y
 
-            if can_move(new_y, new_x):  # comprueba si no hay pared para moverte
-                player_x = new_x        # si hay pared no te mueves a esa direccion pero tampoco te detienes
-                player_y = new_y        # la dir_x e y no cambia 
-                eventos()
+            if can_move(next_ty, next_tx): 
+                dir_x = deseada_x
+                dir_y = deseada_y
+
+            # Verificar la dirección actual
+            next_tx = tile_x + dir_x
+            next_ty = tile_y + dir_y
+
+            if not can_move(next_ty, next_tx):
+                dir_x = 0
+                dir_y = 0
+
+        # Mover en pixeles
+        # Actualiza la posición en píxeles
+        pos_x += dir_x * speed  
+        pos_y += dir_y * speed
+
+        # Actualiza la posición en casillas
+        player_x = round(pos_x / cfg.TILE) # round es para elegir la posicion mas cercana a la actual
+        player_y = round(pos_y / cfg.TILE)
+
+        eventos()
                 
         # ---------------------------
         # MOVER ENEMIGO
