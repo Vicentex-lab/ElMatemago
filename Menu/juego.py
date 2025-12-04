@@ -100,6 +100,11 @@ def jugar(SCREEN):
             screen.blit(txt_none, (hud_x + 160, hud_y + 160))
 
     
+    
+    
+    
+    
+    
     FPS = 60
     
     FILAS = len(colision.maze)
@@ -436,6 +441,11 @@ def jugar(SCREEN):
             inmunidad=0
             
         # DIBUJO DE todo LO QUE SE VE EN PANTALLA
+        
+        
+        
+        
+        
         #Mapa
         #for anidado para recorrer todas las filas (r) y columnas (c)
         #matriz.maze contiene valores si una celda es pared (0)
