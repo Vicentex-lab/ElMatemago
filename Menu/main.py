@@ -382,6 +382,8 @@ def menu_principal():
                     # Si el juego devuelve False (puntaje cero), llama a bajo_puntaje().
                     if resultado_juego == False:
                         bajo_puntaje()
+                    #Si devuelve True, la ejecución simplemente continúa con el menú
+                    #(ya que menu_principal() está en un bucle infinito `while True:`)
                         
                 if BOTON_MARCADORES.checkForInput(POS_MOUSE_MENU):
                     marcadores() # Va a la pantalla de marcadores.
