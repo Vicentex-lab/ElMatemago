@@ -86,7 +86,16 @@ class cero(criature):
         return False
 
     def dibujar(self, screen, sprite, tile_size, offset_x, offset_y):
-        """Se dibuja a sí mismo en la pantalla"""
+        """
+    Dibuja al enemigo en pantalla usando su posición dentro de la matriz.
+    
+    Parámetros:
+        screen     superficie principal donde se dibuja todo el juego.
+        sprite    imagen del enemigo (Surface).
+        tile_size  tamaño de cada celda del mapa (32 px).
+        offset_x    desplazamiento horizontal para centrar el mapa.
+        offset_y    desplazamiento vertical para centrar el mapa.
+    """
         if self.exist:
             screen.blit(
                 sprite,

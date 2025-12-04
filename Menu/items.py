@@ -25,6 +25,22 @@ class item():
         return False
     
     def draw(self, screen):
+        """Dibuja el ítem en pantalla usando su posición dentro de la matriz.
+
+    Parámetros:
+        screen        superficie principal donde se dibuja todo el juego.
+        self.obj_sprite   imagen del ítem (Surface), como espada, escudo o anillo.
+    Conversion coordenadas
+        self.actual_x e y     columna/fila donde se encuentra el ítem dentro del laberinto.  
+        self.actual_x * cfg.TILE e y   convierte la columna/fila en  en píxeles 32.
+    
+        Centrando el mapa:
+        cfg.offset_x e y  se suma para desplazar todo el mapa horizontalmente/verticalmente
+
+        
+    Resultado:
+        El sprite del ítem se dibuja exactamente en la casilla correspondiente del laberinto"""
+
         screen.blit(
             self.obj_sprite,
             (
