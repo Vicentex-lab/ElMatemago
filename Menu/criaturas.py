@@ -111,6 +111,8 @@ class pigarto(criature):
         # Definimos las rutas COMO ATRIBUTOS DE INSTANCIA
         self.path_x = [10, 10, 9, 8, 8, 7, 6, 6, 5, 4, 3, 2, 2, 2, 3, 3, 3, 2, 2, 2, 3, 3, 3, 2, 2, 2, 3, 3, 3, 4, 4, 4, 3, 3, 3, 3, 4, 4, 4, 3, 3, 2, 2, 2, 3, 3, 4, 5, 5, 6, 6, 7, 8, 9, 10, 11, 12, 13, 14, 14, 15, 15, 15, 16, 17, 17, 17, 18, 18, 18, 17, 17, 17, 16, 16, 16, 17, 17, 17, 17, 16, 16, 16, 16, 17, 17, 17, 17, 16, 16, 16, 17, 18, 18, 18, 18, 18, 17, 16, 15, 14, 14, 13, 12, 11, 10, 0]
         self.path_y = [3, 2, 2, 2, 3, 3, 3, 2, 2, 2, 2, 2, 3, 4, 4, 5, 6, 6, 7, 8, 8, 9, 10, 10, 11, 12, 12, 13, 14, 14, 15, 16, 16, 17, 18, 19, 19, 20, 21, 21, 22, 22, 23, 24, 24, 25, 25, 25, 24, 24, 23, 23, 23, 23, 23, 23, 23, 23, 23, 24, 24, 25, 26, 26, 26, 25, 24, 24, 23, 22, 22, 21, 20, 20, 19, 18, 18, 17, 16, 15, 15, 14, 13, 12, 11, 11, 10, 9, 8, 8, 7, 6, 6, 6, 5, 4, 3, 2, 2, 2, 2, 2, 3, 3, 3, 3, 0]
+        self.tail_x=0
+        self.tail_y=0
 
         super().__init__(
             hp=3.141592731, 
@@ -145,20 +147,32 @@ class pigarto(criature):
             # Actualizamos las coordenadas actuales para que coincidan con el índice
             self.positions_x = self.path_x[self.pos]
             self.positions_y = self.path_y[self.pos]
+            
+            self.tail_x=self.path_x[self.pos-1]
+            self.tail_y=self.path_y[self.pos-1]
 
     def colisionar(self, player_y, player_x):
         """Verifica si la posición actual de la ruta toca al jugador"""
         if self.exist == 1 and self.positions_y == player_y and self.positions_x == player_x:
             return True
+        elif self.exist== 1 and self.tail_y == player_y and self.tail_x == player_x:
+            return True
         return False
 
     def dibujar(self, screen, sprite, tile_size, offset_x, offset_y):
-        if self.exist:
+        if self.exist==1:
             screen.blit(
                 sprite,
                 (
                     self.positions_x * tile_size + offset_x,
                     self.positions_y * tile_size + offset_y
+                )
+            )
+            screen.blit(
+                sprite,
+                (
+                    self.tail_x * tile_size + offset_x,
+                    self.tail_y * tile_size + offset_y
                 )
             )
             
@@ -236,7 +250,7 @@ class raiznegativa(criature):
 
     def dibujar(self, screen, sprite, tile_size, offset_x, offset_y):
         """Se dibuja a sí mismo en la pantalla"""
-        if self.exist:
+        if self.exist==1:
             screen.blit(
                 sprite,
                 (

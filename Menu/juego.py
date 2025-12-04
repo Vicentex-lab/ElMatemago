@@ -330,10 +330,6 @@ def jugar(SCREEN):
                 player_pts+=cero.pts
                 player_item=""
                 cero.exist=0
-                if pigarto.exist==1 and raiznegativa.exist==0:
-                    print("espada: cero")
-                    sword.actual_y=cero.positions_y
-                    sword.actual_x=cero.positions_x
             elif inmunidad!=1 and player_hp-cero.damage>0:
                 player_x=cr.player.positions_x
                 player_y=cr.player.positions_y
@@ -391,10 +387,6 @@ def jugar(SCREEN):
                 player_item=""
                 raiznegativa.exist=0
                 inmunidad=0
-                if pigarto.exist==1 and cero.exist==0:
-                    print("espada: cero")
-                    sword.actual_y=cero.positions_y
-                    sword.actual_x=cero.positions_x
             elif player_item==sword.name:
                 raiznegativa.hp-=sword.damage
                 raiznegativa.positions_x=10
