@@ -6,7 +6,6 @@ import criaturas as cr
 import items as item           
 from sprites import MAGO, CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO, CORAZON, WALL, FLOOR
 
-
 def jugar(SCREEN):
     # Muestra la pantalla de juego, detiene la música del menú e inicia la música de juego.
     
@@ -20,6 +19,7 @@ def jugar(SCREEN):
         pygame.mixer.music.set_volume(cfg.VOLUMEN_GLOBAL) 
     except pygame.error as e:
         print(f"Error al cargar la música del juego: {e}")
+    
     def dibujar_hud(screen, player_pts, player_hp, player_item):
         # CONFIGURACIÓN DEL MARCO 
         hud_x = 40           # posicion del hud en eje x
@@ -29,78 +29,81 @@ def jugar(SCREEN):
     
         # Se crea una superficie especial para el HUD con transparencia.
         # Esto permite tener un recuadro semitransparente encima del juego
-        hud_surface = pygame.Surface((hud_w, hud_h), pygame.SRCALPHA)
-        hud_surface.fill((25, 30, 80, 160))  # Color oscuro + transparencia (160)
+        #pygame.surface es modulo para construir lienzo para modificarlo
+        #Recibe 2 parametros, el primero tupla (ancho,largo)
+    
+        hud_surface = pygame.Surface((hud_w, hud_h), pygame.SRCALPHA) 
+        #pygame.SRCALPHA es para que la superficie que dibujamos permita transparencia por pixel y podamos dibujar encima
+        #En este caso 160 es la transparencia
+        #R,G,B, transparencia
+        hud_surface.fill((25, 30, 80, 160))  # Se rellana superficie, con transparencia 25 y colores
+        #Metodo .fill es para rellenar Surfaces con colores
     
         #Se dibuja un borde dorado alrededor del HUD
-        pygame.draw.rect(hud_surface, (255, 210, 60),  # Color dorado
-                         (0, 0, hud_w, hud_h),   # Tamaño del rectángulo
-                         5,                   # Grosor del borde
-                         border_radius=18)     #Bordes redondeados
+        pygame.draw.rect(hud_surface, (255, 210, 60),  # Color dorado en formato rgb
+                         (0, 0, hud_w, hud_h),   # Tupla que define posicion y tamaño
+                         5,                   # Grosor del borde, es tan bajo porque es una linea
+                         border_radius=18)     #Bordes redondeados, suaviza esquinas
     
         # Finalmente se coloca el HUD completo en la pantalla principal.
+        #.blit() "pega" una Surface sobre otra.
+        #Se dibuja hud en coordenadas superiores izquierdas
         screen.blit(hud_surface, (hud_x, hud_y))
     
-        
-        
-        
         #SECCIÓN: PUNTAJE
-        fuente = cfg.get_letra(22)   #Fuente para el texto
-        txt_pts = fuente.render(f"PUNTAJE: {player_pts}", True, (255, 255, 120))   # Texto en color amarillo suave
-        screen.blit(txt_pts, (hud_x + 30, hud_y + 20))  # Se dibuja dentro del HUD
+        fuente = cfg.get_letra(22)   #Funcion en cfg para retornar texto en pygame con tamaño 22
+        txt_pts = fuente.render(f"PUNTAJE: {player_pts}", True, (255, 255, 120))   
+        #.render convierte string en surface, mostramos puntaje jugador, True es para bordes suaves no pixelados
+        screen.blit(txt_pts, (hud_x + 30, hud_y + 20))  # Se dibuja HUD creado en pantalla con su texto con sus coordenadas
     
-        
-        
-        
         # SECCIÓN: VIDA 
-        fuente_vida = cfg.get_letra(22)
+        fuente_vida = cfg.get_letra(22)  #Funcion en cfg para retornar texto en pygame con tamaño 22
+        #.render convierte string en surface, mostramos puntaje jugador, True es para bordes suaves no pixelados
         txt_vida = fuente_vida.render("VIDA:", True, (255, 255, 255))
+        #.render convierte string en surface, mostramos puntaje jugador, True es para bordes suaves no pixelados
         screen.blit(txt_vida, (hud_x + 30, hud_y + 90))
-    
-        CORAZON_HUD = pygame.transform.scale(CORAZON, (28, 28)) # Escalamos el corazón para que encaje con el tamaño del HUD 
+        #nueva variable con corazon reescalado para que encaje con tamaño hud, escala 28x28
+        CORAZON_HUD = pygame.transform.scale(CORAZON, (28, 28)) 
         # Dibujamos un corazón por cada punto de vida
+        #Ciclo for para dibujar corazones, cada uno cambiara en "i * 32" pixeles a la derecha
         for i in range(player_hp):
-            screen.blit(CORAZON_HUD, (hud_x + 150 + i*32, hud_y + 88)) # Cada corazón se dibuja un poco más a la derecha
+            screen.blit(CORAZON_HUD, (hud_x + 150 + i*32, hud_y + 88)) 
     
-        # SECCIÓN: ITEM
-        fuente_item = cfg.get_letra(22)  
+            # SECCIÓN: ITEM
+        fuente_item = cfg.get_letra(22)  #Funcion en cfg para retornar texto en pygame con tamaño 22
         txt_item = fuente_item.render("ITEM:", True, (255, 255, 255))
-        screen.blit(txt_item, (hud_x + 30, hud_y + 160))
+        #.render convierte string en surface, mostramos puntaje jugador, True es para bordes suaves no pixelados
+        screen.blit(txt_item, (hud_x + 30, hud_y + 160)) # Se dibuja HUD creado en pantalla con su texto con sus coordenadas
     
         # Selección del sprite del ítem
-        if player_item == item.sword.name:
+        #Segun que item tenga jugador lo mostraremos en pantalla con su respectivo sprite
+        if player_item == sword.name:
             sprite = ESPADA
-        elif player_item == item.shield.name:
+        elif player_item == shield.name:
             sprite = ESCUDO
-        elif player_item == item.ring.name:
+        elif player_item == ring.name:
             sprite = ANILLO
         else:
-            sprite = None # Si no tiene ítem, no hay imagen que mostrar
-    
+            sprite = None  # Si no tiene ítem, no hay imagen que mostrar
+        # En caso que sprite != None 
+        #Sprite tiene valor falso y se ejecutara else
+        
+        #Dibujaremos todo dentro de HUD
         if sprite:
-            ITEM_HUD = pygame.transform.scale(sprite, (40, 40)) # Tamaño ideal para el HUD
+            ITEM_HUD = pygame.transform.scale(sprite, (40, 40))  # Tamaño ideal de items para HUD
+            #Dibujamos todo en pantalla con .blit()
             screen.blit(ITEM_HUD, (hud_x + 160, hud_y + 160))
         else:
-             # Si NO hay un ítem equipado, se escribe la palabra "NINGUNO"
-            txt_none = fuente_item.render("NINGUNO", True, (160, 160, 160))
+            # Si NO hay un ítem equipado, se escribe la palabra "NINGUNO"
+            txt_none = fuente_item.render("NINGUNO", True, (160, 160, 160)) 
+            #.render convierte string en surface, mostramos puntaje jugador, True es para bordes suaves no pixelados
             screen.blit(txt_none, (hud_x + 160, hud_y + 160))
-    
 
+    
     FPS = 60
     
     FILAS = len(colision.maze)
     COLUMNAS = len(colision.maze[0])
-    
-    COLOR_WALL = (30,30,30)
-    COLOR_FLOOR = (253, 254, 253)
-    COLOR_PLAYER = (0,120,255)
-    COLOR_CERO = (0, 0, 255)
-    COLOR_PIGARTO = (0, 255, 0)
-    COLOR_RAIZ = (255, 0, 0)
-    COLOR_SWORD = (255, 255, 0)
-    COLOR_SHIELD = (255, 165, 0)
-    COLOR_RING = (0, 0, 0)
-    COLOR_HEART = (255, 100, 100)
     
     screen = SCREEN # Usar la variable pasada como argumento
     clock = pygame.time.Clock()
@@ -119,555 +122,380 @@ def jugar(SCREEN):
     inmunidad=0
     player_pts=cr.player.pts
     temporizador=0
+    invul_base=1*60 #segundos*FPS para frame
+    invul_frames=invul_base #segundos*FPS para frames
+    colision_detected=True
     
-    # Pigarto: Resetea el índice de posición en su camino y su existencia.
-    cr.pigarto.pos = 0 
-    cr.pigarto.exist = 1 # Asumimos que debe empezar vivo
-    
-    # Cero: Resetea su existencia y posición (si fueron modificados al morir).
-    cr.cero.exist = 1 
-    
-    # Raíz Negativa: Resetea su existencia
-    cr.raiznegativa.exist = 1 
-
+    # Bandera para evitar acumulación de bonus de victoria
+    victoria_detectada = False
     
     #Spawnear Item
     #Espada
-    cont_aux_1=random.randint(0, 5)
-    print("espada",  cont_aux_1)
-    sword_place_y=item.sword.places_y[ cont_aux_1]
-    sword_place_x=item.sword.places_x[ cont_aux_1]
+    sword=item.sword()
+    sword.spawn()
     
-    #Escudo
-    cont_aux_1=random.randint(0, 5)
-    while item.shield.places_x==sword_place_x and item.shield.places_y==sword_place_y:
-        cont_aux_1=random.randint(0, 5)
-    print("escudo",  cont_aux_1)
-    shield_place_y=item.shield.places_y[cont_aux_1]
-    shield_place_x=item.shield.places_x[cont_aux_1]
-    
+   #Escudo
+    shield=item.shield()
+    while True:
+        shield.spawn()
+        if shield.actual_x!=sword.actual_x and shield.actual_y!=sword.actual_y:
+            break
+        
     #Anillo
-    cont_aux_1=random.randint(0, 5)
-    print("anillo", cont_aux_1)
-    while item.ring.places_x==sword_place_x and item.ring.places_y==sword_place_y and item.ring.places_x==shield_place_x and item.ring.places_y==shield_place_y:
-        cont_aux_1=random.randint(0, 5)
-    ring_place_y=item.shield.places_y[cont_aux_1]
-    ring_place_x=item.shield.places_x[cont_aux_1]
+    ring=item.ring()
+    while True:
+        ring.spawn()
+        if ring.actual_x!=sword.actual_x and ring.actual_y!=sword.actual_y and ring.actual_x!=shield.actual_x and ring.actual_y!=shield.actual_y:
+            break
     
     def can_move(r, c):
         return 0 <= r < FILAS and 0 <= c < COLUMNAS and colision.maze[r][c] >= 1
     
     def eventos(): #Etiquetas para la matriz
-        nonlocal player_y
-        nonlocal player_x
-        nonlocal pos_x, pos_y  
-        nonlocal dir_x, dir_y  
-        
-        if colision.maze[player_y][player_x] == 2: #Teletransportación Matemagica 1
-            if player_y == 14 and player_x == 0:
-                player_y = 13
-                player_x = 18
-                # Sincroniza posiciones en píxeles y resetea dirección
-                pos_x = player_x * cfg.TILE
-                pos_y = player_y * cfg.TILE
-                print("Matemagicamente Teletransportado")
-
-                
-            elif player_y == 13 and player_x == 19:  
-                player_y = 14
-                player_x = 1
-                pos_x = player_x * cfg.TILE
-                pos_y = player_y * cfg.TILE
-                print("Matemagicamente Teletransportado")
-
-                
-        if colision.maze[player_y][player_x] == 3: #Teletransportación Matemagica 2
-            if player_y == 0 and player_x == 9:
-                player_y = 26
-                player_x = 10
-                pos_x = player_x * cfg.TILE
-                pos_y = player_y * cfg.TILE
-                print("Matemagicamente Teletransportado")
-                        
-                      
-            elif player_y == 27 and player_x == 10:  
-                player_y = 1
-                player_x = 9
-                pos_x = player_x * cfg.TILE
-                pos_y = player_y * cfg.TILE
-                print("Matemagicamente Teletransportado")
-     
-    
-    #MOVIMIENTO DEL ENEMIGO
-    # ---------------------------
-    # CERO
-    # ---------------------------
-    cero_y = cr.cero.positions_y
-    cero_x = cr.cero.positions_x
-    cero_exist=cr.cero.exist
-    cero_cooldown = 0
-    cero_ratio=cr.cero.movement_ratio
-    
-    # ---------------------------
-    # Pigarto
-    # ---------------------------
-    pigarto_y = cr.pigarto.positions_y
-    pigarto_x = cr.pigarto.positions_x
-    pigarto_cooldown = 0
-    pigarto_exist=cr.pigarto.exist
-    pigarto_ratio=cr.pigarto.movement_ratio
-    # ---------------------------
-    # Raíz Negativa
-    # ---------------------------
-    raiznegativa_y = cr.raiznegativa.positions_y
-    raiznegativa_x = cr.raiznegativa.positions_x
-    raiznegativa_ratio=cr.raiznegativa.movement_ratio
-    raiznegativa_cooldown = 0
-    raiznegativa_exist=cr.raiznegativa.exist
-
-    def mover_enemigo(f, c, f_obj, c_obj):
-        """Mueve al enemigo acercándose al jugador"""
-
-        # Vertical
-        if f_obj < f and can_move(f - 1, c):
-            f -= 1
-        elif f_obj > f and can_move(f + 1, c):
-            f += 1
-
-        # Horizontal
-        elif c_obj < c and can_move(f, c - 1):
-            c -= 1
-        elif c_obj > c and can_move(f, c + 1):
-            c += 1
-
-        return f, c
- 
-    
-    move_cooldown = True   # evita que avance varias casillas al dejar presionada una tecla
-    
-    # ============================
-    #  MOVIMIENTO DEL JUGADOR 
-    # ============================
-
-    # Dirección actual del jugador
-    dir_x = 0
-    dir_y = 0
-
-    # Dirección deseada por el jugador
-    deseada_x = 0   
-    deseada_y = 0
-
-    # Posición en pixeles
-    pos_x = player_x * cfg.TILE   #cfg.tile es el tamaño de una casilla en pixeles
-    pos_y = player_y * cfg.TILE
-
-    speed = 2  # velocidad (pixeles por frame)
-
-    running = True
+            nonlocal player_y
+            nonlocal player_x
+            if colision.maze[player_y][player_x] == 2: #Teletransportación Matemagica 1
+                        if player_y==14 and player_x==0:
+                            player_y=13
+                            player_x=18
+                            print("Matemagicamente Teletransportado")
+                            
+                        if player_y==13 and player_x==19:
+                            player_y=14
+                            player_x=1
+                            print("Matemagicamente Teletransportado")
+                            
+            if colision.maze[player_y][player_x] == 3: #Teletransportación Matemagica 2
+                        if player_y==0 and player_x==9:
+                            player_y=26
+                            player_x=10
+                            print("Matemagicamente Teletransportado")
+                            
+                        if player_y==27 and player_x==10:
+                            player_y=1
+                            player_x=9
+                            print("Matemagicamente Teletransportado")
     
     def reiniciar_juego():
-        #nonlocal le dice a Python que no son variables locales de reiniciar_juego() si no que
-        #se refiere a las variables definidas en la función superior, jugar()
-        #Esto permite que el reinicio se aplique al estado global del juego 
-        nonlocal player_y, player_x, player_hp, player_item, inmunidad, temporizador
-        nonlocal cero_y, cero_x, cero_exist, cero_cooldown, cero_ratio  
-        nonlocal pigarto_y, pigarto_x, pigarto_cooldown, pigarto_exist, pigarto_ratio
-        nonlocal raiznegativa_y, raiznegativa_x, raiznegativa_ratio, raiznegativa_cooldown, raiznegativa_exist  
-        nonlocal sword_place_y, sword_place_x, shield_place_y, shield_place_x, ring_place_y, ring_place_x
-        nonlocal float_offset, float_direction, move_cooldown, dir_x, dir_y
-    
-        # Reinicio del jugador (excepto player_pts, que se mantiene)
+        nonlocal player_y, player_x, player_hp, player_item, inmunidad, temporizador, invul_frames, colision_detected
+        nonlocal dir_x, dir_y, move_timer, float_offset, float_direction
+        nonlocal player_pts  # Ignorar para conservar el puntaje
+        nonlocal cero, pigarto, raiznegativa  # Instancias de enemigos que se reasignan
+        nonlocal victoria_detectada  # Resetear la bandera
+        
+        # Reiniciar posición del jugador
         player_y = cr.player.positions_y
         player_x = cr.player.positions_x
+        
+        # Reiniciar vida del jugador
         player_hp = cr.player.hp
+        
+        # Reiniciar item del jugador
         player_item = ""
+        
+        # Reiniciar inmunidad
         inmunidad = 0
-        temporizador = 0  # Reinicia el temporizador para el nuevo "nivel"
-    
-        # Reinicio de enemigos
-        cr.pigarto.pos = 0
-        cr.pigarto.exist = 1
-        cr.cero.exist = 1
-        cr.raiznegativa.exist = 1
-    
-        # Reinicio de variables locales de existencia
-        cero_exist = cr.cero.exist
-        pigarto_exist = cr.pigarto.exist 
-        raiznegativa_exist = cr.raiznegativa.exist
-    
-        # Variables de movimiento de enemigos
-        cero_y = cr.cero.positions_y
-        cero_x = cr.cero.positions_x
-        cero_cooldown = 0
-        cero_ratio = cr.cero.movement_ratio
-    
-        pigarto_y = cr.pigarto.positions_y
-        pigarto_x = cr.pigarto.positions_x
-        pigarto_cooldown = 0
-        pigarto_ratio = cr.pigarto.movement_ratio
-    
-        raiznegativa_y = cr.raiznegativa.positions_y
-        raiznegativa_x = cr.raiznegativa.positions_x
-        raiznegativa_ratio = cr.raiznegativa.movement_ratio
-        raiznegativa_cooldown = 0
-    
-        # Reinicio de spawneo de items (aleatorio)
-        cont_aux_1 = random.randint(0, 5)
-        sword_place_y = item.sword.places_y[cont_aux_1]
-        sword_place_x = item.sword.places_x[cont_aux_1]
-    
-        cont_aux_1 = random.randint(0, 5)
-        # Asegura que el escudo no spawnee donde la espada
-        while item.shield.places_x[cont_aux_1] == sword_place_x and item.shield.places_y[cont_aux_1] == sword_place_y:
-            cont_aux_1 = random.randint(0, 5)
-        shield_place_y = item.shield.places_y[cont_aux_1]
-        shield_place_x = item.shield.places_x[cont_aux_1]
-    
-        cont_aux_1 = random.randint(0, 5)
-        # Asegura que el anillo no spawnee donde la espada ni el escudo
-        while (item.ring.places_x[cont_aux_1] == sword_place_x and item.ring.places_y[cont_aux_1] == sword_place_y) or \
-              (item.ring.places_x[cont_aux_1] == shield_place_x and item.ring.places_y[cont_aux_1] == shield_place_y):
-            cont_aux_1 = random.randint(0, 5)
-        ring_place_y = item.ring.places_y[cont_aux_1]
-        ring_place_x = item.ring.places_x[cont_aux_1]
-    
-        # Reinicio de otras variables
-        float_offset = 0
-        float_direction = 1
-        move_cooldown = True
+        
+        # Reiniciar temporizador
+        temporizador = 0
+        
+        # Reiniciar frames de invulnerabilidad
+        invul_frames = 2 * 60
+        
+        # Reiniciar detección de colisión
+        colision_detected = True
+        
+        # Reiniciar movimiento
         dir_x = 0
         dir_y = 0
         move_timer = 0
         
-    reiniciar_juego()  # Inicialización inicial
-
+        # Reiniciar efecto de flotación
+        float_offset = 0
+        float_direction = 1
+        
+        # Reiniciar enemigos (clases globales)
+        cr.pigarto.pos = 0
+        cr.pigarto.exist = 1
+        cr.cero.exist = 1
+        cr.raiznegativa.exist = 1
+        
+        # Reiniciar items (respawnear)
+        sword.spawn()
+        while True:
+            shield.spawn()
+            if shield.actual_x != sword.actual_x or shield.actual_y != sword.actual_y:
+                break
+        while True:
+            ring.spawn()
+            if (ring.actual_x != sword.actual_x or ring.actual_y != sword.actual_y) and \
+               (ring.actual_x != shield.actual_x or ring.actual_y != shield.actual_y):
+                break
+        
+        # Reiniciar instancias de enemigos
+        cero = cr.cero()
+        pigarto = cr.pigarto()
+        raiznegativa = cr.raiznegativa()
+        
+        # Resetear bandera de victoria (evita la acumulación de puntaje)
+        victoria_detectada = False
+        
+        print("Juego reiniciado")
+    
+    #Instanciar ENEMIGO
+    cero = cr.cero()
+    pigarto=cr.pigarto()
+    raiznegativa=cr.raiznegativa()
+    
+    # ============================
+    #  MOVIMIENTO DEL JUGADOR 
+    # ============================
+    dir_x = 0    # La dirección en donde se mueve le personaje en x
+    dir_y = 0    # En y
+    move_timer = 0     # acomula tiempo
+    move_delay = 120   # velocidad del personaje 
+    
     running = True
-    mostrando_mensaje_victoria = False  # Nueva variable para controlar el mensaje
+    mostrando_mensaje_victoria = False  
     mensaje_temporizador = 0  # Temporizador para el mensaje (en frames)
     
     while running:
-       
+        tiempof = clock.tick(FPS)  # tiempof es el tiempo en ms desde el ultimo frame
+        screen.fill((0,0,0))
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-
-            # Guardar dirección DESEADA siempre
+            
+            # --- AÑADIR MANEJO DE ESCAPE EN JUEGO ---
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.mixer.music.stop()
+                    running = False # Detiene el bucle para salir o ir a Game Over
+                    return True 
+
                 if event.key in (pygame.K_w, pygame.K_UP):
-                    deseada_x = 0
-                    deseada_y = -1
+                    if can_move(player_y - 1, player_x):
+                        dir_x = 0
+                        dir_y = -1
 
                 if event.key in (pygame.K_s, pygame.K_DOWN):
-                    deseada_x = 0
-                    deseada_y = 1
+                    if can_move(player_y + 1, player_x):
+                        dir_x = 0
+                        dir_y = 1
 
                 if event.key in (pygame.K_a, pygame.K_LEFT):
-                    deseada_x = -1
-                    deseada_y = 0
+                    if can_move(player_y, player_x - 1):
+                        dir_x = -1
+                        dir_y = 0
 
                 if event.key in (pygame.K_d, pygame.K_RIGHT):
-                    deseada_x = 1
-                    deseada_y = 0
+                    if can_move(player_y, player_x + 1):
+                        dir_x = 1
+                        dir_y = 0
 
-   
-        # Convierte la posición de píxeles a casilla
-   
-        tile_x = round(pos_x / cfg.TILE)
-        tile_y = round(pos_y / cfg.TILE)
+        #  Movimiento con velocidad
+        move_timer += tiempof  # se suma el tiempo que paso
 
-        # Calcula si esta el jugador esta centrado
-        alineado_x = (pos_x % cfg.TILE) == 0   # Si el resto es 0 esta alineado
-        alineado_y = (pos_y % cfg.TILE) == 0
+        if move_timer >= move_delay:  # cuando pasa cierto tiempo se mueve una casilla
+            move_timer = 0
 
-        if alineado_x and alineado_y:
-            next_tx = tile_x + deseada_x
-            next_ty = tile_y + deseada_y
+            new_x = player_x + dir_x  # calcula la siguiente casilla hacia donde va el jugador
+            new_y = player_y + dir_y  # eje: vas arriba dir_y = -1, new_y = player_y -1
 
-            if can_move(next_ty, next_tx): 
-                dir_x = deseada_x
-                dir_y = deseada_y
-
-            # Verificar la dirección actual
-            next_tx = tile_x + dir_x
-            next_ty = tile_y + dir_y
-
-            if not can_move(next_ty, next_tx):
-                dir_x = 0
-                dir_y = 0
-
-        # Mover en pixeles
-        # Actualiza la posición en píxeles
-        pos_x += dir_x * speed  
-        pos_y += dir_y * speed
-
-        # Actualiza la posición en casillas
-        player_x = round(pos_x / cfg.TILE) # round es para elegir la posicion mas cercana a la actual
-        player_y = round(pos_y / cfg.TILE)
-
-        eventos()
-
+            if can_move(new_y, new_x):  # comprueba si no hay pared para moverte
+                player_x = new_x        # si hay pared no te mueves a esa direccion pero tampoco te detienes
+                player_y = new_y        # la dir_x e y no cambia 
+                eventos()
                 
         # ---------------------------
         # MOVER ENEMIGO
         # ---------------------------
-        #Cero
-        ahora = pygame.time.get_ticks()
-        if ahora - cero_cooldown >= cero_ratio:
-            cero_y, cero_x = mover_enemigo(cero_y, cero_x, player_y, player_x)
-            cero_cooldown = ahora
-
-        #Pigarto
-        if ahora - pigarto_cooldown >= pigarto_ratio:
-            if cr.pigarto.pos<106:
-                cr.pigarto.pos = cr.pigarto.pos+1
-                pigarto_cooldown=ahora
-            if cr.pigarto.pos>=106:
-                cr.pigarto.pos=0
-                pigarto_cooldown=ahora
-                
-        #Raíz negativa
-        if ahora - raiznegativa_cooldown >= raiznegativa_ratio:
-            raiznegativa_y, raiznegativa_x = mover_enemigo(raiznegativa_y, raiznegativa_x, player_y, player_x)
-            raiznegativa_cooldown = ahora
-            #ESTOCADA INTEGRADA EN  MAIN
-            if raiznegativa_x==player_x:
-                raiznegativa_ratio=cr.raiznegativa.movement_ratio-150
-            elif raiznegativa_y==player_y:
-                raiznegativa_ratio=cr.raiznegativa.movement_ratio-150
-            else:
-                raiznegativa_ratio=cr.raiznegativa.movement_ratio
+        cero.mover(player_y, player_x, colision.maze)
+        pigarto.mover()
+        raiznegativa.mover(player_y, player_x, colision.maze)
+        
         # ---------------------------
         # COLISIÓN (Lógica de DERROTA)
         # ---------------------------
         #Con CERO
-        if cero_y == player_y and cero_x == player_x and cero_exist==1:
-            if player_item==item.shield.name:
+        if cero.colisionar(player_y, player_x) and colision_detected==False:
+            colision_detected=True
+            if player_item==shield.name:
+                cero.positions_x=10
+                cero.positions_y=13
                 player_item=""
                 inmunidad=0
-                cero_x=cr.cero.positions_x
-                cero_y=cr.cero.positions_y
-            elif player_item==item.sword.name:
-                player_pts+=cr.cero.pts
-                COLOR_CERO=COLOR_FLOOR
+            elif player_item==sword.name:
+                player_pts+=cero.pts
                 player_item=""
-                cero_exist=0
-                if pigarto_exist==1 and raiznegativa_exist==0:
-                    COLOR_SWORD=(255, 255, 0)
-                    sword_place_y=cr.cero.positions_y
-                    sword_place_x=cr.cero.positions_y
-            elif inmunidad!=1 and player_hp-cr.cero.damage>0:
-                player_x=cr.player.positions_x #El matemago muere instantaneamente si no se cambia de lugar
-                player_y=cr.player.positions_y #Ideal siguiente paso es poenr frames de invlunerabilidad, por mientras esto funciona.
-                player_hp-=cr.cero.damage
-            elif inmunidad!=1 and player_hp-cr.cero.damage<=0:
+                cero.exist=0
+            elif inmunidad!=1 and player_hp-cero.damage>0:
+                player_x=cr.player.positions_x
+                player_y=cr.player.positions_y
+                player_hp-=cero.damage
+            elif inmunidad!=1 and player_hp-cero.damage<=0:
                 print("💀 cero")
                 pygame.mixer.music.stop() 
                 if player_pts > 0:
                     cfg.guardar_nuevo_puntaje(screen, player_pts)
-                    return True # Indica que debe ir al menú principal
+                    return True #Volver al menú
                 else:
-                    return False # Indica que debe ir a bajo_puntaje
+                    return False #Mostrar pantalla bajo puntaje
             
         #Con Pigarto
-        if pigarto_y[cr.pigarto.pos] == player_y and pigarto_x[cr.pigarto.pos] == player_x and pigarto_exist==1:
-            if player_item==item.shield.name:
-                cr.pigarto.pos=0
+        if pigarto.colisionar(player_y, player_x) and colision_detected==False:
+            colision_detected=True
+            if player_item==shield.name:
+                pigarto.resetear_ruta()
                 inmunidad=0
                 player_item=""
-            elif player_item==item.sword.name:
-                # Comportamiento único: Pigarto recibe daño normal a menos que sea el último
-                if cero_exist==1 or raiznegativa_exist==1: 
-                    cr.pigarto.hp=cr.pigarto.hp-item.sword.damage
-                if cero_exist==0 and raiznegativa_exist==0 and pigarto_exist==1: #Comando cuando sólo queda pigarto
-                    pigarto_exist=0
-                    pigarto_ratio=9999999
-                    COLOR_PIGARTO=COLOR_FLOOR
-                    player_pts+=cr.pigarto.pts
+            elif player_item==sword.name:
+                if cero.exist==1 or raiznegativa.exist==1:
+                    pigarto.hp=pigarto.hp-sword.damage
+                if cero.exist==0 and raiznegativa.exist==0 and pigarto.exist==1:
+                    pigarto.exist=0
+                    player_pts+=pigarto.pts
                 player_item=""
                 
-                cr.pigarto.pos=0
-                if cr.pigarto.hp<=0:
-                    player_pts+=cr.pigarto.pts
-                    pigarto_exist=0
-                    pigarto_x=0
-                    pigarto_y=0
-                    pigarto_ratio=9999999
-                    COLOR_PIGARTO=COLOR_WALL
-            elif player_item==item.ring.name:
-                player_pts+=cr.pigarto.pts
-                COLOR_PIGARTO=COLOR_FLOOR
+                pigarto.resetear_ruta()
+                if pigarto.hp<=0:
+                    player_pts+=pigarto.pts
+                    pigarto.exist=0
+            elif player_item==ring.name:
+                player_pts+=pigarto.pts
                 player_item=""
-                pigarto_exist=0
-            elif inmunidad!=1 and player_hp-cr.pigarto.damage>0:
-                player_x=cr.player.positions_x #El matemago muere instantaneamente si no se cambia de lugar
-                player_y=cr.player.positions_y #Ideal siguiente paso es poenr frames de invlunerabilidad, por mientras esto funciona.
-                player_hp-=cr.pigarto.damage
-            elif inmunidad!=1 and player_hp-cr.pigarto.damage<=0:
+                pigarto.exist=0
+            elif inmunidad!=1 and player_hp-pigarto.damage>0:
+                player_x=cr.player.positions_x
+                player_y=cr.player.positions_y
+                player_hp-=pigarto.damage
+            elif inmunidad!=1 and player_hp-pigarto.damage<=0:
                 print("💀 pigarto")
                 pygame.mixer.music.stop() 
                 if player_pts > 0:
                     cfg.guardar_nuevo_puntaje(screen, player_pts)
-                    return True # Indica que debe ir al menú principal
+                    return True #Volver al menú
                 else:
-                    return False # Indica que debe ir a bajo_puntaje
+                    return False #Mostrar pantalla bajo puntaje
             
         #Con Raiz negativa
-        if raiznegativa_y == player_y and raiznegativa_x == player_x and raiznegativa_exist==1:
-            if player_item==item.shield.name:
-                player_pts+=cr.raiznegativa.pts
-                COLOR_RAIZ=COLOR_FLOOR
+        if raiznegativa.colisionar(player_y, player_x) and colision_detected==False:
+            colision_detected=True
+            if player_item==shield.name:
+                player_pts+=raiznegativa.pts
                 player_item=""
-                raiznegativa_exist=0
+                raiznegativa.exist=0
                 inmunidad=0
-                raiznegativa_x=0
-                raiznegativa_y=0
-                raiznegativa_ratio=9999999
-                if pigarto_exist==1 and cero_exist==0:
-                    COLOR_SWORD=(255, 255, 0)
-                    sword_place_y=cr.cero.positions_y
-                    sword_place_x=cr.cero.positions_y
-            elif player_item==item.sword.name:
-                cr.raiznegativa.hp-=item.sword.damage
+            elif player_item==sword.name:
+                raiznegativa.hp-=sword.damage
+                raiznegativa.positions_x=10
+                raiznegativa.positions_y=9
                 player_item=""
-                raiznegativa_x=cr.raiznegativa.positions_x
-                raiznegativa_y=cr.raiznegativa.positions_y
-                if cr.raiznegativa.hp<=0:
-                    player_pts+=cr.raiznegativa.pts
-                    raiznegativa_exist=0
-                    raiznegativa_x=0
-                    raiznegativa_y=0
-                    raiznegativa_ratio=9999999
-                    COLOR_RAIZ=COLOR_FLOOR
-            elif inmunidad!=1 and player_hp-cr.raiznegativa.damage>0:
-                player_x=cr.player.positions_x #El matemago muere instantaneamente si no se cambia de lugar
-                player_y=cr.player.positions_y #Ideal siguiente paso es poenr frames de invlunerabilidad, por mientras esto funciona.
-                player_hp-=cr.raiznegativa.damage
-            elif inmunidad!=1 and player_hp-cr.raiznegativa.damage<=0:
+                if raiznegativa.hp<=0:
+                    raiznegativa.exist=0
+                    player_pts+=raiznegativa.pts
+                else:
+                    player_pts+=100
+            elif inmunidad!=1 and player_hp-raiznegativa.damage>0:
+                player_x=cr.player.positions_x
+                player_y=cr.player.positions_y
+                player_hp-=raiznegativa.damage
+            elif inmunidad!=1 and player_hp-raiznegativa.damage<=0:
                 print("💀 raiz")
                 pygame.mixer.music.stop() 
                 if player_pts > 0:
                     cfg.guardar_nuevo_puntaje(screen, player_pts)
-                    return True # Indica que debe ir al menú principal
+                    return True #Volver al menú 
                 else:
-                    return False # Indica que debe ir a bajo_puntaje
+                    return False #Mostrar pantalla bajo puntaje
         
         #COLISIÓN CON ITEMS
         #Espada
-        if sword_place_x==player_x and sword_place_y==player_y:
-            player_item=item.sword.name
-            sword_place_x=0
-            sword_place_y=1
-            player_pts+=item.sword.pts
+        if sword.colision(player_y, player_x):
+            player_item=sword.name
+            sword.actual_x=0
+            sword.actual_y=1
+            player_pts+=sword.pts
+            inmunidad=0
             
         #Escudo
-        if shield_place_x==player_x and shield_place_y==player_y:
-            player_item=item.shield.name
+        if shield.colision(player_y, player_x):
+            player_item=shield.name
             inmunidad=1
-            shield_place_x=0
-            shield_place_y=2
-            player_pts+=item.shield.pts
-            
-        if ring_place_x==player_x and ring_place_y==player_y:
-            player_item=item.ring.name
-            ring_place_x=0
-            ring_place_y=3
-            player_pts+=item.ring.pts
+            shield.actual_x=0
+            shield.actual_y=2
+            player_pts+=shield.pts
+        
+        #Anillo
+        if ring.colision(player_y, player_x):
+            player_item=ring.name
+            ring.actual_x=0
+            ring.actual_y=3
+            player_pts+=ring.pts
+            inmunidad=0
             
         # DIBUJO DE todo LO QUE SE VE EN PANTALLA
-    
         #Mapa
-        # Recorremos cada fila (r) y cada columna (c) del laberinto.
+        #for anidado para recorrer todas las filas (r) y columnas (c)
+        #matriz.maze contiene valores si una celda es pared (0)
+        #suelo transitable (1) o teletransporte (2) o (3)
+        #al momento de dibujar solo se distingue entre pared y suelo
         for r in range(FILAS):
-            # Convertimos la posición en la matriz a coordenadas reales de pantalla
             for c in range(COLUMNAS):
+                # Calculamos la posición en píxeles donde se dibujará cada tile.
+                # Se multiplica la columna/fila por el tamaño del tile (32 px)
+                # y se suma offset_x/y para centrar visualmente el laberinto en pantalla.
+                #Recorremos matriz y multiplicamos por 32
+                #Por ejemplo si tenemos (0,1) se dibuja en (32px, 0px)
+                #Se le suma offset_x/y para dibujar mapa centrado y que no empieze en (0,0)
                 x = c * cfg.TILE + cfg.offset_x
                 y = r * cfg.TILE + cfg.offset_y
-                # Si la celda vale 0 → es una pared.
+                #Si celda vale 0 sera una pared y se dibuja en sus respectivas cordenas con .blit()
                 if colision.maze[r][c] == 0:
-                    screen.blit(WALL, (x, y))      # DIBUJAR PARED
+                    screen.blit(WALL, (x, y))
+                #En cualquier otro caso 1,2,3 sera dibujado como suelo transitable
                 else:
-                    screen.blit(FLOOR, (x, y))     # DIBUJAR SUELO
+                    screen.blit(FLOOR, (x, y))
           
-       #   DIBUJAMOS SPRITES
-       
-       # ENEMIGOS 
-       # Solo se dibuja si está vivo (existencia = 1).
-       # Cero
-        if cero_exist == 1:
-            screen.blit(
-                CERO,
-                (
-                    cero_x * cfg.TILE + cfg.offset_x,
-                    cero_y * cfg.TILE + cfg.offset_y
-                )
-            )
-        
-        # Pigarto
-        # Pigarto se mueve siguiendo una lista de posiciones predefinidas.
-        # cr.pigarto.pos indica el índice actual de su posición.
-        if pigarto_exist == 1:
-            screen.blit(
-                PIGARTO,
-                (
-                    pigarto_x[cr.pigarto.pos] * cfg.TILE + cfg.offset_x,
-                    pigarto_y[cr.pigarto.pos] * cfg.TILE + cfg.offset_y
-                )
-            )
-        
-        # Raíz Negativa
-        # Igual que Cero: se dibuja si sigue vivo.
-        if raiznegativa_exist == 1:
-            screen.blit(
-                RAIZNEGATIVA,
-                (
-                    raiznegativa_x * cfg.TILE + cfg.offset_x,
-                    raiznegativa_y * cfg.TILE + cfg.offset_y
-                )
-            )
+        # ENEMIGOS 
+        # Cada enemigo tiene su propio método .dibujar(), el cual sabe
+        # cómo colocarse correctamente en la pantalla según su posición (x, y).
+        # screen: superficie principal donde se dibuja el juego
+        # CERO: sprite del enemigo
+        # cfg.TILE: tamaño de cada tile del mapa (32 px)
+        # cfg.offset_x / cfg.offset_y: desplazamiento para centrar el laberinto
+        cero.dibujar(screen, CERO, cfg.TILE, cfg.offset_x, cfg.offset_y)
+        pigarto.dibujar(screen, PIGARTO, cfg.TILE, cfg.offset_x, cfg.offset_y)
+        raiznegativa.dibujar(screen, RAIZNEGATIVA, cfg.TILE, cfg.offset_x, cfg.offset_y)
         
         #ITEMS
-        #Cada ítem se dibuja en su posición correspondiente del mapa.
+        # ITEMS
+        # Cada ítem tiene su propio método .draw(), el cual sabe
+        # cómo colocarse correctamente en la pantalla según su posición dentro del mapa.
+        # screen: superficie principal donde se dibuja el juego.
+        # El método .draw() se encarga internamente de:
+        #   - convertir la posición del ítem en la matriz (fila, columna)
+        #     a coordenadas de píxeles usando TILE.
+        #   - aplicar offset_x y offset_y para centrar el mapa en pantalla.
+        #   - dibujar su sprite en la ubicación correcta del laberinto.
+        sword.draw(screen)
+        shield.draw(screen)
+        ring.draw(screen)
         
-        # Espada
-        screen.blit(
-            ESPADA,
-            (
-                sword_place_x * cfg.TILE + cfg.offset_x,
-                sword_place_y * cfg.TILE + cfg.offset_y
-            )
-        )
-        
-        # Escudo
-        screen.blit(
-            ESCUDO,
-            (
-                shield_place_x * cfg.TILE + cfg.offset_x,
-                shield_place_y * cfg.TILE + cfg.offset_y
-            )
-        )
-        
-        # Anillo
-        screen.blit(
-            ANILLO,
-            (
-                ring_place_x * cfg.TILE + cfg.offset_x,
-                ring_place_y * cfg.TILE + cfg.offset_y
-            )
-        )
-        
-        # EFECTO DE FLOTACIÓN DEL MAGO
-       
-       
-       
-       # Modifica el desplazamiento vertical del mago para que suba y baje suavemente.
+        # EFECTO DE FLOTACIÓN DEL MAGO ARRIBA/ABAJO
+        #float_offset es cambio constante en eje y
+        """ float_offset = 0----> desplazamiento vertical que se suma a mago, ej con 1 baja 1 pixel con -2 sube 2 pixeles
+            float_direction = 1   1---> se mueve hacia abajo y -1 hacia arriba
+        """
         float_offset += float_direction * 0.2
-        # Si el mago sube demasiado, empieza a bajar.
+        # Si el desplazamiento supera +2 píxeles, el mago debe empezar a moverse hacia arriba.
         if float_offset > 2:
             float_direction = -1
-        # Si baja demasiado, empieza a subir.
+        # Si el desplazamiento supera -2 píxeles, el mago debe empezar a moverse hacia abajo.
         elif float_offset < -2:
             float_direction = 1
-        # Se dibuja aplicando el efecto de flotación (sumado a la posición Y real)
+        #Misma logica de dibujado pero coordenada y tiene logica de flotamiento
         screen.blit(
             MAGO,
             (
@@ -676,54 +504,59 @@ def jugar(SCREEN):
             )
         )
         
-        
         temporizador+=1
+        if colision_detected==True:
+            if invul_frames>0:
+                invul_frames-=1
+            elif invul_frames<=0:
+                invul_frames=invul_base #Invul_frame vuelve a la constante original
+                colision_detected=False
         
-        # Lógica de VICTORIA
-        if pigarto_exist==0 and cero_exist==0 and raiznegativa_exist==0:
+# Lógica de VICTORIA
+        if pigarto.exist == 0 and cero.exist == 0 and raiznegativa.exist == 0 and not victoria_detectada:
+            victoria_detectada = True
             print("Puntaje sin bonus por tiempo:", player_pts)
-            print("Segundos", temporizador/60)
-            if temporizador/60<=12:
-                player_pts+=2000
+            print("Segundos", temporizador / 60)
+            if temporizador / 60 <= 12:
+                player_pts += 2000
                 print("TIEMPO INHUMANO") 
-            elif temporizador/60<=15:
-                player_pts+=1000
-            elif temporizador/60<=20:
-                player_pts+=500
-            elif temporizador/60<=40:
-                player_pts+=250
-            elif temporizador/60<=60:
-                player_pts+=100
-            elif temporizador/60>60:
-                player_pts+=0
-                                
+            elif temporizador / 60 <= 15:
+                player_pts += 1000
+            elif temporizador / 60 <= 20:
+                player_pts += 500
+            elif temporizador / 60 <= 40:
+                player_pts += 250
+            elif temporizador / 60 <= 60:
+                player_pts += 100
+            else:
+                player_pts += 0
+                            
             print("Puntaje total:", player_pts)
             mostrando_mensaje_victoria = True
-            mensaje_temporizador = 180  # 3 segundos a 60 FPS (60 * 3)
-            reiniciar_juego()
+            mensaje_temporizador = 180  # 3 segundos a 60 FPS
        
         # Manejo del mensaje de victoria
         if mostrando_mensaje_victoria:
-            mensaje_temporizador -= 1
+            mensaje_temporizador -= 1 # Por cada frame del juego, se va restando 1 hasta que se cumplan los 3 segundos
             if mensaje_temporizador <= 0:
-                reiniciar_juego()  # Ahora sí resetea después del mensaje
+                reiniciar_juego()  # Reinicia todo excepto el puntaje después del mensaje
                 mostrando_mensaje_victoria = False
             else:
                 # Dibuja el mensaje de victoria (fondo negro y texto)
                 overlay = pygame.Surface((cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA), pygame.SRCALPHA)
                 overlay.fill((0, 0, 0, 255))  # Fondo negro 
-                screen.blit(overlay, (0, 0))
+                screen.blit(overlay, (0, 0)) # Comienza a dibujar desde la esquina izquierda
                 
                 fuente_titulo = cfg.get_letra(60)
                 fuente_sub = cfg.get_letra(30)
                 texto_titulo = fuente_titulo.render("¡NIVEL COMPLETADO!", True, (255, 255, 0))  # Amarillo
                 texto_puntaje = fuente_sub.render(f"PUNTAJE ACUMULADO: {player_pts}", True, (255, 255, 255))  # Blanco
                 
-                screen.blit(texto_titulo, texto_titulo.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 50)))
-                screen.blit(texto_puntaje, texto_puntaje.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y + 50)))
+                screen.blit(texto_titulo, texto_titulo.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 50))) # Dibujar en la pantalla
+                screen.blit(texto_puntaje, texto_puntaje.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y + 50))) # Dibujar en la pantalla
     
-        dibujar_hud(screen, player_pts, player_hp, player_item)
-        pygame.display.flip()
+        dibujar_hud(screen, player_pts, player_hp, player_item) 
+        pygame.display.flip() # Actualizar la pantalla
 
     # Si sale del bucle 'while running' por QUIT o ESCAPE, regresa al menú
     return True # Indica que debe ir al menú principal
