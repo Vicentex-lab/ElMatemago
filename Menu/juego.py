@@ -235,7 +235,7 @@ def jugar(SCREEN):
     move_delay = 120   # velocidad del personaje 
     
     running = True
-    mostrando_mensaje_victoria = False  # Nueva variable para controlar el mensaje
+    mostrando_mensaje_victoria = False  
     mensaje_temporizador = 0  # Temporizador para el mensaje (en frames)
     
     while running:
@@ -490,7 +490,7 @@ def jugar(SCREEN):
        
         # Manejo del mensaje de victoria
         if mostrando_mensaje_victoria:
-            mensaje_temporizador -= 1
+            mensaje_temporizador -= 1 
             if mensaje_temporizador <= 0:
                 reiniciar_juego()  # Reinicia todo después del mensaje
                 mostrando_mensaje_victoria = False
