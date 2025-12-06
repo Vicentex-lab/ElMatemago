@@ -140,7 +140,7 @@ def marcadores():
             for i, datos_puntaje in enumerate(top_puntaje):
                 # Extrae nombre y puntaje (con valores por defecto por seguridad).
                 nombre = datos_puntaje.get("nombre", "N/A") #Si falta la clave nombre en algún registro, .get se encarga de asignar un valor por defecto (N/A) y que no se cierre el programa
-                puntaje = datos_puntaje.get("player_pts", 0)
+                puntaje = datos_puntaje.get("player.pts", 0)
                 
                 # Formatea la línea: [Ranking]. [Nombre] - [Puntaje]
                 text_puntaje = f"{i+1}. {nombre} - {puntaje}"

@@ -15,12 +15,23 @@ class criature:
         self.cooldown=cooldown
 
 class player(criature):
-    positions_x=10
-    positions_y=23
-    hp=3
-    movement_ratio=1 #El jugador funciona bloque por bloque.
-    name=""
-    pts=0
+    def __init__(self):
+        super().__init__(
+        positions_x=10,
+        positions_y=23,
+        hp=3,
+        movement_ratio=1, #El jugador funciona bloque por bloque.
+        name="",
+        pts=0,
+        exist=1,
+        damage=0,
+        cooldown=0,
+        pos=0
+        )
+        self.item=""
+        self.inmunidad=0
+        self.invul_base=1*60 #segundos*FPS para frame
+        self.invul_frames=self.invul_base
 
 #Los monstruos funcionan por tiempo de espera (Milisegundos)
 
