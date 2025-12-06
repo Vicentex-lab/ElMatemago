@@ -190,7 +190,6 @@ def jugar(SCREEN):
                 pos_x = player_x * cfg.TILE
                 pos_y = player_y * cfg.TILE
                 print("Matemagicamente Teletransportado")
-
     
     def reiniciar_juego():
         nonlocal player_y, player_x, player_hp, player_item, inmunidad, temporizador, invul_frames, colision_detected
@@ -224,6 +223,7 @@ def jugar(SCREEN):
         # Reiniciar movimiento
         dir_x = 0
         dir_y = 0
+        move_timer = 0
         
         # Reiniciar efecto de flotación
         float_offset = 0
@@ -278,14 +278,15 @@ def jugar(SCREEN):
     pos_y = player_y * cfg.TILE
 
     speed = 2  # velocidad (pixeles por frame)
- 
+
     running = True
+
     mostrando_mensaje_victoria = False  
     mensaje_temporizador = 0  # Temporizador para el mensaje (en frames)
     
-    
     while running:
-       
+        screen.fill((0,0,0))
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
