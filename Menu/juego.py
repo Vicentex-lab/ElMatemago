@@ -4,7 +4,7 @@ import configuracion as cfg
 import colisiones as colision 
 import criaturas as cr         
 import items as item           
-from sprites import MAGO, CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO, CORAZON, WALL, FLOOR
+from sprites import CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO, CORAZON, WALL, FLOOR
 
 def jugar(SCREEN):
     # Muestra la pantalla de juego, detiene la música del menú e inicia la música de juego.
@@ -112,6 +112,10 @@ def jugar(SCREEN):
     player_y = cr.player.positions_y
     player_x = cr.player.positions_x
     player_hp = cr.player.hp
+    from sprites import MAGO_1, MAGO_2
+    # --- Animación del mago Mago izquierda derecha
+    player_sprite = MAGO_1   # Sprite inicial
+    anim_frame = 0           # Alterna 0 ↔ 1
     
     # Variables para efecto de flotacion en mago
     float_offset = 0
@@ -307,14 +311,24 @@ def jugar(SCREEN):
                 if event.key in (pygame.K_s, pygame.K_DOWN):
                     deseada_x = 0
                     deseada_y = 1
-
+                #Animacion izquierda derecha mago
+                
+                
                 if event.key in (pygame.K_a, pygame.K_LEFT):
                     deseada_x = -1
                     deseada_y = 0
+                
+                    # Animación izquierda
+                    anim_frame = 1 - anim_frame
+                    player_sprite = MAGO_1 if anim_frame == 0 else MAGO_2
 
                 if event.key in (pygame.K_d, pygame.K_RIGHT):
                     deseada_x = 1
                     deseada_y = 0
+                
+                    # Animación derecha
+                    anim_frame = 1 - anim_frame
+                    player_sprite = MAGO_1 if anim_frame == 0 else MAGO_2
 
    
         # Convierte la posición de píxeles a casilla
@@ -540,9 +554,9 @@ def jugar(SCREEN):
         # Si el desplazamiento supera -2 píxeles, el mago debe empezar a moverse hacia abajo.
         elif float_offset < -2:
             float_direction = 1
-        #Misma logica de dibujado pero coordenada y tiene logica de flotamiento
+        #Misma lógica de dibujado pero con sprite animado y flotamiento
         screen.blit(
-            MAGO,
+            player_sprite,
             (
                 player_x * cfg.TILE + cfg.offset_x,
                 player_y * cfg.TILE + cfg.offset_y + float_offset
