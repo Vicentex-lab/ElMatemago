@@ -6,5 +6,9 @@
     {
         "nombre": "VICENTE",
         "player_pts": 2500
+    },
+    {
+        "nombre": "AAA",
+        "player_pts": 250
     }
 ]

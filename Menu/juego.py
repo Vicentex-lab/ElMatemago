@@ -115,7 +115,9 @@ def jugar(SCREEN):
     from sprites import MAGO_1, MAGO_2
     # --- Animación del mago Mago izquierda derecha
     player_sprite = MAGO_1   # Sprite inicial
-    anim_frame = 0           # Alterna 0 ↔ 1
+    anim_frame = 0 
+    facing = "right"
+    # Alterna 0 ↔ 1
     
     # Variables para efecto de flotacion en mago
     float_offset = 0
@@ -315,20 +317,26 @@ def jugar(SCREEN):
                 
                 
                 if event.key in (pygame.K_a, pygame.K_LEFT):
+                
                     deseada_x = -1
                     deseada_y = 0
                 
-                    # Animación izquierda
-                    anim_frame = 1 - anim_frame
-                    player_sprite = MAGO_1 if anim_frame == 0 else MAGO_2
+                    # SOLO animar si la dirección cambió
+                    if facing != "left":
+                        facing = "left"
+                        anim_frame = 1 - anim_frame
+                        player_sprite = MAGO_1 if anim_frame == 0 else MAGO_2
 
                 if event.key in (pygame.K_d, pygame.K_RIGHT):
+                
                     deseada_x = 1
                     deseada_y = 0
                 
-                    # Animación derecha
-                    anim_frame = 1 - anim_frame
-                    player_sprite = MAGO_1 if anim_frame == 0 else MAGO_2
+                    # SOLO animar si la dirección cambió
+                    if facing != "right":
+                        facing = "right"
+                        anim_frame = 1 - anim_frame
+                        player_sprite = MAGO_1 if anim_frame == 0 else MAGO_2
 
    
         # Convierte la posición de píxeles a casilla

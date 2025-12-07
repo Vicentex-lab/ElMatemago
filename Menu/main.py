@@ -21,13 +21,12 @@ SCREEN = pygame.display.set_mode((cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA), pygame
 
 
 #Importamos sprites luego de definir la pantalla (SCREEN)
-from sprites import MAGO, CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO, CORAZON
+from sprites import CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO, CORAZON
 pygame.display.set_caption("EL MATEMAGO") #Establece el título de la ventana
 
 #Utilizamos .convert_alpha() una vez definida SCREEN
 # Optimiza las imágenes cargadas para un dibujo más rápido en la pantalla y mantiene la transparencia de las imágenes.
 #Forma general de optimizacion
-MAGO = MAGO.convert_alpha()
 CERO = CERO.convert_alpha()
 RAIZNEGATIVA = RAIZNEGATIVA.convert_alpha()
 PIGARTO = PIGARTO.convert_alpha()
