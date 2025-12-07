@@ -112,12 +112,14 @@ def jugar(SCREEN):
     player_y = cr.player.positions_y
     player_x = cr.player.positions_x
     player_hp = cr.player.hp
+    
+    
+    
     from sprites import MAGO_1, MAGO_2
     # --- Animación del mago Mago izquierda derecha
-    player_sprite = MAGO_1   # Sprite inicial
-    anim_frame = 0 
-    facing = "right"
-    # Alterna 0 ↔ 1
+    player_sprite = MAGO_1      # sprite actual del mago
+    anim_frame = 0              # alterna entre 0 y 1
+    facing = "right"            # dirección actual del mago
     
     # Variables para efecto de flotacion en mago
     float_offset = 0
