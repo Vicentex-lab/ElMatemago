@@ -291,9 +291,9 @@ def jugar(SCREEN):
                 if event.key == pygame.K_ESCAPE:
                     pygame.mixer.music.stop()
                     running = False # Detiene el bucle para salir o ir a Game Over
-                    return True 
-
-                # Guardar dirección DESEADA siempre
+                    return True     
+                    
+            # Guardar dirección DESEADA siempre
             if event.type == pygame.KEYDOWN:
                 if event.key in (pygame.K_w, pygame.K_UP):
                     deseada_x = 0
@@ -310,7 +310,9 @@ def jugar(SCREEN):
                 if event.key in (pygame.K_d, pygame.K_RIGHT):
                     deseada_x = 1
                     deseada_y = 0
-
+                    
+                #if event.key in (pygame.K_SPACE):
+                #    #acción
    
         # Convierte la posición de píxeles a casilla
    
