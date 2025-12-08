@@ -10,5 +10,13 @@
     {
         "nombre": "AAA",
         "player_pts": 250
+    },
+    {
+        "nombre": "AAA",
+        "player_pts": 850
+    },
+    {
+        "nombre": "AAAA",
+        "player_pts": 1000
     }
 ]

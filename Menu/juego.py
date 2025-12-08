@@ -98,7 +98,11 @@ def jugar(SCREEN):
             txt_none = fuente_item.render("NINGUNO", True, (160, 160, 160)) 
             #.render convierte string en surface, mostramos puntaje jugador, True es para bordes suaves no pixelados
             screen.blit(txt_none, (hud_x + 160, hud_y + 160))
-        #SECCION
+        #SECCION BUFFS
+        fuente_buffs = cfg.get_letra(22)
+        txt_buffs = fuente_buffs.render("BUFFS:", True, (255, 255, 255))
+        BUFFS_Y = hud_y + 210  # Ajustado para que quede proporcional
+        screen.blit(txt_buffs, (hud_x + 30, BUFFS_Y))
 
     
     FPS = 60
