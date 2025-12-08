@@ -98,6 +98,7 @@ def jugar(SCREEN):
             txt_none = fuente_item.render("NINGUNO", True, (160, 160, 160)) 
             #.render convierte string en surface, mostramos puntaje jugador, True es para bordes suaves no pixelados
             screen.blit(txt_none, (hud_x + 160, hud_y + 160))
+        #SECCION
 
     
     FPS = 60
