@@ -14,9 +14,10 @@ def jugar(SCREEN):
     
     # 2. Carga y reproduce la música del juego en loop
     try:
-        pygame.mixer.music.load(cfg.RUTA_MUSICA_JUEGO) 
-        pygame.mixer.music.play(-1)
-        pygame.mixer.music.set_volume(cfg.VOLUMEN_GLOBAL) 
+        if cfg.MUSICA_ACTIVADA: #Solo reproducir si la música está activada
+            pygame.mixer.music.load(cfg.RUTA_MUSICA_JUEGO)
+            pygame.mixer.music.play(-1) # Reproducir en loop
+            pygame.mixer.music.set_volume(cfg.VOLUMEN_GLOBAL)
     except pygame.error as e:
         print(f"Error al cargar la música del juego: {e}")
     

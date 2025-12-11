@@ -49,6 +49,9 @@ offset_y = CENTRO_Y - (ALTO_LABERINTO // 2)
 
 # --- VARIABLES GLOBALES DE JUEGO ---
 VOLUMEN_GLOBAL = 0.5 # Nivel inicial de volumen (50%).
+DIFICULTAD_GLOBAL = "NORMAL" # Puede ser "NORMAL" o "DIFICIL"
+ARCHIVO_PREFERENCIAS = "Menu/preferencias.json" #Ruta archivo de preferencias del usuario
+MUSICA_ACTIVADA = True # Si es True, la música se reproduce.
 RUTA_MUSICA_MENU = "./assets/Matemago_Menu_Song.mp3" 
 RUTA_MUSICA_JUEGO = "./assets/Matemago_Dungeon_Song.mp3"
 # Obtiene el directorio base del archivo actual (configuracion.py), útil para referencias relativas.
@@ -63,7 +66,7 @@ SLIDER_HEIGHT = 10 #Altura de la línea del slider (es una línea horizontal).
 # Posición X calculada como central inicialmente 
 #con esto centramos slider, restando la mitad del ancho a centro ventana
 SLIDER_X = CENTRO_X - (SLIDER_WIDTH // 2)  
-SLIDER_Y = CENTRO_Y - 80 # Posición Y fija, un poco arriba del centro.
+SLIDER_Y = CENTRO_Y - 190 # Posición Y fija, un poco arriba del centro.
 
 # Posición inicial del manejador (círculo) del slider.
 # Se calcula multiplicando el ancho total por el volumen actual (0.5),
@@ -117,6 +120,79 @@ def cargar_mejores_puntajes():
     # Maneja errores si el archivo existe pero el JSON está mal formado o hay un error de E/S (devuelve lista vacía).    
     except (json.JSONDecodeError, FileNotFoundError):
         return []
+    
+    
+# Función para cargar la configuración al iniciar el juego
+def cargar_preferencias():
+    """
+    Carga el volumen, la dificultad y el estado de la música desde el archivo JSON 
+    si existe. Si el archivo no existe o está corrupto, se usan los valores por defecto 
+    definidos en el módulo 'configuracion'.
+    """    
+    #Modifica las variables globales
+    global VOLUMEN_GLOBAL, DIFICULTAD_GLOBAL, SLIDER_HANDLE_X, MUSICA_ACTIVADA
+    
+    # Comprobación de existencia del archivo
+    if os.path.exists(ARCHIVO_PREFERENCIAS):
+        #Apertura del archivo
+        # 'with open' asegura que el archivo se cerrará automáticamente al salir del bloque, incluso si ocurre un error.
+        with open(ARCHIVO_PREFERENCIAS, 'r') as f:
+            try:
+                # json.load() lee el contenido del archivo .json (f) y lo convierte 
+                # en un diccionario de Python (datos).
+                datos = json.load(f)
+                
+                # Aplicar la configuración guardada
+                
+                # Cargar y aplicar el volumen
+                # Se verifica si la clave 'volumen' existe y si su valor está dentro del rango 0.0 a 1.0.
+                if 'volumen' in datos and 0.0 <= datos['volumen'] <= 1.0:
+                    VOLUMEN_GLOBAL = datos['volumen'] # Asigna el valor guardado a la variable global.
+                    
+                    # Aplica el volumen inmediatamente al mezclador de Pygame,
+                    # para que la música del menú suene con el volumen correcto si está activa.
+                    pygame.mixer.music.set_volume(VOLUMEN_GLOBAL) 
+                    
+                    # Actualizar la posición del slider
+                    SLIDER_HANDLE_X = SLIDER_X + (SLIDER_WIDTH * VOLUMEN_GLOBAL)
+                
+                # Cargar la dificultad
+                # Se verifica si la clave 'dificultad' existe y si su valor es uno de los esperados.
+                if 'dificultad' in datos and datos['dificultad'] in ["NORMAL", "DIFICIL"]:
+                    DIFICULTAD_GLOBAL = datos['dificultad']
+                    
+                # Cargar el estado de la música
+                # Se verifica si la clave 'musica_activada' existe y si su valor es un booleano (True/False).
+                if 'musica_activada' in datos and isinstance(datos['musica_activada'], bool):
+                    MUSICA_ACTIVADA = datos['musica_activada']
+                     
+                print("Configuración cargada exitosamente.")
+                
+            except json.JSONDecodeError:
+                print(f"Error al leer el archivo {ARCHIVO_PREFERENCIAS}. Usando valores predeterminados.")
+    else:
+        print(f"Archivo {ARCHIVO_PREFERENCIAS} no encontrado. Usando valores predeterminados.")
+
+    
+# Función para guardar la configuración después de un cambio
+def guardar_preferencias():
+    """Guarda el volumen, dificultad y otras configuraciones en un archivo JSON."""
+    
+    #Trabaja con variables globales
+    global VOLUMEN_GLOBAL, DIFICULTAD_GLOBAL, MUSICA_ACTIVADA
+    
+    # 1. Crear el diccionario con los datos actuales
+    datos = {
+        'volumen': VOLUMEN_GLOBAL,
+        'dificultad': DIFICULTAD_GLOBAL,
+        'musica_activada': MUSICA_ACTIVADA,
+    }
+    
+    # 2. Escribir el diccionario en el archivo JSON
+    with open(ARCHIVO_PREFERENCIAS, 'w') as f:
+        json.dump(datos, f, indent=4)
+    
+    print("Configuración guardada.")   
     
 def obtener_nombre(screen, player_pts):
     """
