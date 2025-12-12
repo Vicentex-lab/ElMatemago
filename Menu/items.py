@@ -80,3 +80,9 @@ class mathray(item):
     name="Materayo"
     places_y=[11]
     places_x=[9]
+    damage=99999
+    pts=250
+    pos=0
+    actual_x=0
+    actual_y=0
+    obj_sprite=0
