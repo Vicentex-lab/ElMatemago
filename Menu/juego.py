@@ -55,26 +55,26 @@ def jugar(SCREEN):
         fuente = cfg.get_letra(22)   #Funcion en cfg para retornar texto en pygame con tamaño 22
         txt_pts = fuente.render(f"PUNTAJE: {player_pts}", True, (255, 255, 120))   
         #.render convierte string en surface, mostramos puntaje jugador, True es para bordes suaves no pixelados
-        screen.blit(txt_pts, (hud_x + 30, hud_y + 20))  # Se dibuja HUD creado en pantalla con su texto con sus coordenadas
+        screen.blit(txt_pts, (hud_x + 55, hud_y + 20))  # Se dibuja HUD creado en pantalla con su texto con sus coordenadas
     
         # SECCIÓN: VIDA 
         fuente_vida = cfg.get_letra(22)  #Funcion en cfg para retornar texto en pygame con tamaño 22
         #.render convierte string en surface, mostramos puntaje jugador, True es para bordes suaves no pixelados
         txt_vida = fuente_vida.render("VIDA:", True, (255, 255, 255))
         #.render convierte string en surface, mostramos puntaje jugador, True es para bordes suaves no pixelados
-        screen.blit(txt_vida, (hud_x + 30, hud_y + 90))
+        screen.blit(txt_vida, (hud_x + 30, hud_y + 80))
         #nueva variable con corazon reescalado para que encaje con tamaño hud, escala 28x28
         CORAZON_HUD = pygame.transform.scale(CORAZON, (28, 28)) 
         # Dibujamos un corazón por cada punto de vida
         #Ciclo for para dibujar corazones, cada uno cambiara en "i * 32" pixeles a la derecha
         for i in range(player_hp):
-            screen.blit(CORAZON_HUD, (hud_x + 150 + i*32, hud_y + 88)) 
+            screen.blit(CORAZON_HUD, (hud_x + 160 + i*32, hud_y + 78)) 
     
-            # SECCIÓN: ITEM
+        # SECCIÓN: ITEM
         fuente_item = cfg.get_letra(22)  #Funcion en cfg para retornar texto en pygame con tamaño 22
         txt_item = fuente_item.render("ITEM:", True, (255, 255, 255))
         #.render convierte string en surface, mostramos puntaje jugador, True es para bordes suaves no pixelados
-        screen.blit(txt_item, (hud_x + 30, hud_y + 160)) # Se dibuja HUD creado en pantalla con su texto con sus coordenadas
+        screen.blit(txt_item, (hud_x + 30, hud_y + 140)) # Se dibuja HUD creado en pantalla con su texto con sus coordenadas
     
         # Selección del sprite del ítem
         #Segun que item tenga jugador lo mostraremos en pantalla con su respectivo sprite
@@ -93,17 +93,43 @@ def jugar(SCREEN):
         if sprite:
             ITEM_HUD = pygame.transform.scale(sprite, (40, 40))  # Tamaño ideal de items para HUD
             #Dibujamos todo en pantalla con .blit()
-            screen.blit(ITEM_HUD, (hud_x + 160, hud_y + 160))
+            screen.blit(ITEM_HUD, (hud_x + 160, hud_y + 132))
         else:
             # Si NO hay un ítem equipado, se escribe la palabra "NINGUNO"
             txt_none = fuente_item.render("NINGUNO", True, (160, 160, 160)) 
             #.render convierte string en surface, mostramos puntaje jugador, True es para bordes suaves no pixelados
-            screen.blit(txt_none, (hud_x + 160, hud_y + 160))
-        #SECCION BUFFS
+            screen.blit(txt_none, (hud_x + 160, hud_y + 140))
+        
+        
+        
+        
+        # SECCION BUFFS (Es parecido a logica items)
+        # ---------------------------------------------------------
         fuente_buffs = cfg.get_letra(22)
         txt_buffs = fuente_buffs.render("BUFFS:", True, (255, 255, 255))
-        BUFFS_Y = hud_y + 210  # Ajustado para que quede proporcional
-        screen.blit(txt_buffs, (hud_x + 30, BUFFS_Y))
+        screen.blit(txt_buffs, (hud_x + 30, hud_y + 200))
+                
+        # Inicializamos el sprite a dibujar como vacío
+        sprite_buff_activo = None
+        
+        # 1. LÓGICA DE ACTIVACIÓN DE BUFFS
+        # Ejemplo: if variable_buffs == "DOBLE_DAÑO":     
+        # if estado_buff == "POWERUP1":
+        #     sprite_buff_activo = IMAGEN_POWERUP1
+        # elif estado_buff == "POWERUP2":
+        #     sprite_buff_activo = IMAGEN_POWERUP2
+        # elif estado_buff == "POWERUP3":
+        #     sprite_buff_activo = IMAGEN_POWERUP3
+                
+        # 2. DIBUJADO DEL BUFF EN PANTALLA
+        if sprite_buff_activo:
+        # Escalamos el sprite seleccionado a 40x40 para el HUD
+            ICONO_BUFF = pygame.transform.scale(sprite_buff_activo, (40, 40))
+            screen.blit(ICONO_BUFF, (hud_x + 160, hud_y + 192))
+        else:
+            # Si no hay ningún powerup activo, mostramos "NINGUNO"
+            txt_none_buff = fuente_buffs.render("NINGUNO", True, (160, 160, 160))
+            screen.blit(txt_none_buff, (hud_x + 160, hud_y + 200))
 
     
     FPS = 60
