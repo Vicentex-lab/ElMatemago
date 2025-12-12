@@ -147,12 +147,9 @@ def jugar(SCREEN):
     
     
     
-    from sprites import MAGO_1, MAGO_2
+    from sprites import MAGO_1, MAGO_2, MAGO_3,MAGO_4
     # --- Animación del mago Mago izquierda derecha
-    player_sprite = MAGO_1      # sprite actual del mago
-    anim_frame = 0              # alterna entre 0 y 1
-    facing = "right"            # dirección actual del mago
-    
+    player_sprite = MAGO_4      # sprite actual del mago 
     # Variables para efecto de flotacion en mago
     float_offset = 0
     float_direction = 1
@@ -338,39 +335,29 @@ def jugar(SCREEN):
                     running = False # Detiene el bucle para salir o ir a Game Over
                     return True 
 
-                # Guardar dirección DESEADA siempre
             if event.type == pygame.KEYDOWN:
+                # --- ARRIBA (W) ---
                 if event.key in (pygame.K_w, pygame.K_UP):
                     deseada_x = 0
-                    deseada_y = -1
-
+                    deseada_y = -1  
+                    player_sprite = MAGO_3 
+                # --- ABAJO (S) ---
                 if event.key in (pygame.K_s, pygame.K_DOWN):
                     deseada_x = 0
                     deseada_y = 1
-                #Animacion izquierda derecha mago
+                    player_sprite = MAGO_4  
                 
-                
+                # --- IZQUIERDA (A) --
                 if event.key in (pygame.K_a, pygame.K_LEFT):
                 
                     deseada_x = -1
-                    deseada_y = 0
-                
-                    # SOLO animar si la dirección cambió
-                    if facing != "left":
-                        facing = "left"
-                        anim_frame = 1 - anim_frame
-                        player_sprite = MAGO_1 if anim_frame == 0 else MAGO_2
-
+                    deseada_y = 0 
+                    player_sprite = MAGO_2
+                # --- DERECHA (D) --
                 if event.key in (pygame.K_d, pygame.K_RIGHT):
-                
                     deseada_x = 1
                     deseada_y = 0
-                
-                    # SOLO animar si la dirección cambió
-                    if facing != "right":
-                        facing = "right"
-                        anim_frame = 1 - anim_frame
-                        player_sprite = MAGO_1 if anim_frame == 0 else MAGO_2
+                    player_sprite = MAGO_1
 
    
         # Convierte la posición de píxeles a casilla
