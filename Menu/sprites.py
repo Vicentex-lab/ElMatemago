@@ -35,7 +35,7 @@ RAIZNEGATIVA = load("RAIZNEGATIVA", recortar=True)
 PIGARTO = load("PIGARTO", recortar=True)
 
 #ITEMS
-ESPADA = load("ESPADA", recortar=True)
+ESPADA = load("ESPADA", recortar=False)
 ESCUDO = load("ESCUDO", recortar=True)
 ANILLO = load("ANILLO", recortar=True)
 CORAZON = load("CORAZON", recortar=True)
