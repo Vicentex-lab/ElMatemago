@@ -18,5 +18,9 @@
     {
         "nombre": "AAAA",
         "player_pts": 1000
+    },
+    {
+        "nombre": "MMMM",
+        "player_pts": 1750
     }
 ]
