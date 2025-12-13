@@ -37,7 +37,7 @@ ANILLO = ANILLO.convert_alpha()
 CORAZON = CORAZON.convert_alpha()
 
 #Cargamos imagen de fondo para el menú
-fondo_menu = pygame.image.load("./assets/menu_editado.png").convert() #metodo .convert convierte la imagen al mismo formato de color de pantalla
+fondo_menu = pygame.image.load("./assets/fondo_pantallas.png").convert() #metodo .convert convierte la imagen al mismo formato de color de pantalla
                                                                         #otra forma de optimizar y mas eficiencia
 # Escala el fondo para que ocupe todo el tamaño de la pantalla. tenemos escala actual y la transformamos a (ancho, altura pantalla)
 fondo_menu = pygame.transform.scale(fondo_menu, SCREEN.get_size())
@@ -129,7 +129,7 @@ def marcadores():
     while True:
         POS_MOUSE_MARCADORES = pygame.mouse.get_pos()
         SCREEN.blit(fondo_menu, (0, 0)) 
-        
+        5
         # Título de la pantalla.
         TEXTO_TITULO = cfg.get_letra(50).render("MARCADORES", True, "#f2c572")
         RECT_TITULO = TEXTO_TITULO.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 330))

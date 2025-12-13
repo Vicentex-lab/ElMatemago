@@ -22,5 +22,21 @@
     {
         "nombre": "MMMM",
         "player_pts": 1750
+    },
+    {
+        "nombre": "A",
+        "player_pts": 750
+    },
+    {
+        "nombre": "AAA",
+        "player_pts": 250
+    },
+    {
+        "nombre": "AAA",
+        "player_pts": 1500
+    },
+    {
+        "nombre": "AA",
+        "player_pts": 750
     }
 ]

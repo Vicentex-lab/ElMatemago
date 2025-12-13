@@ -53,9 +53,12 @@ def jugar(SCREEN):
     
         #SECCIÓN: PUNTAJE
         fuente = cfg.get_letra(22)   #Funcion en cfg para retornar texto en pygame con tamaño 22
-        txt_pts = fuente.render(f"PUNTAJE: {player_pts}", True, (255, 255, 120))   
-        #.render convierte string en surface, mostramos puntaje jugador, True es para bordes suaves no pixelados
-        screen.blit(txt_pts, (hud_x + 55, hud_y + 20))  # Se dibuja HUD creado en pantalla con su texto con sus coordenadas
+        # 1. Dibujamos la etiqueta "PUNTAJE:"
+        txt_label_pts = fuente.render("PUNTAJE:", True, (255, 255, 120))   
+        screen.blit(txt_label_pts, (hud_x + 30, hud_y + 20))
+        # 2. Dibujamos el número (el valor del puntaje)
+        txt_value_pts = fuente.render(str(player_pts), True, (255, 255, 120))
+        screen.blit(txt_value_pts, (hud_x + 205, hud_y + 20))
     
         # SECCIÓN: VIDA 
         fuente_vida = cfg.get_letra(22)  #Funcion en cfg para retornar texto en pygame con tamaño 22
