@@ -38,5 +38,9 @@
     {
         "nombre": "AA",
         "player_pts": 750
+    },
+    {
+        "nombre": "AAAA",
+        "player_pts": 1500
     }
 ]

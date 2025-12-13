@@ -29,6 +29,17 @@ MAGO_2 = load("MAGO_2", recortar=False) # Izquierda
 MAGO_3 = load("MAGO_3", recortar=False) # Espalda
 MAGO_4 = load("MAGO_4", recortar=False) # Frente
 
+#Sprites secundarios para simular que mago camina
+MAGO_1_B = load("MAGO_1_B", recortar=False) # Derecha
+MAGO_2_B = load("MAGO_2_B", recortar=False) # Izquierda
+MAGO_3_B = load("MAGO_3_B", recortar=False) # Espalda
+MAGO_4_B = load("MAGO_4_B", recortar=False) # Frente
+# 2. Las guardamos en LISTAS (Frame 0 y Frame 1)
+ANIMACION_DERECHA = [MAGO_1, MAGO_1_B]
+ANIMACION_IZQUIERDA = [MAGO_2, MAGO_2_B]
+ANIMACION_ATRAS = [MAGO_3, MAGO_3_B]
+ANIMACION_FRENTE = [MAGO_4, MAGO_4_B]
+
 #ENEMIGOS
 CERO = load("CERO", recortar=True)
 RAIZNEGATIVA = load("RAIZNEGATIVA", recortar=True)
