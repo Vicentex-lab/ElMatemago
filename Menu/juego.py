@@ -4,7 +4,7 @@ import configuracion as cfg
 import colisiones as colision 
 import criaturas as cr         
 import items as item           
-from sprites import MAGO, CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO, CORAZON, WALL, FLOOR
+from sprites import CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO, CORAZON, WALL, FLOOR
 
 def jugar(SCREEN):
     # Muestra la pantalla de juego, detiene la música del menú e inicia la música de juego.
@@ -14,13 +14,14 @@ def jugar(SCREEN):
     
     # 2. Carga y reproduce la música del juego en loop
     try:
-        pygame.mixer.music.load(cfg.RUTA_MUSICA_JUEGO) 
-        pygame.mixer.music.play(-1)
-        pygame.mixer.music.set_volume(cfg.VOLUMEN_GLOBAL) 
+        if cfg.MUSICA_ACTIVADA: #Solo reproducir si la música está activada
+            pygame.mixer.music.load(cfg.RUTA_MUSICA_JUEGO)
+            pygame.mixer.music.play(-1) # Reproducir en loop
+            pygame.mixer.music.set_volume(cfg.VOLUMEN_GLOBAL)
     except pygame.error as e:
         print(f"Error al cargar la música del juego: {e}")
     
-    def dibujar_hud(screen):
+    def dibujar_hud(screen, player_pts, player_hp, player_item):
         # CONFIGURACIÓN DEL MARCO 
         hud_x = 40           # posicion del hud en eje x
         hud_y = 40            #posicion del hud en eje y
@@ -52,7 +53,7 @@ def jugar(SCREEN):
     
         #SECCIÓN: PUNTAJE
         fuente = cfg.get_letra(22)   #Funcion en cfg para retornar texto en pygame con tamaño 22
-        txt_pts = fuente.render(f"PUNTAJE: {player.pts}", True, (255, 255, 120))   
+        txt_pts = fuente.render(f"PUNTAJE: {player_pts}", True, (255, 255, 120))   
         #.render convierte string en surface, mostramos puntaje jugador, True es para bordes suaves no pixelados
         screen.blit(txt_pts, (hud_x + 30, hud_y + 20))  # Se dibuja HUD creado en pantalla con su texto con sus coordenadas
     
@@ -66,7 +67,7 @@ def jugar(SCREEN):
         CORAZON_HUD = pygame.transform.scale(CORAZON, (28, 28)) 
         # Dibujamos un corazón por cada punto de vida
         #Ciclo for para dibujar corazones, cada uno cambiara en "i * 32" pixeles a la derecha
-        for i in range(player.hp):
+        for i in range(player_hp):
             screen.blit(CORAZON_HUD, (hud_x + 150 + i*32, hud_y + 88)) 
     
             # SECCIÓN: ITEM
@@ -77,11 +78,11 @@ def jugar(SCREEN):
     
         # Selección del sprite del ítem
         #Segun que item tenga jugador lo mostraremos en pantalla con su respectivo sprite
-        if player.item == sword.name:
+        if player_item == sword.name:
             sprite = ESPADA
-        elif player.item == shield.name:
+        elif player_item == shield.name:
             sprite = ESCUDO
-        elif player.item == ring.name:
+        elif player_item == ring.name:
             sprite = ANILLO
         else:
             sprite = None  # Si no tiene ítem, no hay imagen que mostrar
@@ -98,6 +99,11 @@ def jugar(SCREEN):
             txt_none = fuente_item.render("NINGUNO", True, (160, 160, 160)) 
             #.render convierte string en surface, mostramos puntaje jugador, True es para bordes suaves no pixelados
             screen.blit(txt_none, (hud_x + 160, hud_y + 160))
+        #SECCION BUFFS
+        fuente_buffs = cfg.get_letra(22)
+        txt_buffs = fuente_buffs.render("BUFFS:", True, (255, 255, 255))
+        BUFFS_Y = hud_y + 210  # Ajustado para que quede proporcional
+        screen.blit(txt_buffs, (hud_x + 30, BUFFS_Y))
 
     
     FPS = 60
@@ -109,17 +115,29 @@ def jugar(SCREEN):
     clock = pygame.time.Clock()
     
     #Definiciones del jugador
-    player=cr.player()
-    player_y = player.positions_y
-    player_x = player.positions_x
+    player_y = cr.player.positions_y
+    player_x = cr.player.positions_x
+    player_hp = cr.player.hp
+    
+    
+    
+    from sprites import MAGO_1, MAGO_2
+    # --- Animación del mago Mago izquierda derecha
+    player_sprite = MAGO_1      # sprite actual del mago
+    anim_frame = 0              # alterna entre 0 y 1
+    facing = "right"            # dirección actual del mago
     
     # Variables para efecto de flotacion en mago
     float_offset = 0
     float_direction = 1
     
     #Resto de definiciones del jugador
-    player.item=""
+    player_item=""
+    inmunidad=0
+    player_pts=cr.player.pts
     temporizador=0
+    invul_base=1*60 #segundos*FPS para frame
+    invul_frames=invul_base #segundos*FPS para frames
     colision_detected=True
     
     # Bandera para evitar acumulación de bonus de victoria
@@ -188,29 +206,30 @@ def jugar(SCREEN):
                 print("Matemagicamente Teletransportado")
     
     def reiniciar_juego():
-        nonlocal player_y, player_x, temporizador, colision_detected
+        nonlocal player_y, player_x, player_hp, player_item, inmunidad, temporizador, invul_frames, colision_detected
         nonlocal dir_x, dir_y, float_offset, float_direction
+        nonlocal player_pts  # Ignorar para conservar el puntaje
         nonlocal cero, pigarto, raiznegativa  # Instancias de enemigos que se reasignan
         nonlocal victoria_detectada  # Resetear la bandera
         
         # Reiniciar posición del jugador
-        player_y = 13   #Revisar en este apartado y en criaturas porqué no puedo tomar la instacia de criaturas
-        player_x = 23
+        player_y = cr.player.positions_y
+        player_x = cr.player.positions_x
         
         # Reiniciar vida del jugador
-        player.hp = 3
+        player_hp = cr.player.hp
         
         # Reiniciar item del jugador
-        player.item = ""
+        player_item = ""
         
-        # Reiniciar player.inmunidad
-        player.inmunidad = 0
+        # Reiniciar inmunidad
+        inmunidad = 0
         
         # Reiniciar temporizador
         temporizador = 0
         
         # Reiniciar frames de invulnerabilidad
-        player.invul_frames = player.invul_base
+        invul_frames = 2 * 60
         
         # Reiniciar detección de colisión
         colision_detected = True
@@ -291,9 +310,9 @@ def jugar(SCREEN):
                 if event.key == pygame.K_ESCAPE:
                     pygame.mixer.music.stop()
                     running = False # Detiene el bucle para salir o ir a Game Over
-                    return True     
-                    
-            # Guardar dirección DESEADA siempre
+                    return True 
+
+                # Guardar dirección DESEADA siempre
             if event.type == pygame.KEYDOWN:
                 if event.key in (pygame.K_w, pygame.K_UP):
                     deseada_x = 0
@@ -302,17 +321,31 @@ def jugar(SCREEN):
                 if event.key in (pygame.K_s, pygame.K_DOWN):
                     deseada_x = 0
                     deseada_y = 1
-
+                #Animacion izquierda derecha mago
+                
+                
                 if event.key in (pygame.K_a, pygame.K_LEFT):
+                
                     deseada_x = -1
                     deseada_y = 0
+                
+                    # SOLO animar si la dirección cambió
+                    if facing != "left":
+                        facing = "left"
+                        anim_frame = 1 - anim_frame
+                        player_sprite = MAGO_1 if anim_frame == 0 else MAGO_2
 
                 if event.key in (pygame.K_d, pygame.K_RIGHT):
+                
                     deseada_x = 1
                     deseada_y = 0
-                    
-                #if event.key in (pygame.K_SPACE):
-                #    #acción
+                
+                    # SOLO animar si la dirección cambió
+                    if facing != "right":
+                        facing = "right"
+                        anim_frame = 1 - anim_frame
+                        player_sprite = MAGO_1 if anim_frame == 0 else MAGO_2
+
    
         # Convierte la posición de píxeles a casilla
    
@@ -363,22 +396,24 @@ def jugar(SCREEN):
         #Con CERO
         if cero.colisionar(player_y, player_x) and colision_detected==False:
             colision_detected=True
-            if player.item==shield.name:
+            if player_item==shield.name:
                 cero.positions_x=10
                 cero.positions_y=13
-                player.item=""
-                player.inmunidad=0
-            elif player.item==sword.name:
-                player.pts+=cero.pts
-                player.item=""
+                player_item=""
+                inmunidad=0
+            elif player_item==sword.name:
+                player_pts+=cero.pts
+                player_item=""
                 cero.exist=0
-            elif player.inmunidad!=1 and player.hp-cero.damage>0:
-                player.hp-=cero.damage
-            elif player.inmunidad!=1 and player.hp-cero.damage<=0:
+            elif inmunidad!=1 and player_hp-cero.damage>0:
+                player_x=cr.player.positions_x
+                player_y=cr.player.positions_y
+                player_hp-=cero.damage
+            elif inmunidad!=1 and player_hp-cero.damage<=0:
                 print("💀 cero")
                 pygame.mixer.music.stop() 
-                if player.pts > 0:
-                    cfg.guardar_nuevo_puntaje(screen, player.pts)
+                if player_pts > 0:
+                    cfg.guardar_nuevo_puntaje(screen, player_pts)
                     return True #Volver al menú
                 else:
                     return False #Mostrar pantalla bajo puntaje
@@ -386,33 +421,35 @@ def jugar(SCREEN):
         #Con Pigarto
         if pigarto.colisionar(player_y, player_x) and colision_detected==False:
             colision_detected=True
-            if player.item==shield.name:
+            if player_item==shield.name:
                 pigarto.resetear_ruta()
-                player.inmunidad=0
-                player.item=""
-            elif player.item==sword.name:
+                inmunidad=0
+                player_item=""
+            elif player_item==sword.name:
                 if cero.exist==1 or raiznegativa.exist==1:
                     pigarto.hp=pigarto.hp-sword.damage
                 if cero.exist==0 and raiznegativa.exist==0 and pigarto.exist==1:
                     pigarto.exist=0
-                    player.pts+=pigarto.pts
-                player.item=""
+                    player_pts+=pigarto.pts
+                player_item=""
                 
                 pigarto.resetear_ruta()
                 if pigarto.hp<=0:
-                    player.pts+=pigarto.pts
+                    player_pts+=pigarto.pts
                     pigarto.exist=0
-            elif player.item==ring.name:
-                player.pts+=pigarto.pts
-                player.item=""
+            elif player_item==ring.name:
+                player_pts+=pigarto.pts
+                player_item=""
                 pigarto.exist=0
-            elif player.inmunidad!=1 and player.hp-pigarto.damage>0:
-                player.hp-=pigarto.damage
-            elif player.inmunidad!=1 and player.hp-pigarto.damage<=0:
+            elif inmunidad!=1 and player_hp-pigarto.damage>0:
+                player_x=cr.player.positions_x
+                player_y=cr.player.positions_y
+                player_hp-=pigarto.damage
+            elif inmunidad!=1 and player_hp-pigarto.damage<=0:
                 print("💀 pigarto")
                 pygame.mixer.music.stop() 
-                if player.pts > 0:
-                    cfg.guardar_nuevo_puntaje(screen, player.pts)
+                if player_pts > 0:
+                    cfg.guardar_nuevo_puntaje(screen, player_pts)
                     return True #Volver al menú
                 else:
                     return False #Mostrar pantalla bajo puntaje
@@ -420,28 +457,30 @@ def jugar(SCREEN):
         #Con Raiz negativa
         if raiznegativa.colisionar(player_y, player_x) and colision_detected==False:
             colision_detected=True
-            if player.item==shield.name:
-                player.pts+=raiznegativa.pts
-                player.item=""
+            if player_item==shield.name:
+                player_pts+=raiznegativa.pts
+                player_item=""
                 raiznegativa.exist=0
-                player.inmunidad=0
-            elif player.item==sword.name:
+                inmunidad=0
+            elif player_item==sword.name:
                 raiznegativa.hp-=sword.damage
                 raiznegativa.positions_x=10
                 raiznegativa.positions_y=9
-                player.item=""
+                player_item=""
                 if raiznegativa.hp<=0:
                     raiznegativa.exist=0
-                    player.pts+=raiznegativa.pts
+                    player_pts+=raiznegativa.pts
                 else:
-                    player.pts+=100
-            elif player.inmunidad!=1 and player.hp-raiznegativa.damage>0:
-                player.hp-=raiznegativa.damage
-            elif player.inmunidad!=1 and player.hp-raiznegativa.damage<=0:
+                    player_pts+=100
+            elif inmunidad!=1 and player_hp-raiznegativa.damage>0:
+                player_x=cr.player.positions_x
+                player_y=cr.player.positions_y
+                player_hp-=raiznegativa.damage
+            elif inmunidad!=1 and player_hp-raiznegativa.damage<=0:
                 print("💀 raiz")
                 pygame.mixer.music.stop() 
-                if player.pts > 0:
-                    cfg.guardar_nuevo_puntaje(screen, player.pts)
+                if player_pts > 0:
+                    cfg.guardar_nuevo_puntaje(screen, player_pts)
                     return True #Volver al menú 
                 else:
                     return False #Mostrar pantalla bajo puntaje
@@ -449,27 +488,27 @@ def jugar(SCREEN):
         #COLISIÓN CON ITEMS
         #Espada
         if sword.colision(player_y, player_x):
-            player.item=sword.name
+            player_item=sword.name
             sword.actual_x=0
             sword.actual_y=1
-            player.pts+=sword.pts
-            player.inmunidad=0
+            player_pts+=sword.pts
+            inmunidad=0
             
         #Escudo
         if shield.colision(player_y, player_x):
-            player.item=shield.name
-            player.inmunidad=1
+            player_item=shield.name
+            inmunidad=1
             shield.actual_x=0
             shield.actual_y=2
-            player.pts+=shield.pts
+            player_pts+=shield.pts
         
         #Anillo
         if ring.colision(player_y, player_x):
-            player.item=ring.name
+            player_item=ring.name
             ring.actual_x=0
             ring.actual_y=3
-            player.pts+=ring.pts
-            player.inmunidad=0
+            player_pts+=ring.pts
+            inmunidad=0
             
         # DIBUJO DE todo LO QUE SE VE EN PANTALLA
         #Mapa
@@ -531,9 +570,9 @@ def jugar(SCREEN):
         # Si el desplazamiento supera -2 píxeles, el mago debe empezar a moverse hacia abajo.
         elif float_offset < -2:
             float_direction = 1
-        #Misma logica de dibujado pero coordenada y tiene logica de flotamiento
+        #Misma lógica de dibujado pero con sprite animado y flotamiento
         screen.blit(
-            MAGO,
+            player_sprite,
             (
                 player_x * cfg.TILE + cfg.offset_x,
                 player_y * cfg.TILE + cfg.offset_y + float_offset
@@ -542,32 +581,32 @@ def jugar(SCREEN):
         
         temporizador+=1
         if colision_detected==True:
-            if player.invul_frames>0:
-                player.invul_frames-=1
-            elif player.invul_frames<=0:
-                player.invul_frames=player.invul_base #Invul_frame vuelve a la constante original
+            if invul_frames>0:
+                invul_frames-=1
+            elif invul_frames<=0:
+                invul_frames=invul_base #Invul_frame vuelve a la constante original
                 colision_detected=False
         
 # Lógica de VICTORIA
         if pigarto.exist == 0 and cero.exist == 0 and raiznegativa.exist == 0 and not victoria_detectada:
             victoria_detectada = True
-            print("Puntaje sin bonus por tiempo:", player.pts)
+            print("Puntaje sin bonus por tiempo:", player_pts)
             print("Segundos", temporizador / 60)
             if temporizador / 60 <= 12:
-                player.pts += 2000
+                player_pts += 2000
                 print("TIEMPO INHUMANO") 
             elif temporizador / 60 <= 15:
-                player.pts += 1000
+                player_pts += 1000
             elif temporizador / 60 <= 20:
-                player.pts += 500
+                player_pts += 500
             elif temporizador / 60 <= 40:
-                player.pts += 250
+                player_pts += 250
             elif temporizador / 60 <= 60:
-                player.pts += 100
+                player_pts += 100
             else:
-                player.pts += 0
+                player_pts += 0
                             
-            print("Puntaje total:", player.pts)
+            print("Puntaje total:", player_pts)
             mostrando_mensaje_victoria = True
             mensaje_temporizador = 180  # 3 segundos a 60 FPS
        
@@ -586,12 +625,12 @@ def jugar(SCREEN):
                 fuente_titulo = cfg.get_letra(60)
                 fuente_sub = cfg.get_letra(30)
                 texto_titulo = fuente_titulo.render("¡NIVEL COMPLETADO!", True, (255, 255, 0))  # Amarillo
-                texto_puntaje = fuente_sub.render(f"PUNTAJE ACUMULADO: {player.pts}", True, (255, 255, 255))  # Blanco
+                texto_puntaje = fuente_sub.render(f"PUNTAJE ACUMULADO: {player_pts}", True, (255, 255, 255))  # Blanco
                 
                 screen.blit(texto_titulo, texto_titulo.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 50))) # Dibujar en la pantalla
                 screen.blit(texto_puntaje, texto_puntaje.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y + 50))) # Dibujar en la pantalla
     
-        dibujar_hud(screen) 
+        dibujar_hud(screen, player_pts, player_hp, player_item) 
         pygame.display.flip() # Actualizar la pantalla
 
     # Si sale del bucle 'while running' por QUIT o ESCAPE, regresa al menú

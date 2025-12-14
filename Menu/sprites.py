@@ -20,7 +20,8 @@ def load(name):
 
 
 #Sprites de jugador, enemigos, items, mapa, corazones,etc
-MAGO = load("MAGO")
+MAGO_1 = load("MAGO_1")
+MAGO_2 = load("MAGO_2")
 CERO = load("CERO")
 RAIZNEGATIVA = load("RAIZNEGATIVA")
 PIGARTO = load("PIGARTO")
