@@ -11,6 +11,7 @@ from juego import jugar as iniciar_juego # Importa la función principal del jue
 # Inicializa todos los módulos necesarios de Pygame
 pygame.init() 
 pygame.mixer.init()  # Inicializa el módulo de mezcla de sonido (necesario para la música y efectos).
+cfg.cargar_sfx() #Cargar los efectos de sonido
 
 #Cargar preferencias del usuario
 cfg.cargar_preferencias()
@@ -42,7 +43,7 @@ fondo_menu = pygame.image.load("./assets/fondo_pantallas.png").convert() #metodo
 # Escala el fondo para que ocupe todo el tamaño de la pantalla. tenemos escala actual y la transformamos a (ancho, altura pantalla)
 fondo_menu = pygame.transform.scale(fondo_menu, SCREEN.get_size())
 
-
+            
 # FUNCIÓN DE UTILIDAD PARA SALIDA RÁPIDA (ESCAPE / QUIT)
 def manejar_salida_menu(event):
     """
@@ -369,7 +370,7 @@ def opciones():
         SCREEN.blit(TEXTO_SFX, TEXTO_SFX.get_rect(center=(cfg.CENTRO_X-430, cfg.CENTRO_Y+100)))
         
         # 1. BOTÓN SI SFX
-        color_si_sfx = COLOR_SELECCION if cfg.DIFICULTAD_GLOBAL == "NORMAL" else COLOR_BASE
+        color_si_sfx = COLOR_SELECCION if cfg.SFX_ACTIVADOS else COLOR_BASE
         BOTON_SI_SFX = Button(
             image=RECT_PEQUEÑO,
             pos=(cfg.CENTRO_X-50, cfg.CENTRO_Y+100),
@@ -380,7 +381,7 @@ def opciones():
         )
         
         # 2. BOTÓN NO SFX
-        color_no_sfx = COLOR_SELECCION if cfg.DIFICULTAD_GLOBAL == "DIFICIL" else COLOR_BASE
+        color_no_sfx = COLOR_SELECCION if not cfg.SFX_ACTIVADOS else COLOR_BASE
         BOTON_NO_SFX = Button(
             image=RECT_PEQUEÑO,
             pos=(cfg.CENTRO_X+250, cfg.CENTRO_Y+100),
@@ -457,6 +458,18 @@ def opciones():
                 #Cambia la variable a difícil cuando se presiona el botón    
                 if BOTON_DIFICIL.checkForInput(POS):
                     cfg.DIFICULTAD_GLOBAL = "DIFICIL"  
+                    
+                #Activa SFX cuando se presiona el botón
+                if BOTON_SI_SFX.checkForInput(POS):
+                    if not cfg.SFX_ACTIVADOS:
+                        cfg.SFX_ACTIVADOS = True
+                        cfg.guardar_preferencias()
+                
+                #Desactiva SFX cuando se presiona el botón
+                if BOTON_NO_SFX.checkForInput(POS):
+                    if cfg.SFX_ACTIVADOS:
+                        cfg.SFX_ACTIVADOS = False
+                        cfg.guardar_preferencias()
                     
                 if VOLVER.checkForInput(POS):
                     cfg.guardar_preferencias() #Guarda las preferencias indicadas por el usuario

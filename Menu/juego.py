@@ -417,15 +417,20 @@ def jugar(SCREEN):
                 cero.positions_y=13
                 player_item=""
                 inmunidad=0
+                cfg.play_sfx("player_hurt")
             elif player_item==sword.name:
                 player_pts+=cero.pts
                 player_item=""
                 cero.exist=0
+                cfg.play_sfx("enemy_die")
+                
             elif inmunidad!=1 and player_hp-cero.damage>0:
                 player_x=cr.player.positions_x
                 player_y=cr.player.positions_y
                 player_hp-=cero.damage
+                cfg.play_sfx("player_hurt")
             elif inmunidad!=1 and player_hp-cero.damage<=0:
+                cfg.play_sfx("player_hurt")
                 print("💀 cero")
                 pygame.mixer.music.stop() 
                 if player_pts > 0:
@@ -441,9 +446,11 @@ def jugar(SCREEN):
                 pigarto.resetear_ruta()
                 inmunidad=0
                 player_item=""
+                cfg.play_sfx("player_hurt")
             elif player_item==sword.name:
                 if cero.exist==1 or raiznegativa.exist==1:
                     pigarto.hp=pigarto.hp-sword.damage
+                    cfg.play_sfx("player_hurt")
                 if cero.exist==0 and raiznegativa.exist==0 and pigarto.exist==1:
                     pigarto.exist=0
                     player_pts+=pigarto.pts
@@ -457,11 +464,15 @@ def jugar(SCREEN):
                 player_pts+=pigarto.pts
                 player_item=""
                 pigarto.exist=0
+                cfg.play_sfx("enemy_die")
+                
             elif inmunidad!=1 and player_hp-pigarto.damage>0:
                 player_x=cr.player.positions_x
                 player_y=cr.player.positions_y
                 player_hp-=pigarto.damage
+                cfg.play_sfx("player_hurt")
             elif inmunidad!=1 and player_hp-pigarto.damage<=0:
+                cfg.play_sfx("player_hurt")
                 print("💀 pigarto")
                 pygame.mixer.music.stop() 
                 if player_pts > 0:
@@ -478,11 +489,13 @@ def jugar(SCREEN):
                 player_item=""
                 raiznegativa.exist=0
                 inmunidad=0
+                cfg.play_sfx("enemy_die")
             elif player_item==sword.name:
                 raiznegativa.hp-=sword.damage
                 raiznegativa.positions_x=10
                 raiznegativa.positions_y=9
                 player_item=""
+                cfg.play_sfx("player_hurt")
                 if raiznegativa.hp<=0:
                     raiznegativa.exist=0
                     player_pts+=raiznegativa.pts
@@ -492,7 +505,9 @@ def jugar(SCREEN):
                 player_x=cr.player.positions_x
                 player_y=cr.player.positions_y
                 player_hp-=raiznegativa.damage
+                cfg.play_sfx("player_hurt")
             elif inmunidad!=1 and player_hp-raiznegativa.damage<=0:
+                cfg.play_sfx("player_hurt")
                 print("💀 raiz")
                 pygame.mixer.music.stop() 
                 if player_pts > 0:
@@ -509,6 +524,7 @@ def jugar(SCREEN):
             sword.actual_y=1
             player_pts+=sword.pts
             inmunidad=0
+            cfg.play_sfx("item_pickup")
             
         #Escudo
         if shield.colision(player_y, player_x):
@@ -517,6 +533,7 @@ def jugar(SCREEN):
             shield.actual_x=0
             shield.actual_y=2
             player_pts+=shield.pts
+            cfg.play_sfx("item_pickup")
         
         #Anillo
         if ring.colision(player_y, player_x):
@@ -525,6 +542,7 @@ def jugar(SCREEN):
             ring.actual_y=3
             player_pts+=ring.pts
             inmunidad=0
+            cfg.play_sfx("item_pickup")
             
         # DIBUJO DE todo LO QUE SE VE EN PANTALLA
         #Mapa

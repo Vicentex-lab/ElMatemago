@@ -54,6 +54,13 @@ ARCHIVO_PREFERENCIAS = "Menu/preferencias.json" #Ruta archivo de preferencias de
 MUSICA_ACTIVADA = True # Si es True, la música se reproduce.
 RUTA_MUSICA_MENU = "./assets/Matemago_Menu_Song.mp3" 
 RUTA_MUSICA_JUEGO = "./assets/Matemago_Dungeon_Song.mp3"
+
+SFX_ACTIVADOS = True # Controla si los efectos de sonido se reproducen
+RUTA_SFX_ITEM = "./assets/sfx/Get_item.wav"
+RUTA_SFX_ENEMY_DIE = "./assets/sfx/Enemy_die.wav"
+RUTA_SFX_PLAYER_HURT = "./assets/sfx/Player_hurt.wav"
+SFX_LIBRARY = {} # Este diccionario global almacenará todos los objetos pygame.mixer.Sound cargados. Se inicializa vacío ({}) para que 'cargar_sfx()' pueda llenarlo al inicio del juego.
+
 # Obtiene el directorio base del archivo actual (configuracion.py), útil para referencias relativas.
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Construye la ruta completa al archivo JSON de puntajes de forma segura.
@@ -89,6 +96,73 @@ def get_letra(size):
             pygame.font.Font: Un objeto de fuente de Pygame listo para renderizar texto.
         """
     return pygame.font.Font("./assets/prstart.ttf", size)
+
+# Función de carga de SFX
+def cargar_sfx():
+    """
+    Carga todos los efectos de sonido definidos en las rutas a SFX_LIBRARY.
+    """
+    
+    # Declaración global: Indicamos que vamos a modificar la variable 'SFX_LIBRARY' que fue definida fuera de esta función.
+    global SFX_LIBRARY
+    
+    # Definición de la lista de sonidos a cargar.
+    # Usamos un diccionario para mapear una CLAVE de texto fácil de usar 
+    # (ej. "item_pickup") a la RUTA de archivo real donde se encuentra el sonido.
+    SFX_A_CARGAR = {
+        "item_pickup": RUTA_SFX_ITEM,
+        "enemy_die": RUTA_SFX_ENEMY_DIE,
+        "player_hurt": RUTA_SFX_PLAYER_HURT,
+         # Añadir aquí más sonidos
+    }
+    
+    # Bucle para recorrer el diccionario y cargar cada sonido.
+    for key, path in SFX_A_CARGAR.items():
+        # Bloque 'try/except' para manejar errores de carga (ej. archivo no encontrado).
+        try:
+            # Crea un objeto pygame.mixer.Sound con el archivo de la ruta (path).
+            # Los objetos Sound se cargan completamente en la memoria para una reproducción instantánea y múltiple (pueden sonar varios a la vez).
+            SFX_LIBRARY[key] = pygame.mixer.Sound(path)
+        except pygame.error as e:
+            # Si hay un error (ej. archivo faltante), se notifica al usuario
+            print(f"Advertencia: No se pudo cargar el SFX '{key}'. Error: {e}")
+            # Asignamos None al slot del diccionario para evitar un error de programa si intentamos usar un sonido que nunca se cargó.
+            SFX_LIBRARY[key] = None 
+
+# Función de reproducción de SFX
+def play_sfx(key):
+    """
+    Reproduce el efecto de sonido asociado a 'key' si los SFX están activos y
+    ajusta su volumen al valor global del usuario.
+    
+    Args:
+        key (str): La clave del sonido a reproducir (ej. 'item_pickup').
+    """
+    
+    # Declaración global: Accedemos a las variables de configuración definidas 
+    # globalmente para leer el estado del volumen y la librería de sonidos.
+    global MUSICA_ACTIVADA, VOLUMEN_GLOBAL, SFX_LIBRARY 
+    
+    # Comprobación de Activación de SFX
+    # Si el usuario ha desactivado los SFX en las opciones, el resto de la función se salta, y el sonido no se reproduce.
+    if SFX_ACTIVADOS: 
+        
+        # Verificación de Carga y Existencia
+        # Comprueba que la 'key' exista en la librería Y que el objeto de sonido asociado no sea None (es decir, que se cargó correctamente antes).
+        if key in SFX_LIBRARY and SFX_LIBRARY[key] is not None:
+            
+            # Recuperamos el objeto pygame.mixer.Sound para manipularlo.
+            sound_object = SFX_LIBRARY[key]
+            
+            # Establecer el Volumen
+            # Aplicamos el volumen global del usuario (ej. 0.5) al objeto de sonido,
+            # asegurando que los SFX respeten las preferencias.
+            sound_object.set_volume(VOLUMEN_GLOBAL) 
+            
+            # Reproducir el Sonido
+            # Inicia la reproducción del SFX una sola vez. Como es un objeto Sound,
+            # esta llamada no interrumpe la música del juego.
+            sound_object.play()
 
 def cargar_mejores_puntajes():
     """
@@ -130,7 +204,7 @@ def cargar_preferencias():
     definidos en el módulo 'configuracion'.
     """    
     #Modifica las variables globales
-    global VOLUMEN_GLOBAL, DIFICULTAD_GLOBAL, SLIDER_HANDLE_X, MUSICA_ACTIVADA
+    global VOLUMEN_GLOBAL, DIFICULTAD_GLOBAL, SLIDER_HANDLE_X, MUSICA_ACTIVADA, SFX_ACTIVADOS
     
     # Comprobación de existencia del archivo
     if os.path.exists(ARCHIVO_PREFERENCIAS):
@@ -165,6 +239,9 @@ def cargar_preferencias():
                 # Se verifica si la clave 'musica_activada' existe y si su valor es un booleano (True/False).
                 if 'musica_activada' in datos and isinstance(datos['musica_activada'], bool):
                     MUSICA_ACTIVADA = datos['musica_activada']
+                    
+                if 'sfx_activados' in datos and isinstance(datos['sfx_activados'], bool):
+                    SFX_ACTIVADOS = datos['sfx_activados']
                      
                 print("Configuración cargada exitosamente.")
                 
@@ -186,6 +263,7 @@ def guardar_preferencias():
         'volumen': VOLUMEN_GLOBAL,
         'dificultad': DIFICULTAD_GLOBAL,
         'musica_activada': MUSICA_ACTIVADA,
+        'sfx_activados': SFX_ACTIVADOS,
     }
     
     # 2. Escribir el diccionario en el archivo JSON

@@ -1,5 +1,6 @@
 {
-    "volumen": 0.456,
+    "volumen": 0.504,
     "dificultad": "NORMAL",
-    "musica_activada": true
+    "musica_activada": true,
+    "sfx_activados": true
 }
