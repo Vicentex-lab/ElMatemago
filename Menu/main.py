@@ -69,8 +69,10 @@ def bajo_puntaje():
        Impide guardar puntajes de cero.
     """
     
-    # Detiene cualquier música que quede sonando
+    # Detiene cualquier música que quede sonando y reproducir sfx de Game Over
     pygame.mixer.music.stop() 
+    
+    cfg.play_sfx("game_over")
     
     # 1. Crea un reloj local y define FPS 
     clock = pygame.time.Clock() 
@@ -102,7 +104,7 @@ def bajo_puntaje():
         SCREEN.blit(TEXTO_TITULO, RECT_TITULO)
         
         #Subtitulos
-        TEXTO_SUB = cfg.get_letra(20).render("TU PUNTAJE ES 0. NECESITAS MÁS DE 0 PUNTOS PARA PODER GUARDARLO.", True, "#FFFFFF")
+        TEXTO_SUB = cfg.get_letra(20).render(f"TU PUNTAJE ES MUY BAJO. NECESITAS MÁS PUNTOS PARA ENTRAR EN EL TOP.", True, "#FFFFFF")
         RECT_SUB = TEXTO_SUB.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y + 50))
         SCREEN.blit(TEXTO_SUB, RECT_SUB)
         
@@ -508,7 +510,6 @@ def menu_principal():
     # 1. Gestión de música de inicio:
     # Si no hay música sonando y la música está activada, carga y reproduce la música del menú en loop (-1).
     if cfg.MUSICA_ACTIVADA:
-        if not pygame.mixer.music.get_busy():
             pygame.mixer.music.load(cfg.RUTA_MUSICA_MENU)
             pygame.mixer.music.play(-1) 
             pygame.mixer.music.set_volume(cfg.VOLUMEN_GLOBAL)
@@ -578,7 +579,10 @@ def menu_principal():
                         bajo_puntaje()
                     #Si devuelve True, la ejecución simplemente continúa con el menú
                     #(ya que menu_principal() está en un bucle infinito `while True:`)
-                        
+                     
+                    #Detener la música que esté sonando    
+                    pygame.mixer.music.stop()
+                    
                 if BOTON_MARCADORES.checkForInput(POS_MOUSE_MENU):
                     marcadores() # Va a la pantalla de marcadores.
                     

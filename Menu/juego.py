@@ -433,7 +433,7 @@ def jugar(SCREEN):
                 cfg.play_sfx("player_hurt")
                 print("💀 cero")
                 pygame.mixer.music.stop() 
-                if player_pts > 0:
+                if cfg.es_top_3(player_pts):
                     cfg.guardar_nuevo_puntaje(screen, player_pts)
                     return True #Volver al menú
                 else:
@@ -475,7 +475,7 @@ def jugar(SCREEN):
                 cfg.play_sfx("player_hurt")
                 print("💀 pigarto")
                 pygame.mixer.music.stop() 
-                if player_pts > 0:
+                if cfg.es_top_3(player_pts):
                     cfg.guardar_nuevo_puntaje(screen, player_pts)
                     return True #Volver al menú
                 else:
@@ -510,7 +510,7 @@ def jugar(SCREEN):
                 cfg.play_sfx("player_hurt")
                 print("💀 raiz")
                 pygame.mixer.music.stop() 
-                if player_pts > 0:
+                if cfg.es_top_3(player_pts):
                     cfg.guardar_nuevo_puntaje(screen, player_pts)
                     return True #Volver al menú 
                 else:
