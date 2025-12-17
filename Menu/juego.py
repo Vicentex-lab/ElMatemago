@@ -314,6 +314,13 @@ def jugar(SCREEN):
     pigarto=cr.pigarto()
     raiznegativa=cr.raiznegativa()
     
+    #CONFIGURAR en función de dificultad
+    if cfg.DIFICULTAD_GLOBAL=="DIFICIL":
+        cero.movement_ratio=cero.movement_ratio*0.75
+        pigarto.movement_ratio=pigarto.movement_ratio*0.75
+        raiznegativa.ratios[0]=raiznegativa.ratios[0]*0.75
+        raiznegativa.ratios[1]=raiznegativa.ratios[1]*0.75
+    
     # ============================
     #  MOVIMIENTO DEL JUGADOR 
     # ============================
@@ -570,6 +577,7 @@ def jugar(SCREEN):
                 #    speed_boost.pos=-1 #resetear variable auxiliar
         """
         if slow_time.colision(player_y, player_x):
+            player_pts+=slow_time.pts
             if slow_time.pos==-1: #es la forma auxiliar de expresar que la variable no se ha usado
                 slow_time.pos=60*6 #pos se usará como auxiliar para contar la cnatidad de frames (frame*segunodp)
                 aux=[cero.movement_ratio, pigarto.movement_ratio, raiznegativa.movement_ratio]
