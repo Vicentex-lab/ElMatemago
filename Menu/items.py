@@ -39,6 +39,7 @@ class item():
             )
     
     def random_spawn(self):
+        self.exist=1
         while True:
             self.actual_y=random.randint(0, len(colision.maze)-1) #len(maze) toma cuantos arreglos tiene maze
             self.actual_x=random.randint(0, len(colision.maze[0])-1) #len(maze[0]) toma cuantos valores tiene el primer arreglo de maze

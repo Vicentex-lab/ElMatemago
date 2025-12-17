@@ -1,3 +1,4 @@
+
 import pygame, sys
 import random
 import configuracion as cfg
@@ -199,6 +200,9 @@ def jugar(SCREEN):
         slow_time.random_spawn()
         if slow_time.actual_x!=sword.actual_x and slow_time.actual_y!=sword.actual_y and slow_time.actual_x!=shield.actual_x and slow_time.actual_y!=shield.actual_y and slow_time.actual_x!=ring.actual_x and slow_time.actual_y!=ring.actual_y:
             break
+        
+    multiplier=pw.multiplier()
+    divisor=pw.divisor()
 
     def can_move(r, c):
         return 0 <= r < FILAS and 0 <= c < COLUMNAS and colision.maze[r][c] >= 1
@@ -425,6 +429,19 @@ def jugar(SCREEN):
         pigarto.mover()
         raiznegativa.mover(player_y, player_x, colision.maze)
         
+        #SPAWNEO EN MITAD DE PARTIDA
+        spawn_chance=random.randint(1, 60*30)
+        print("contador random:", spawn_chance)
+        if spawn_chance==1 and multiplier.spawned==False:
+            while True:
+                multiplier.random_spawn()
+                if multiplier.actual_x!=sword.actual_x and multiplier.actual_y!=sword.actual_y and multiplier.actual_x!=shield.actual_x and multiplier.actual_y!=shield.actual_y and multiplier.actual_x!=ring.actual_x and multiplier.actual_y!=ring.actual_y and multiplier.actual_x!=slow_time.actual_x and multiplier.actual_y!=slow_time.actual_y:
+                    break
+        if spawn_chance==2 and divisor.spawned==False:
+            while True:
+                divisor.random_spawn()
+                if divisor.actual_x!=sword.actual_x and divisor.actual_y!=sword.actual_y and divisor.actual_x!=shield.actual_x and divisor.actual_y!=shield.actual_y and divisor.actual_x!=ring.actual_x and divisor.actual_y!=ring.actual_y and divisor.actual_x!=slow_time.actual_x and divisor.actual_y!=slow_time.actual_y and divisor.actual_x!=multiplier.actual_x and divisor.actual_y!=multiplier.actual_y:
+                    break
         # ---------------------------
         # COLISIÓN (Lógica de DERROTA)
         # ---------------------------
@@ -438,7 +455,14 @@ def jugar(SCREEN):
                 inmunidad=0
                 cfg.play_sfx("player_hurt")
             elif player_item==sword.name:
-                player_pts+=cero.pts
+                if multiplier.state==True and divisor.state==False:
+                    player_pts+=cero.pts*2
+                elif divisor.state==True and multiplier.state==False:
+                    player_pts+=cero.pts//2
+                elif divisor.state==True and multiplier.state==True:
+                    player_pts+=cero.pts
+                else:
+                    player_pts+=cero.pts
                 player_item=""
                 cero.exist=0
                 cfg.play_sfx("enemy_die")
@@ -472,12 +496,26 @@ def jugar(SCREEN):
                     cfg.play_sfx("player_hurt")
                 if cero.exist==0 and raiznegativa.exist==0 and pigarto.exist==1:
                     pigarto.exist=0
-                    player_pts+=pigarto.pts
+                    if multiplier.state==True and divisor.state==False:
+                        player_pts+=pigarto.pts*2
+                    elif divisor.state==True and multiplier.state==False:
+                        player_pts+=pigarto.pts//2
+                    elif divisor.state==True and multiplier.state==True:
+                        player_pts+=pigarto.pts
+                    else:
+                        player_pts+=pigarto.pts
                 player_item=""
                 
                 pigarto.resetear_ruta()
                 if pigarto.hp<=0:
-                    player_pts+=pigarto.pts
+                    if multiplier.state==True and divisor.state==False:
+                        player_pts+=pigarto.pts*2
+                    elif divisor.state==True and multiplier.state==False:
+                        player_pts+=pigarto.pts//2
+                    elif divisor.state==True and multiplier.state==True:
+                        player_pts+=pigarto.pts
+                    else:
+                        player_pts+=pigarto.pts
                     pigarto.exist=0
             elif player_item==ring.name:
                 player_pts+=pigarto.pts
@@ -504,7 +542,14 @@ def jugar(SCREEN):
         if raiznegativa.colisionar(player_y, player_x) and colision_detected==False:
             colision_detected=True
             if player_item==shield.name:
-                player_pts+=raiznegativa.pts
+                if multiplier.state==True and divisor.state==False:
+                    player_pts+=raiznegativa.pts*2
+                elif divisor.state==True and multiplier.state==False:
+                    player_pts+=raiznegativa.pts//2
+                elif divisor.state==True and multiplier.state==True:
+                    player_pts+=raiznegativa.pts
+                else:
+                    player_pts+=raiznegativa.pts
                 player_item=""
                 raiznegativa.exist=0
                 inmunidad=0
@@ -517,7 +562,14 @@ def jugar(SCREEN):
                 cfg.play_sfx("player_hurt")
                 if raiznegativa.hp<=0:
                     raiznegativa.exist=0
-                    player_pts+=raiznegativa.pts
+                    if multiplier.state==True and divisor.state==False:
+                        player_pts+=raiznegativa.pts*2
+                    elif divisor.state==True and multiplier.state==False:
+                        player_pts+=raiznegativa.pts//2
+                    elif divisor.state==True and multiplier.state==True:
+                        player_pts+=raiznegativa.pts
+                    else:
+                        player_pts+=raiznegativa.pts
                 else:
                     player_pts+=100
             elif inmunidad!=1 and player_hp-raiznegativa.damage>0:
@@ -541,7 +593,14 @@ def jugar(SCREEN):
             player_item=sword.name
             sword.actual_x=0
             sword.actual_y=1
-            player_pts+=sword.pts
+            if multiplier.state==True and divisor.state==False:
+                player_pts+=sword.pts*2
+            elif divisor.state==True and multiplier.state==False:
+                player_pts+=sword.pts//2
+            elif divisor.state==True and multiplier.state==True:
+                player_pts+=sword.pts
+            else:
+                player_pts+=sword.pts
             inmunidad=0
             cfg.play_sfx("item_pickup")
             
@@ -551,7 +610,14 @@ def jugar(SCREEN):
             inmunidad=1
             shield.actual_x=0
             shield.actual_y=2
-            player_pts+=shield.pts
+            if multiplier.state==True and divisor.state==False:
+                player_pts+=shield.pts*2
+            elif divisor.state==True and multiplier.state==False:
+                player_pts+=shield.pts//2
+            elif divisor.state==True and multiplier.state==True:
+                player_pts+=shield.pts
+            else:
+                player_pts+=shield.pts
             cfg.play_sfx("item_pickup")
         
         #Anillo
@@ -559,7 +625,14 @@ def jugar(SCREEN):
             player_item=ring.name
             ring.actual_x=0
             ring.actual_y=3
-            player_pts+=ring.pts
+            if multiplier.state==True and divisor.state==False:
+                player_pts+=ring.pts*2
+            elif divisor.state==True and multiplier.state==False:
+                player_pts+=ring.pts//2
+            elif divisor.state==True and multiplier.state==True:
+                player_pts+=ring.pts
+            else:
+                player_pts+=ring.pts
             inmunidad=0
             cfg.play_sfx("item_pickup")
             
@@ -577,9 +650,16 @@ def jugar(SCREEN):
                 #    speed_boost.pos=-1 #resetear variable auxiliar
         """
         if slow_time.colision(player_y, player_x):
-            player_pts+=slow_time.pts
+            if multiplier.state==True and divisor.state==False:
+                player_pts+=slow_time.pts*2
+            elif divisor.state==True and multiplier.state==False:
+                player_pts+=slow_time.pts//2
+            elif divisor.state==True and multiplier.state==True:
+                player_pts+=slow_time.pts
+            else:
+                player_pts+=slow_time.pts
             if slow_time.pos==-1: #es la forma auxiliar de expresar que la variable no se ha usado
-                slow_time.pos=60*6 #pos se usará como auxiliar para contar la cnatidad de frames (frame*segunodp)
+                slow_time.pos=60*10 #pos se usará como auxiliar para contar la cnatidad de frames (frame*segunodp)
                 aux=[cero.movement_ratio, pigarto.movement_ratio, raiznegativa.movement_ratio]
                 cero.movement_ratio=cero.movement_ratio*2
                 pigarto.movement_ratio=pigarto.movement_ratio*2
@@ -593,6 +673,28 @@ def jugar(SCREEN):
                 raiznegativa.movement_ratio=aux[2]
                 slow_time.pos=-1 #resetear variable auxiliar
                 slow_time.pos-=1
+                
+        if multiplier.colision(player_y, player_x):
+            if multiplier.pos==-1:
+                multiplier.pos==60*15
+                multiplier.state=True
+                multiplier.spawned=False
+        if multiplier.pos!=-1:
+            multiplier.pos-=1
+            if multiplier.pos==0:
+                multiplier.pos=-1
+                multiplier.state=False
+        
+        if divisor.colision(player_y, player_x):
+            if divisor.pos==-1:
+                divisor.pos==60*15
+                divisor.state=True
+                divisor.spawned=False
+        if divisor.pos!=-1:
+            divisor.pos-=1
+            if divisor.pos==0:
+                divisor.pos=-1
+                divisor.state=False
             
         # DIBUJO DE todo LO QUE SE VE EN PANTALLA
         #Mapa
@@ -643,6 +745,8 @@ def jugar(SCREEN):
         ring.draw(screen)
         #speed_boost.draw(screen)
         slow_time.draw(screen)
+        multiplier.draw(screen)
+        divisor.draw(screen)
         
         #power up por mietrnas
         pygame.draw.rect(screen, (255, 255, 0), (100, 100, 50, 50))
