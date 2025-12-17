@@ -53,28 +53,31 @@ def jugar(SCREEN):
     
         #SECCIÓN: PUNTAJE
         fuente = cfg.get_letra(22)   #Funcion en cfg para retornar texto en pygame con tamaño 22
-        txt_pts = fuente.render(f"PUNTAJE: {player_pts}", True, (255, 255, 120))   
-        #.render convierte string en surface, mostramos puntaje jugador, True es para bordes suaves no pixelados
-        screen.blit(txt_pts, (hud_x + 30, hud_y + 20))  # Se dibuja HUD creado en pantalla con su texto con sus coordenadas
+        # 1. Dibujamos la etiqueta "PUNTAJE:"
+        txt_label_pts = fuente.render("PUNTAJE:", True, (255, 255, 120))   
+        screen.blit(txt_label_pts, (hud_x + 30, hud_y + 20))
+        # 2. Dibujamos el número (el valor del puntaje)
+        txt_value_pts = fuente.render(str(player_pts), True, (255, 255, 120))
+        screen.blit(txt_value_pts, (hud_x + 205, hud_y + 20))
     
         # SECCIÓN: VIDA 
         fuente_vida = cfg.get_letra(22)  #Funcion en cfg para retornar texto en pygame con tamaño 22
         #.render convierte string en surface, mostramos puntaje jugador, True es para bordes suaves no pixelados
         txt_vida = fuente_vida.render("VIDA:", True, (255, 255, 255))
         #.render convierte string en surface, mostramos puntaje jugador, True es para bordes suaves no pixelados
-        screen.blit(txt_vida, (hud_x + 30, hud_y + 90))
+        screen.blit(txt_vida, (hud_x + 30, hud_y + 80))
         #nueva variable con corazon reescalado para que encaje con tamaño hud, escala 28x28
         CORAZON_HUD = pygame.transform.scale(CORAZON, (28, 28)) 
         # Dibujamos un corazón por cada punto de vida
         #Ciclo for para dibujar corazones, cada uno cambiara en "i * 32" pixeles a la derecha
         for i in range(player_hp):
-            screen.blit(CORAZON_HUD, (hud_x + 150 + i*32, hud_y + 88)) 
+            screen.blit(CORAZON_HUD, (hud_x + 160 + i*32, hud_y + 78)) 
     
-            # SECCIÓN: ITEM
+        # SECCIÓN: ITEM
         fuente_item = cfg.get_letra(22)  #Funcion en cfg para retornar texto en pygame con tamaño 22
         txt_item = fuente_item.render("ITEM:", True, (255, 255, 255))
         #.render convierte string en surface, mostramos puntaje jugador, True es para bordes suaves no pixelados
-        screen.blit(txt_item, (hud_x + 30, hud_y + 160)) # Se dibuja HUD creado en pantalla con su texto con sus coordenadas
+        screen.blit(txt_item, (hud_x + 30, hud_y + 140)) # Se dibuja HUD creado en pantalla con su texto con sus coordenadas
     
         # Selección del sprite del ítem
         #Segun que item tenga jugador lo mostraremos en pantalla con su respectivo sprite
@@ -93,17 +96,43 @@ def jugar(SCREEN):
         if sprite:
             ITEM_HUD = pygame.transform.scale(sprite, (40, 40))  # Tamaño ideal de items para HUD
             #Dibujamos todo en pantalla con .blit()
-            screen.blit(ITEM_HUD, (hud_x + 160, hud_y + 160))
+            screen.blit(ITEM_HUD, (hud_x + 160, hud_y + 132))
         else:
             # Si NO hay un ítem equipado, se escribe la palabra "NINGUNO"
             txt_none = fuente_item.render("NINGUNO", True, (160, 160, 160)) 
             #.render convierte string en surface, mostramos puntaje jugador, True es para bordes suaves no pixelados
-            screen.blit(txt_none, (hud_x + 160, hud_y + 160))
-        #SECCION BUFFS
+            screen.blit(txt_none, (hud_x + 160, hud_y + 140))
+        
+        
+        
+        
+        # SECCION BUFFS (Es parecido a logica items)
+        # ---------------------------------------------------------
         fuente_buffs = cfg.get_letra(22)
         txt_buffs = fuente_buffs.render("BUFFS:", True, (255, 255, 255))
-        BUFFS_Y = hud_y + 210  # Ajustado para que quede proporcional
-        screen.blit(txt_buffs, (hud_x + 30, BUFFS_Y))
+        screen.blit(txt_buffs, (hud_x + 30, hud_y + 200))
+                
+        # Inicializamos el sprite a dibujar como vacío
+        sprite_buff_activo = None
+        
+        # 1. LÓGICA DE ACTIVACIÓN DE BUFFS
+        # Ejemplo: if variable_buffs == "DOBLE_DAÑO":     
+        # if estado_buff == "POWERUP1":
+        #     sprite_buff_activo = IMAGEN_POWERUP1
+        # elif estado_buff == "POWERUP2":
+        #     sprite_buff_activo = IMAGEN_POWERUP2
+        # elif estado_buff == "POWERUP3":
+        #     sprite_buff_activo = IMAGEN_POWERUP3
+                
+        # 2. DIBUJADO DEL BUFF EN PANTALLA
+        if sprite_buff_activo:
+        # Escalamos el sprite seleccionado a 40x40 para el HUD
+            ICONO_BUFF = pygame.transform.scale(sprite_buff_activo, (40, 40))
+            screen.blit(ICONO_BUFF, (hud_x + 160, hud_y + 192))
+        else:
+            # Si no hay ningún powerup activo, mostramos "NINGUNO"
+            txt_none_buff = fuente_buffs.render("NINGUNO", True, (160, 160, 160))
+            screen.blit(txt_none_buff, (hud_x + 160, hud_y + 200))
 
     
     FPS = 60
@@ -121,12 +150,9 @@ def jugar(SCREEN):
     
     
     
-    from sprites import MAGO_1, MAGO_2
+    from sprites import MAGO_1, MAGO_2, MAGO_3,MAGO_4
     # --- Animación del mago Mago izquierda derecha
-    player_sprite = MAGO_1      # sprite actual del mago
-    anim_frame = 0              # alterna entre 0 y 1
-    facing = "right"            # dirección actual del mago
-    
+    player_sprite = MAGO_4      # sprite actual del mago 
     # Variables para efecto de flotacion en mago
     float_offset = 0
     float_direction = 1
@@ -312,39 +338,29 @@ def jugar(SCREEN):
                     running = False # Detiene el bucle para salir o ir a Game Over
                     return True 
 
-                # Guardar dirección DESEADA siempre
             if event.type == pygame.KEYDOWN:
+                # --- ARRIBA (W) ---
                 if event.key in (pygame.K_w, pygame.K_UP):
                     deseada_x = 0
-                    deseada_y = -1
-
+                    deseada_y = -1  
+                    player_sprite = MAGO_3 
+                # --- ABAJO (S) ---
                 if event.key in (pygame.K_s, pygame.K_DOWN):
                     deseada_x = 0
                     deseada_y = 1
-                #Animacion izquierda derecha mago
+                    player_sprite = MAGO_4  
                 
-                
+                # --- IZQUIERDA (A) --
                 if event.key in (pygame.K_a, pygame.K_LEFT):
                 
                     deseada_x = -1
-                    deseada_y = 0
-                
-                    # SOLO animar si la dirección cambió
-                    if facing != "left":
-                        facing = "left"
-                        anim_frame = 1 - anim_frame
-                        player_sprite = MAGO_1 if anim_frame == 0 else MAGO_2
-
+                    deseada_y = 0 
+                    player_sprite = MAGO_2
+                # --- DERECHA (D) --
                 if event.key in (pygame.K_d, pygame.K_RIGHT):
-                
                     deseada_x = 1
                     deseada_y = 0
-                
-                    # SOLO animar si la dirección cambió
-                    if facing != "right":
-                        facing = "right"
-                        anim_frame = 1 - anim_frame
-                        player_sprite = MAGO_1 if anim_frame == 0 else MAGO_2
+                    player_sprite = MAGO_1
 
    
         # Convierte la posición de píxeles a casilla
@@ -401,15 +417,20 @@ def jugar(SCREEN):
                 cero.positions_y=13
                 player_item=""
                 inmunidad=0
+                cfg.play_sfx("player_hurt")
             elif player_item==sword.name:
                 player_pts+=cero.pts
                 player_item=""
                 cero.exist=0
+                cfg.play_sfx("enemy_die")
+                
             elif inmunidad!=1 and player_hp-cero.damage>0:
                 player_x=cr.player.positions_x
                 player_y=cr.player.positions_y
                 player_hp-=cero.damage
+                cfg.play_sfx("player_hurt")
             elif inmunidad!=1 and player_hp-cero.damage<=0:
+                cfg.play_sfx("player_hurt")
                 print("💀 cero")
                 pygame.mixer.music.stop() 
                 if player_pts > 0:
@@ -425,9 +446,11 @@ def jugar(SCREEN):
                 pigarto.resetear_ruta()
                 inmunidad=0
                 player_item=""
+                cfg.play_sfx("player_hurt")
             elif player_item==sword.name:
                 if cero.exist==1 or raiznegativa.exist==1:
                     pigarto.hp=pigarto.hp-sword.damage
+                    cfg.play_sfx("player_hurt")
                 if cero.exist==0 and raiznegativa.exist==0 and pigarto.exist==1:
                     pigarto.exist=0
                     player_pts+=pigarto.pts
@@ -441,11 +464,15 @@ def jugar(SCREEN):
                 player_pts+=pigarto.pts
                 player_item=""
                 pigarto.exist=0
+                cfg.play_sfx("enemy_die")
+                
             elif inmunidad!=1 and player_hp-pigarto.damage>0:
                 player_x=cr.player.positions_x
                 player_y=cr.player.positions_y
                 player_hp-=pigarto.damage
+                cfg.play_sfx("player_hurt")
             elif inmunidad!=1 and player_hp-pigarto.damage<=0:
+                cfg.play_sfx("player_hurt")
                 print("💀 pigarto")
                 pygame.mixer.music.stop() 
                 if player_pts > 0:
@@ -462,11 +489,13 @@ def jugar(SCREEN):
                 player_item=""
                 raiznegativa.exist=0
                 inmunidad=0
+                cfg.play_sfx("enemy_die")
             elif player_item==sword.name:
                 raiznegativa.hp-=sword.damage
                 raiznegativa.positions_x=10
                 raiznegativa.positions_y=9
                 player_item=""
+                cfg.play_sfx("player_hurt")
                 if raiznegativa.hp<=0:
                     raiznegativa.exist=0
                     player_pts+=raiznegativa.pts
@@ -476,7 +505,9 @@ def jugar(SCREEN):
                 player_x=cr.player.positions_x
                 player_y=cr.player.positions_y
                 player_hp-=raiznegativa.damage
+                cfg.play_sfx("player_hurt")
             elif inmunidad!=1 and player_hp-raiznegativa.damage<=0:
+                cfg.play_sfx("player_hurt")
                 print("💀 raiz")
                 pygame.mixer.music.stop() 
                 if player_pts > 0:
@@ -493,6 +524,7 @@ def jugar(SCREEN):
             sword.actual_y=1
             player_pts+=sword.pts
             inmunidad=0
+            cfg.play_sfx("item_pickup")
             
         #Escudo
         if shield.colision(player_y, player_x):
@@ -501,6 +533,7 @@ def jugar(SCREEN):
             shield.actual_x=0
             shield.actual_y=2
             player_pts+=shield.pts
+            cfg.play_sfx("item_pickup")
         
         #Anillo
         if ring.colision(player_y, player_x):
@@ -509,6 +542,7 @@ def jugar(SCREEN):
             ring.actual_y=3
             player_pts+=ring.pts
             inmunidad=0
+            cfg.play_sfx("item_pickup")
             
         # DIBUJO DE todo LO QUE SE VE EN PANTALLA
         #Mapa

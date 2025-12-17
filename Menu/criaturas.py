@@ -179,13 +179,14 @@ class pigarto(criature):
                     self.positions_y * tile_size + offset_y
                 )
             )
-            screen.blit(
+            """screen.blit(
                 sprite,
                 (
                     self.tail_x * tile_size + offset_x,
                     self.tail_y * tile_size + offset_y
                 )
             )
+            """
             
     def resetear_ruta(self):
         """Método auxiliar para enviar al Pigarto al inicio"""
