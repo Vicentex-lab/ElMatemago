@@ -42,5 +42,13 @@
     {
         "nombre": "AAAA",
         "player_pts": 1500
+    },
+    {
+        "nombre": "DXD",
+        "player_pts": 750
+    },
+    {
+        "nombre": "L",
+        "player_pts": 350
     }
 ]

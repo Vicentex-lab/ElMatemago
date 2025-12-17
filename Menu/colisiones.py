@@ -31,4 +31,6 @@ maze = [
 [0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0],#27
 ]
 
-print(maze[19][3])
+#print(maze[19][3])
+print (len(maze))
+print(len(maze[0]))

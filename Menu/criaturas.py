@@ -21,6 +21,10 @@ class player(criature):
     movement_ratio=1 #El jugador funciona bloque por bloque.
     name=""
     pts=0
+    
+"""
+
+"""
 
 #Los monstruos funcionan por tiempo de espera (Milisegundos)
 

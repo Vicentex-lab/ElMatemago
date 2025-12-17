@@ -3,7 +3,8 @@ import random
 import configuracion as cfg
 import colisiones as colision 
 import criaturas as cr         
-import items as item           
+import items as item
+import powerups as pw           
 from sprites import CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO, CORAZON, WALL, FLOOR
 
 def jugar(SCREEN):
@@ -135,8 +136,6 @@ def jugar(SCREEN):
             screen.blit(txt_none_buff, (hud_x + 160, hud_y + 200))
 
     
-    FPS = 60
-    
     FILAS = len(colision.maze)
     COLUMNAS = len(colision.maze[0])
     
@@ -188,6 +187,19 @@ def jugar(SCREEN):
         if ring.actual_x!=sword.actual_x and ring.actual_y!=sword.actual_y and ring.actual_x!=shield.actual_x and ring.actual_y!=shield.actual_y:
             break
     
+    #spawnear powerups
+    #speed_boost=pw.speed_boost()
+    #while True:
+    #    speed_boost.random_spawn()
+    #    if speed_boost.actual_x!=sword.actual_x and speed_boost.actual_y!=sword.actual_y and speed_boost.actual_x!=shield.actual_x and speed_boost.actual_y!=shield.actual_y and speed_boost.actual_x!=ring.actual_x and speed_boost.actual_y!=ring.actual_y:
+    #        break
+        
+    slow_time=pw.slow_time()
+    while True:
+        slow_time.random_spawn()
+        if slow_time.actual_x!=sword.actual_x and slow_time.actual_y!=sword.actual_y and slow_time.actual_x!=shield.actual_x and slow_time.actual_y!=shield.actual_y and slow_time.actual_x!=ring.actual_x and slow_time.actual_y!=ring.actual_y:
+            break
+
     def can_move(r, c):
         return 0 <= r < FILAS and 0 <= c < COLUMNAS and colision.maze[r][c] >= 1
     
@@ -544,6 +556,36 @@ def jugar(SCREEN):
             inmunidad=0
             cfg.play_sfx("item_pickup")
             
+        #Power-ups
+        """
+        #Funcionaria de no ser por un problema con los cambios de velocidad del jugador.
+        if speed_boost.colision(player_y, player_x):
+            if speed_boost.pos==-1: #es la forma auxiliar de expresar que la variable no se ha usado
+                speed_boost.pos=60*4 #pos se usará como auxiliar para contar la cnatidad de frames (frame*segunodp)
+                speed=4 #tiene que ser divisor de 32
+            else:
+                speed_boost.pos-=1
+                #if speed_boost.pos==0:
+                #    speed=2
+                #    speed_boost.pos=-1 #resetear variable auxiliar
+        """
+        if slow_time.colision(player_y, player_x):
+            if slow_time.pos==-1: #es la forma auxiliar de expresar que la variable no se ha usado
+                slow_time.pos=60*6 #pos se usará como auxiliar para contar la cnatidad de frames (frame*segunodp)
+                aux=[cero.movement_ratio, pigarto.movement_ratio, raiznegativa.movement_ratio]
+                cero.movement_ratio=cero.movement_ratio*2
+                pigarto.movement_ratio=pigarto.movement_ratio*2
+                raiznegativa.movement_ratio=raiznegativa.movement_ratio*2
+                
+        if slow_time.pos!=-1:
+            slow_time.pos-=1
+            if slow_time.pos==0:
+                cero.movement_ratio=aux[0]
+                pigarto.movement_ratio=aux[1]
+                raiznegativa.movement_ratio=aux[2]
+                slow_time.pos=-1 #resetear variable auxiliar
+                slow_time.pos-=1
+            
         # DIBUJO DE todo LO QUE SE VE EN PANTALLA
         #Mapa
         #for anidado para recorrer todas las filas (r) y columnas (c)
@@ -591,7 +633,11 @@ def jugar(SCREEN):
         sword.draw(screen)
         shield.draw(screen)
         ring.draw(screen)
+        #speed_boost.draw(screen)
+        slow_time.draw(screen)
         
+        #power up por mietrnas
+        pygame.draw.rect(screen, (255, 255, 0), (100, 100, 50, 50))
         # EFECTO DE FLOTACIÓN DEL MAGO ARRIBA/ABAJO
         #float_offset es cambio constante en eje y
         """ float_offset = 0----> desplazamiento vertical que se suma a mago, ej con 1 baja 1 pixel con -2 sube 2 pixeles
