@@ -24,6 +24,7 @@ SCREEN = pygame.display.set_mode((cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA), pygame
 
 #Importamos sprites luego de definir la pantalla (SCREEN)
 from sprites import CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO, CORAZON
+
 pygame.display.set_caption("EL MATEMAGO") #Establece el título de la ventana
 
 #Utilizamos .convert_alpha() una vez definida SCREEN
