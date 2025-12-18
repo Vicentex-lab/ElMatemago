@@ -510,6 +510,7 @@ def menu_principal():
     # 1. Gestión de música de inicio:
     # Si no hay música sonando y la música está activada, carga y reproduce la música del menú en loop (-1).
     if cfg.MUSICA_ACTIVADA:
+        if not pygame.mixer.music.get_busy():
             pygame.mixer.music.load(cfg.RUTA_MUSICA_MENU)
             pygame.mixer.music.play(-1) 
             pygame.mixer.music.set_volume(cfg.VOLUMEN_GLOBAL)
