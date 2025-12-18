@@ -54,11 +54,13 @@ ARCHIVO_PREFERENCIAS = "Menu/preferencias.json" #Ruta archivo de preferencias de
 MUSICA_ACTIVADA = True # Si es True, la música se reproduce.
 RUTA_MUSICA_MENU = "./assets/Matemago_Menu_Song.mp3" 
 RUTA_MUSICA_JUEGO = "./assets/Matemago_Dungeon_Song.mp3"
+RUTA_MUSICA_RECORD = "./assets/High_score.mp3"
 
 SFX_ACTIVADOS = True # Controla si los efectos de sonido se reproducen
 RUTA_SFX_ITEM = "./assets/sfx/Get_item.wav"
 RUTA_SFX_ENEMY_DIE = "./assets/sfx/Enemy_die.wav"
 RUTA_SFX_PLAYER_HURT = "./assets/sfx/Player_hurt.wav"
+RUTA_SFX_GAME_OVER = "./assets/sfx/Game_over.wav"
 SFX_LIBRARY = {} # Este diccionario global almacenará todos los objetos pygame.mixer.Sound cargados. Se inicializa vacío ({}) para que 'cargar_sfx()' pueda llenarlo al inicio del juego.
 
 # Obtiene el directorio base del archivo actual (configuracion.py), útil para referencias relativas.
@@ -113,7 +115,8 @@ def cargar_sfx():
         "item_pickup": RUTA_SFX_ITEM,
         "enemy_die": RUTA_SFX_ENEMY_DIE,
         "player_hurt": RUTA_SFX_PLAYER_HURT,
-         # Añadir aquí más sonidos
+        "game_over": RUTA_SFX_GAME_OVER
+        # Añadir aquí más sonidos
     }
     
     # Bucle para recorrer el diccionario y cargar cada sonido.
@@ -407,6 +410,16 @@ def guardar_nuevo_puntaje(screen, player_pts):
            player_pts (int): El puntaje obtenido.
     """
        
+    # DETENER MÚSICA ANTERIOR Y CARGAR LA DE RÉCORD
+    pygame.mixer.music.stop()
+    if MUSICA_ACTIVADA:
+        try:
+            pygame.mixer.music.load(RUTA_MUSICA_RECORD)
+            pygame.mixer.music.set_volume(VOLUMEN_GLOBAL)
+            pygame.mixer.music.play(-1) # En bucle
+        except pygame.error as e:
+            print(f"Error cargando música de récord: {e}")   
+    
     # 1. Solicita el nombre al usuario usando la ventana de Pygame.
     nombre = obtener_nombre(screen, player_pts)
             
@@ -445,4 +458,30 @@ def guardar_nuevo_puntaje(screen, player_pts):
         print("Puntaje guardado exitosamente.")
     except IOError: # Cubre si es que hay otros problemas aparte de que el archivo no exista al momento de la escritura, IOError es un error de entrada y salida, evita que se cierre el programa
         print(f"Error al escribir en el archivo: {RUTA_PUNTAJES}")
+        
+
+def es_top_3(player_pts):
+    """
+    Verifica si un puntaje califica para entrar en el Top 3.
+    Retorna True si califica, False de lo contrario.
+    """
+    todos_los_puntajes = []
+    
+    # 1. Intentar cargar los puntajes existentes
+    if os.path.exists(RUTA_PUNTAJES):
+        try:
+            with open(RUTA_PUNTAJES, "r") as archivo:
+                todos_los_puntajes = json.load(archivo)
+        except (json.JSONDecodeError, IOError):
+            todos_los_puntajes = []
+
+    # 2. Si hay menos de 3, cualquier puntaje califica
+    if len(todos_los_puntajes) < 3:
+        return True
+
+    # 3. Ordenar y comparar con el tercero
+    todos_los_puntajes.sort(key=lambda x: x["player_pts"], reverse=True)
+    tercer_mejor_puntaje = todos_los_puntajes[2]["player_pts"]
+    
+    return player_pts >= tercer_mejor_puntaje
 
