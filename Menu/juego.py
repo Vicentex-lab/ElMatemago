@@ -6,7 +6,7 @@ import colisiones as colision
 import criaturas as cr         
 import items as item
 import powerups as pw           
-from sprites import CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO, CORAZON, WALL, FLOOR
+from sprites import CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO, CORAZON, WALL, FLOOR, SPEED_BOOST, SLOW_TIME, MULTIPLIER, DIVISOR
 
 def jugar(SCREEN):
     # Muestra la pantalla de juego, detiene la música del menú e inicia la música de juego.
@@ -108,31 +108,70 @@ def jugar(SCREEN):
         
         
         
-        # SECCION BUFFS (Es parecido a logica items)
-        # ---------------------------------------------------------
+        # SECCION BUFFS
+        
+        # Creamos y posicionamos el texto "BUFFS:" en el HUD
         fuente_buffs = cfg.get_letra(22)
         txt_buffs = fuente_buffs.render("BUFFS:", True, (255, 255, 255))
         screen.blit(txt_buffs, (hud_x + 30, hud_y + 200))
-                
-        # Inicializamos el sprite a dibujar como vacío
-        sprite_buff_activo = None
         
-        # 1. LÓGICA DE ACTIVACIÓN DE BUFFS
-        # Ejemplo: if variable_buffs == "DOBLE_DAÑO":     
-        # if estado_buff == "POWERUP1":
-        #     sprite_buff_activo = IMAGEN_POWERUP1
-        # elif estado_buff == "POWERUP2":
-        #     sprite_buff_activo = IMAGEN_POWERUP2
-        # elif estado_buff == "POWERUP3":
-        #     sprite_buff_activo = IMAGEN_POWERUP3
-                
-        # 2. DIBUJADO DEL BUFF EN PANTALLA
+       #Variables por defecto          
+       # Si no hay ningún buff activo, estas variables se quedarán así.
+        sprite_buff_activo = None
+        tiempo_actual = 0
+        tiempo_maximo = 1
+        color_barra = (255, 255, 255)
+
+        #Verificamos cuál power-up está activo y asignamos sprite
+
+        if multiplier.state:
+            sprite_buff_activo = MULTIPLIER
+            tiempo_actual = multiplier.pos  #Frames restantes #En Powerups: pos = Tiempo restante (Frames de vida).
+            tiempo_maximo = 60 * 15   # Duración total (15 seg * 60 FPS)
+            color_barra = (50, 255, 50) # Verde
+            
+        elif divisor.state:
+            sprite_buff_activo = DIVISOR
+            tiempo_actual = divisor.pos #Frames restantes #En Powerups: pos = Tiempo restante (Frames de vida).
+            tiempo_maximo = 60 * 15     #Duracion total (15 seg * 60FPS)
+            color_barra = (255, 50, 50) # Rojo
+        # IMPORTANTE: Este objeto NO tiene variable '.state'. 
+        # Usa lógica distinta: si .pos es distinto de -1, significa que está ACTIVO    
+        elif slow_time.pos != -1:
+            sprite_buff_activo = SLOW_TIME
+            tiempo_actual = slow_time.pos  #Frames restantes #En Powerups: pos = Tiempo restante (Frames de vida).
+            tiempo_maximo = 60 * 10 # Duracion total (10 seg * 60fps)
+            color_barra = (50, 100, 255) # Azul
+
+        # 2. DIBUJADO DEL BUFF Y BARRA EN CASO DE BUFF ACTIVO
+        
         if sprite_buff_activo:
-        # Escalamos el sprite seleccionado a 40x40 para el HUD
+            #Dibujar icono
+            # Escalamos el sprite a 40x40 para que encaje en el HUD y lo posicionamos
             ICONO_BUFF = pygame.transform.scale(sprite_buff_activo, (40, 40))
             screen.blit(ICONO_BUFF, (hud_x + 160, hud_y + 192))
+            
+            #Dibujar Barra de Tiempo debajo del icono
+            ancho_barra_max = 100
+            alto_barra = 10
+            pos_barra_x = hud_x + 210 # Un poco a la derecha del icono
+            pos_barra_y = hud_y + 208
+            
+            # Fondo de la barra (Barra vacia: gris oscuro)
+            pygame.draw.rect(screen, (50, 50, 50), (pos_barra_x, pos_barra_y, ancho_barra_max, alto_barra)) 
+            # Porcentaje = Tiempo Restante / Tiempo Total
+            # Evitamos división por cero con max(tiempo_maximo, 1)
+            porcentaje = tiempo_actual / max(tiempo_maximo, 1)
+            #El ancho de la barra rellena es proporcional al porcentaje
+            ancho_actual = int(ancho_barra_max * porcentaje)
+            
+            # Dibujar Relleno (Tiempo Restante - Color Dinámico)
+            pygame.draw.rect(screen, color_barra, (pos_barra_x, pos_barra_y, ancho_actual, alto_barra))
+            
+            # Borde de la barra (blanco fino)
+            pygame.draw.rect(screen, (200, 200, 200), (pos_barra_x, pos_barra_y, ancho_barra_max, alto_barra), 1)
+        #En caso que no haya buffs se escribe texto "Ninguno"
         else:
-            # Si no hay ningún powerup activo, mostramos "NINGUNO"
             txt_none_buff = fuente_buffs.render("NINGUNO", True, (160, 160, 160))
             screen.blit(txt_none_buff, (hud_x + 160, hud_y + 200))
 
@@ -768,9 +807,6 @@ def jugar(SCREEN):
         slow_time.draw(screen)
         multiplier.draw(screen)
         divisor.draw(screen)
-        
-        #power up por mietrnas
-        pygame.draw.rect(screen, (255, 255, 0), (100, 100, 50, 50))
         # EFECTO DE FLOTACIÓN DEL MAGO ARRIBA/ABAJO
         #float_offset es cambio constante en eje y
         """ float_offset = 0----> desplazamiento vertical que se suma a mago, ej con 1 baja 1 pixel con -2 sube 2 pixeles

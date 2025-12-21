@@ -82,5 +82,13 @@
     {
         "nombre": "XD",
         "player_pts": 850
+    },
+    {
+        "nombre": "A",
+        "player_pts": 750
+    },
+    {
+        "nombre": "AAA",
+        "player_pts": 2550
     }
 ]
