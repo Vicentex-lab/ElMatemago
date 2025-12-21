@@ -1,6 +1,22 @@
 [
     {
         "nombre": "VICENTE",
+        "player_pts": 6100
+    },
+    {
+        "nombre": "TEST",
+        "player_pts": 250
+    },
+    {
+        "nombre": "VICENTE",
+        "player_pts": 750
+    },
+    {
+        "nombre": "VICENTE",
         "player_pts": 2500
+    },
+    {
+        "nombre": "XD",
+        "player_pts": 350
     }
 ]

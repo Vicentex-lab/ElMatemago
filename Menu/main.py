@@ -8,11 +8,13 @@ import random
 import configuracion as cfg
 from juego import jugar as iniciar_juego # Importa la función principal del juego desde 'juego.py'
 
-# INICIALIZACIÓN DE PYGAME Y PANTALLA 
-
 # Inicializa todos los módulos necesarios de Pygame
 pygame.init() 
 pygame.mixer.init()  # Inicializa el módulo de mezcla de sonido (necesario para la música y efectos).
+cfg.cargar_sfx() #Cargar los efectos de sonido
+
+#Cargar preferencias del usuario
+cfg.cargar_preferencias()
 
 # Define la pantalla en modo Fullscreen utilizando las dimensiones obtenidas en 'configuracion.py'.
 SCREEN = pygame.display.set_mode((cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA), pygame.FULLSCREEN)
@@ -21,13 +23,13 @@ SCREEN = pygame.display.set_mode((cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA), pygame
 
 
 #Importamos sprites luego de definir la pantalla (SCREEN)
-from sprites import MAGO, CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO, CORAZON
+from sprites import CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO, CORAZON
+
 pygame.display.set_caption("EL MATEMAGO") #Establece el título de la ventana
 
 #Utilizamos .convert_alpha() una vez definida SCREEN
 # Optimiza las imágenes cargadas para un dibujo más rápido en la pantalla y mantiene la transparencia de las imágenes.
 #Forma general de optimizacion
-MAGO = MAGO.convert_alpha()
 CERO = CERO.convert_alpha()
 RAIZNEGATIVA = RAIZNEGATIVA.convert_alpha()
 PIGARTO = PIGARTO.convert_alpha()
@@ -37,12 +39,12 @@ ANILLO = ANILLO.convert_alpha()
 CORAZON = CORAZON.convert_alpha()
 
 #Cargamos imagen de fondo para el menú
-fondo_menu = pygame.image.load("./assets/menu_editado.png").convert() #metodo .convert convierte la imagen al mismo formato de color de pantalla
+fondo_menu = pygame.image.load("./assets/fondo_pantallas.png").convert() #metodo .convert convierte la imagen al mismo formato de color de pantalla
                                                                         #otra forma de optimizar y mas eficiencia
 # Escala el fondo para que ocupe todo el tamaño de la pantalla. tenemos escala actual y la transformamos a (ancho, altura pantalla)
 fondo_menu = pygame.transform.scale(fondo_menu, SCREEN.get_size())
 
-
+            
 # FUNCIÓN DE UTILIDAD PARA SALIDA RÁPIDA (ESCAPE / QUIT)
 def manejar_salida_menu(event):
     """
@@ -68,8 +70,10 @@ def bajo_puntaje():
        Impide guardar puntajes de cero.
     """
     
-    # Detiene cualquier música que quede sonando
+    # Detiene cualquier música que quede sonando y reproducir sfx de Game Over
     pygame.mixer.music.stop() 
+    
+    cfg.play_sfx("game_over")
     
     # 1. Crea un reloj local y define FPS 
     clock = pygame.time.Clock() 
@@ -101,7 +105,7 @@ def bajo_puntaje():
         SCREEN.blit(TEXTO_TITULO, RECT_TITULO)
         
         #Subtitulos
-        TEXTO_SUB = cfg.get_letra(20).render("TU PUNTAJE ES 0. NECESITAS MÁS DE 0 PUNTOS PARA PODER GUARDARLO.", True, "#FFFFFF")
+        TEXTO_SUB = cfg.get_letra(20).render(f"TU PUNTAJE ES MUY BAJO. NECESITAS MÁS PUNTOS PARA ENTRAR EN EL TOP.", True, "#FFFFFF")
         RECT_SUB = TEXTO_SUB.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y + 50))
         SCREEN.blit(TEXTO_SUB, RECT_SUB)
         
@@ -129,7 +133,7 @@ def marcadores():
     while True:
         POS_MOUSE_MARCADORES = pygame.mouse.get_pos()
         SCREEN.blit(fondo_menu, (0, 0)) 
-        
+        5
         # Título de la pantalla.
         TEXTO_TITULO = cfg.get_letra(50).render("MARCADORES", True, "#f2c572")
         RECT_TITULO = TEXTO_TITULO.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 330))
@@ -243,28 +247,27 @@ def opciones():
        Muestra la pantalla de opciones, permitiendo al usuario ajustar el volumen 
        mediante un control deslizante (slider).
     """
+    
+    # Colores de fondo para la dificultad seleccionada
+    COLOR_BASE = "#e2f3ff" #Opción inactiva
+    COLOR_HOVER = "#f1ca04" #Color al colocar el mouse encima
+    COLOR_SELECCION = "#1eff00" # Color para la opción activa
+    
+    # Carga la imagen originales
+    QUIT_RECT_ORIGINAL = pygame.image.load("./assets/Quit Rect.png").convert_alpha()
+    
+    #Escala para botones más pequeños (ej. dificultad)
+    ANCHO_PEQUEÑO = 250
+    ALTO_PEQUEÑO = 55
+    
+    # Escalar la imagen de botón para dificultad
+    RECT_PEQUEÑO = pygame.transform.scale(QUIT_RECT_ORIGINAL, (ANCHO_PEQUEÑO, ALTO_PEQUEÑO))
+    
     # Variable de control: indica si el usuario está arrastrando el slider, de base es False y se hara True cuando se presione
     mouse_held = False
     while True:
-        """#
-        VOLUMEN_GLOBAL = 0.5 # Nivel inicial de volumen (50%).
-        --- CONFIGURACIÓN DEL SLIDER DE VOLUMEN ---
-SLIDER_WIDTH = 500 # Anchura de la línea del slider
-SLIDER_HEIGHT = 10 #Altura de la línea del slider (es una línea horizontal).
 
-# Posición X calculada como central inicialmente 
-#con esto centramos slider, restando la mitad del ancho a centro ventana
-SLIDER_X = CENTRO_X - (SLIDER_WIDTH // 2)  
-SLIDER_Y = CENTRO_Y - 80 # Posición Y fija, un poco arriba del centro.
-
-# Posición inicial del manejador (círculo) del slider.
-# Se calcula multiplicando el ancho total por el volumen actual (0.5),
-# y sumando eso a la posición inicial X del slider.
-SLIDER_HANDLE_X = SLIDER_X + int(SLIDER_WIDTH * VOLUMEN_GLOBAL)
-
-#tamaño circulo
-HANDLE_RADIUS = 15"""
-         # Posición actual del mouse (x,y)
+        # Posición actual del mouse (x,y)
         POS = pygame.mouse.get_pos()
         # Dibujamos el fondo del menú de opciones.
         SCREEN.blit(fondo_menu, (0, 0))
@@ -272,18 +275,130 @@ HANDLE_RADIUS = 15"""
         # Renderizamos el texto "OPCIONES" con una fuente grande (50 px)
         # #.render convierte string en surface, True es para bordes suaves no pixelados
         TEXTO_OP = cfg.get_letra(50).render("OPCIONES", True, "#f2c572")
-         # y lo centramos en una posición superior de la pantalla.
+        # y lo centramos en una posición superior de la pantalla.
         # con surface ya creada con texto "Volumen" creamos rectangulo para envolverlo
         #center coloca en centro cordenadas de centro pantalla (centro_x y centro_y -330 para que este arriba)
         SCREEN.blit(TEXTO_OP, TEXTO_OP.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 330)))
         
+        # DIBUJOS VOLUMEN
         
-        # Texto que muestra el volumen actual en porcentaje (usando VOLUMEN_GLOBAL de .cfg)
+        # Texto que dice "Volumen" a la izquierda del slider 
         #.render convierte string en surface para trabajarla, True es antialiasing para bordes suaves texto
-        TEXTO_VOL = cfg.get_letra(40).render(f"VOLUMEN: {int(cfg.VOLUMEN_GLOBAL*100)}%", True, "White")
+        TEXTO_VOL = cfg.get_letra(35).render(f"VOLUMEN:", True, "White")
         
         #Dibujamos texto volumen (surface) y el rectangulo que lo envuelve, centramos ambos en su posicion
-        SCREEN.blit(TEXTO_VOL, TEXTO_VOL.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y - 180)))
+        SCREEN.blit(TEXTO_VOL, TEXTO_VOL.get_rect(center=(cfg.SLIDER_X-180, cfg.SLIDER_Y)))
+        
+        # Texto que muestra el volumen actual en porcentaje a la derecha del slider (usando VOLUMEN_GLOBAL de .cfg)
+        #.render convierte string en surface para trabajarla, True es antialiasing para bordes suaves texto
+        TEXTO_VOLPORCENTAJE = cfg.get_letra(35).render(f"{int(cfg.VOLUMEN_GLOBAL*100)}%", True, "White")
+        
+        #Dibujamos texto volumen (surface) y el rectangulo que lo envuelve, centramos ambos en su posicion
+        SCREEN.blit(TEXTO_VOLPORCENTAJE, TEXTO_VOLPORCENTAJE.get_rect(center=(cfg.SLIDER_X+600, cfg.SLIDER_Y)))
+        
+        # DIBUJOS DIFICULTAD
+        
+        TEXTO_DIFICULTAD = cfg.get_letra(35).render(f"DIFICULTAD:", True, "White")
+  
+        SCREEN.blit(TEXTO_DIFICULTAD, TEXTO_DIFICULTAD.get_rect(center=(cfg.CENTRO_X-400, cfg.CENTRO_Y - 100)))
+        
+        # 1. BOTÓN NORMAL
+        color_normal = COLOR_SELECCION if cfg.DIFICULTAD_GLOBAL == "NORMAL" else COLOR_BASE
+        BOTON_NORMAL = Button(
+            image=RECT_PEQUEÑO,
+            pos=(cfg.CENTRO_X-50, cfg.CENTRO_Y - 100),
+            text_input="NORMAL",
+            font=cfg.get_letra(30),
+            base_color=color_normal, 
+            hovering_color=COLOR_HOVER
+        )
+        
+        # 2. BOTÓN DIFÍCIL
+        color_dificil = COLOR_SELECCION if cfg.DIFICULTAD_GLOBAL == "DIFICIL" else COLOR_BASE
+        BOTON_DIFICIL = Button(
+            image=RECT_PEQUEÑO,
+            pos=(cfg.CENTRO_X+250, cfg.CENTRO_Y - 100),
+            text_input="DIFICIL",
+            font=cfg.get_letra(30),
+            base_color=color_dificil, 
+            hovering_color=COLOR_HOVER
+        )
+
+        # Actualizar y dibujar botones de dificultad
+        BOTON_NORMAL.changeColor(POS)
+        BOTON_NORMAL.update(SCREEN)
+        BOTON_DIFICIL.changeColor(POS)
+        BOTON_DIFICIL.update(SCREEN)
+        
+        
+        # DIBUJOS MUSICA
+        
+        TEXTO_MUSICA = cfg.get_letra(35).render(f"MUSICA:", True, "White")
+  
+        SCREEN.blit(TEXTO_MUSICA, TEXTO_MUSICA.get_rect(center=(cfg.CENTRO_X-430, cfg.CENTRO_Y)))
+        
+        # 1. BOTÓN SI MÚSICA
+        color_si_musica = COLOR_SELECCION if cfg.MUSICA_ACTIVADA else COLOR_BASE
+        BOTON_SI_MUS = Button(
+            image=RECT_PEQUEÑO,
+            pos=(cfg.CENTRO_X-50, cfg.CENTRO_Y),
+            text_input="SI",
+            font=cfg.get_letra(30),
+            base_color=color_si_musica, 
+            hovering_color=COLOR_HOVER
+        )
+        
+        # 2. BOTÓN NO MÚSICA
+        color_no_musica = COLOR_SELECCION if not cfg.MUSICA_ACTIVADA else COLOR_BASE
+        BOTON_NO_MUS = Button(
+            image=RECT_PEQUEÑO,
+            pos=(cfg.CENTRO_X+250, cfg.CENTRO_Y),
+            text_input="NO",
+            font=cfg.get_letra(30),
+            base_color=color_no_musica, 
+            hovering_color=COLOR_HOVER
+        )
+
+        # Actualizar y dibujar botones de dificultad
+        BOTON_SI_MUS.changeColor(POS)
+        BOTON_SI_MUS.update(SCREEN)
+        BOTON_NO_MUS.changeColor(POS)
+        BOTON_NO_MUS.update(SCREEN)
+        
+        
+        # DIBUJOS SFX (EFECTOS DE SONIDO)
+        
+        TEXTO_SFX = cfg.get_letra(35).render(f"SFX:", True, "White")
+        
+        SCREEN.blit(TEXTO_SFX, TEXTO_SFX.get_rect(center=(cfg.CENTRO_X-430, cfg.CENTRO_Y+100)))
+        
+        # 1. BOTÓN SI SFX
+        color_si_sfx = COLOR_SELECCION if cfg.SFX_ACTIVADOS else COLOR_BASE
+        BOTON_SI_SFX = Button(
+            image=RECT_PEQUEÑO,
+            pos=(cfg.CENTRO_X-50, cfg.CENTRO_Y+100),
+            text_input="SI",
+            font=cfg.get_letra(30),
+            base_color=color_si_sfx, 
+            hovering_color=COLOR_HOVER
+        )
+        
+        # 2. BOTÓN NO SFX
+        color_no_sfx = COLOR_SELECCION if not cfg.SFX_ACTIVADOS else COLOR_BASE
+        BOTON_NO_SFX = Button(
+            image=RECT_PEQUEÑO,
+            pos=(cfg.CENTRO_X+250, cfg.CENTRO_Y+100),
+            text_input="NO",
+            font=cfg.get_letra(30),
+            base_color=color_no_sfx, 
+            hovering_color=COLOR_HOVER
+        )
+        
+        # Actualizar y dibujar botones de dificultad
+        BOTON_SI_SFX.changeColor(POS)
+        BOTON_SI_SFX.update(SCREEN)
+        BOTON_NO_SFX.changeColor(POS)
+        BOTON_NO_SFX.update(SCREEN)
         
         # DIBUJO DEL SLIDER 
         
@@ -296,7 +411,7 @@ HANDLE_RADIUS = 15"""
         # Botón para volver.
         VOLVER = Button(
             image=pygame.image.load("./assets/Play Rect.png"),
-            pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 150),
+            pos=(cfg.CENTRO_X, cfg.CENTRO_Y + 350),
             text_input="VOLVER",
             font=cfg.get_letra(50),
             base_color="#e2f3ff",
@@ -317,7 +432,50 @@ HANDLE_RADIUS = 15"""
                     and cfg.SLIDER_Y - 10 <= POS[1] <= cfg.SLIDER_Y + 30):
                      # El usuario está agarrando el slider -> activar arrastre
                     mouse_held = True
+    
+                # Detección para botones de Música
+                if BOTON_SI_MUS.checkForInput(POS):
+                    if not cfg.MUSICA_ACTIVADA:
+                        # 1. Cambiar la bandera de activación
+                        cfg.MUSICA_ACTIVADA = True
+                        
+                        # 2. Reproducir la música inmediatamente:
+                        # Se detiene cualquier cosa que esté sonando (si hay)
+                        pygame.mixer.music.stop() 
+                        
+                        # Cargar y reproducir la música del menú
+                        pygame.mixer.music.load(cfg.RUTA_MUSICA_MENU)
+                        pygame.mixer.music.play(-1) # Reproducir en loop
+                        pygame.mixer.music.set_volume(cfg.VOLUMEN_GLOBAL) # Aplicar el volumen actual
+                        
+                if BOTON_NO_MUS.checkForInput(POS):
+                    if cfg.MUSICA_ACTIVADA:
+                        cfg.MUSICA_ACTIVADA = False
+                        pygame.mixer.music.stop() # Detener la música inmediatamente
+                        cfg.guardar_preferencias()
+                    
+                #Cambia la variable a normal cuando se presioona el botón    
+                if BOTON_NORMAL.checkForInput(POS):
+                    cfg.DIFICULTAD_GLOBAL = "NORMAL"  
+                    
+                #Cambia la variable a difícil cuando se presiona el botón    
+                if BOTON_DIFICIL.checkForInput(POS):
+                    cfg.DIFICULTAD_GLOBAL = "DIFICIL"  
+                    
+                #Activa SFX cuando se presiona el botón
+                if BOTON_SI_SFX.checkForInput(POS):
+                    if not cfg.SFX_ACTIVADOS:
+                        cfg.SFX_ACTIVADOS = True
+                        cfg.guardar_preferencias()
+                
+                #Desactiva SFX cuando se presiona el botón
+                if BOTON_NO_SFX.checkForInput(POS):
+                    if cfg.SFX_ACTIVADOS:
+                        cfg.SFX_ACTIVADOS = False
+                        cfg.guardar_preferencias()
+                    
                 if VOLVER.checkForInput(POS):
+                    cfg.guardar_preferencias() #Guarda las preferencias indicadas por el usuario
                     return menu_principal() # Usar return para volver al menú principal
             
             # Cuando el usuario suelta el clic -> dejar de arrastrar
@@ -351,11 +509,15 @@ def menu_principal():
     """
     
     # 1. Gestión de música de inicio:
-    # Si no hay música sonando, carga y reproduce la música del menú en loop (-1).
-    if not pygame.mixer.music.get_busy():
-        pygame.mixer.music.load(cfg.RUTA_MUSICA_MENU)
-        pygame.mixer.music.play(-1) 
-        pygame.mixer.music.set_volume(cfg.VOLUMEN_GLOBAL)
+    # Si no hay música sonando y la música está activada, carga y reproduce la música del menú en loop (-1).
+    if cfg.MUSICA_ACTIVADA:
+        if not pygame.mixer.music.get_busy():
+            pygame.mixer.music.load(cfg.RUTA_MUSICA_MENU)
+            pygame.mixer.music.play(-1) 
+            pygame.mixer.music.set_volume(cfg.VOLUMEN_GLOBAL)
+    else:
+        # Si la música no debe estar activada, nos aseguramos de que esté detenida
+        pygame.mixer.music.stop()
         
     SCREEN.fill((0, 0, 0))
     pygame.display.update()
@@ -365,11 +527,15 @@ def menu_principal():
     while True:
         
         # 2. Gestión de música durante el bucle
-        # Se asegura de que la música de fondo se reinicie si se detiene por alguna razón.
-        if not pygame.mixer.music.get_busy():
-            pygame.mixer.music.load(cfg.RUTA_MUSICA_MENU)
-            pygame.mixer.music.play(-1)
-            pygame.mixer.music.set_volume(cfg.VOLUMEN_GLOBAL)
+        # Se asegura de que la música de fondo se reinicie si se detiene por alguna razón y está activada
+        if cfg.MUSICA_ACTIVADA:
+            if not pygame.mixer.music.get_busy():
+                pygame.mixer.music.load(cfg.RUTA_MUSICA_MENU)
+                pygame.mixer.music.play(-1)
+                pygame.mixer.music.set_volume(cfg.VOLUMEN_GLOBAL)
+        else:        
+            # Si el usuario la desactivó, la detenemos si por alguna razón inició.
+            pygame.mixer.music.stop()
             
         # 3. Dibujo del fondo y del título
         SCREEN.fill((0, 0, 0)) 
@@ -415,7 +581,10 @@ def menu_principal():
                         bajo_puntaje()
                     #Si devuelve True, la ejecución simplemente continúa con el menú
                     #(ya que menu_principal() está en un bucle infinito `while True:`)
-                        
+                     
+                    #Detener la música que esté sonando    
+                    pygame.mixer.music.stop()
+                    
                 if BOTON_MARCADORES.checkForInput(POS_MOUSE_MENU):
                     marcadores() # Va a la pantalla de marcadores.
                     
