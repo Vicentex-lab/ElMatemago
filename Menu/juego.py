@@ -1,13 +1,12 @@
+
 import pygame, sys
 import random
 import configuracion as cfg
 import colisiones as colision 
 import criaturas as cr         
-import items as item           
-from sprites import CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO, CORAZON, WALL, FLOOR
-#Sprites simulacion animacion movimiento mago
-from sprites import (ANIMACION_DERECHA, ANIMACION_IZQUIERDA, 
-                     ANIMACION_ATRAS, ANIMACION_FRENTE)
+import items as item
+import powerups as pw           
+from sprites import CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO, CORAZON, WALL, FLOOR, SPEED_BOOST, SLOW_TIME, MULTIPLIER, DIVISOR
 
 def jugar(SCREEN):
     # Muestra la pantalla de juego, detiene la música del menú e inicia la música de juego.
@@ -29,7 +28,7 @@ def jugar(SCREEN):
         hud_x = 40           # posicion del hud en eje x
         hud_y = 40            #posicion del hud en eje y
         hud_w = 320          # ancho del hud
-        hud_h = 260          # alto del hud
+        hud_h = 360         # alto del hud
     
         # Se crea una superficie especial para el HUD con transparencia.
         # Esto permite tener un recuadro semitransparente encima del juego
@@ -109,36 +108,86 @@ def jugar(SCREEN):
         
         
         
-        # SECCION BUFFS (Es parecido a logica items)
-        # ---------------------------------------------------------
+        # SECCION BUFFS
+        #Lista para guardar TODOS los buffs activos
+        lista_buffs_activos = []
+        
+        # Creamos y posicionamos el texto "BUFFS:" en el HUD
         fuente_buffs = cfg.get_letra(22)
         txt_buffs = fuente_buffs.render("BUFFS:", True, (255, 255, 255))
         screen.blit(txt_buffs, (hud_x + 30, hud_y + 200))
+
+        #Verificamos cuál/cuales power-up están activo y asignamos sprites
+
+        # -- Buff 1: Multiplicador --
+        if multiplier.state:
+            datos_buff = {
+                "sprite": MULTIPLIER,
+                "t_actual": multiplier.pos, #Tiempo restante (frames)
+                "t_max": 60 * 15,  #Tiempo total 60FPS * 15 segundos= 900 frames totales, esto para calcular %
+                "color": (50, 255, 50) # Verde
+            }
+            lista_buffs_activos.append(datos_buff) #Agregamos elemento con todas sus caracteristicas a lista
+            
+        # -- Buff 2: Divisor --
+        if divisor.state:
+            datos_buff = {
+                "sprite": DIVISOR,
+                "t_actual": divisor.pos, #Tiempo restante (frames)
+                "t_max": 60 * 15,  #Tiempo total 60FPS * 15 segundos= 900 frames totales, esto para calcular %
+                "color": (255, 50, 50) # Rojo
+            }
+            lista_buffs_activos.append(datos_buff)
+            
+        # -- Buff 3: Slow Time --
+        if slow_time.pos != -1: 
+            datos_buff = {
+                "sprite": SLOW_TIME,
+                "t_actual": slow_time.pos,  #Tiempo restante (frames)
+                "t_max": 60 * 10,   #Tiempo total 60FPS * 10 segundos= 600 frames totales, esto para calcular %
+                "color": (50, 100, 255) # Azul
+            }
+            lista_buffs_activos.append(datos_buff)
+        # Si la lista tiene elementos, los dibujamos uno por uno
+        if len(lista_buffs_activos) > 0:
+            
+            # 'i' es el índice (0, 1, 2...) y 'buff' es el diccionario de datos
+            # Multiplicamos el índice por 50px para que no pongan uno encima del otro
+            for i, buff in enumerate(lista_buffs_activos):
                 
-        # Inicializamos el sprite a dibujar como vacío
-        sprite_buff_activo = None
-        
-        # 1. LÓGICA DE ACTIVACIÓN DE BUFFS
-        # Ejemplo: if variable_buffs == "DOBLE_DAÑO":     
-        # if estado_buff == "POWERUP1":
-        #     sprite_buff_activo = IMAGEN_POWERUP1
-        # elif estado_buff == "POWERUP2":
-        #     sprite_buff_activo = IMAGEN_POWERUP2
-        # elif estado_buff == "POWERUP3":
-        #     sprite_buff_activo = IMAGEN_POWERUP3
+                # Calculamos la altura Y basada en el índice.
+                # Cada buff estará 50 pixeles más abajo que el anterior.
+                offset_y = i * 50 
                 
-        # 2. DIBUJADO DEL BUFF EN PANTALLA
-        if sprite_buff_activo:
-        # Escalamos el sprite seleccionado a 40x40 para el HUD
-            ICONO_BUFF = pygame.transform.scale(sprite_buff_activo, (40, 40))
-            screen.blit(ICONO_BUFF, (hud_x + 160, hud_y + 192))
+                # Dibujar Icono
+                ICONO = pygame.transform.scale(buff["sprite"], (40, 40))
+                # Sumamos 'offset_y' a la altura base
+                screen.blit(ICONO, (hud_x + 160, hud_y + 192 + offset_y))
+                
+                # Dibujar Barra del tiempo
+                ancho_barra_max = 100
+                alto_barra = 10
+                pos_barra_x = hud_x + 210
+                pos_barra_y = hud_y + 208 + offset_y # También bajamos la barra
+                
+                # Fondo barra
+                pygame.draw.rect(screen, (50, 50, 50), (pos_barra_x, pos_barra_y, ancho_barra_max, alto_barra))
+                
+                # Porcentaje = Tiempo Restante / Tiempo Total
+                porcentaje = buff["t_actual"] / max(buff["t_max"], 1)
+                ancho_actual = int(ancho_barra_max * porcentaje)
+                
+                # Relleno barra
+                pygame.draw.rect(screen, buff["color"], (pos_barra_x, pos_barra_y, ancho_actual, alto_barra))
+                
+                # Borde barra
+                pygame.draw.rect(screen, (200, 200, 200), (pos_barra_x, pos_barra_y, ancho_barra_max, alto_barra), 1)
+                
         else:
-            # Si no hay ningún powerup activo, mostramos "NINGUNO"
+            # Si la lista está vacía mensaje "NINGUNO"
             txt_none_buff = fuente_buffs.render("NINGUNO", True, (160, 160, 160))
             screen.blit(txt_none_buff, (hud_x + 160, hud_y + 200))
 
-    
-    FPS = 60
     
     FILAS = len(colision.maze)
     COLUMNAS = len(colision.maze[0])
@@ -155,7 +204,7 @@ def jugar(SCREEN):
     
     from sprites import MAGO_1, MAGO_2, MAGO_3,MAGO_4
     # --- Animación del mago Mago izquierda derecha
-    lista_actual = ANIMACION_FRENTE    # sprite actual del mago 
+    player_sprite = MAGO_4      # sprite actual del mago 
     # Variables para efecto de flotacion en mago
     float_offset = 0
     float_direction = 1
@@ -191,6 +240,22 @@ def jugar(SCREEN):
         if ring.actual_x!=sword.actual_x and ring.actual_y!=sword.actual_y and ring.actual_x!=shield.actual_x and ring.actual_y!=shield.actual_y:
             break
     
+    #spawnear powerups
+    #speed_boost=pw.speed_boost()
+    #while True:
+    #    speed_boost.random_spawn()
+    #    if speed_boost.actual_x!=sword.actual_x and speed_boost.actual_y!=sword.actual_y and speed_boost.actual_x!=shield.actual_x and speed_boost.actual_y!=shield.actual_y and speed_boost.actual_x!=ring.actual_x and speed_boost.actual_y!=ring.actual_y:
+    #        break
+        
+    slow_time=pw.slow_time()
+    while True:
+        slow_time.random_spawn()
+        if slow_time.actual_x!=sword.actual_x and slow_time.actual_y!=sword.actual_y and slow_time.actual_x!=shield.actual_x and slow_time.actual_y!=shield.actual_y and slow_time.actual_x!=ring.actual_x and slow_time.actual_y!=ring.actual_y:
+            break
+        
+    multiplier=pw.multiplier()
+    divisor=pw.divisor()
+
     def can_move(r, c):
         return 0 <= r < FILAS and 0 <= c < COLUMNAS and colision.maze[r][c] >= 1
     
@@ -235,15 +300,18 @@ def jugar(SCREEN):
                 print("Matemagicamente Teletransportado")
     
     def reiniciar_juego():
-        nonlocal player_y, player_x, player_hp, player_item, inmunidad, temporizador, invul_frames, colision_detected
+        nonlocal player_y, player_x, pos_x, pos_y, player_hp, player_item, inmunidad, temporizador, invul_frames, colision_detected
+        nonlocal sword, shield, ring, slow_time, multiplier, divisor
         nonlocal dir_x, dir_y, float_offset, float_direction
         nonlocal player_pts  # Ignorar para conservar el puntaje
         nonlocal cero, pigarto, raiznegativa  # Instancias de enemigos que se reasignan
         nonlocal victoria_detectada  # Resetear la bandera
         
         # Reiniciar posición del jugador
-        player_y = cr.player.positions_y
-        player_x = cr.player.positions_x
+        player_y = cr.player.positions_y #posición en grid
+        player_x = cr.player.positions_x #posición en grid
+        pos_x = player_x * cfg.TILE #posición en pixeles
+        pos_y = player_y * cfg.TILE #posición en pixeles
         
         # Reiniciar vida del jugador
         player_hp = cr.player.hp
@@ -279,15 +347,34 @@ def jugar(SCREEN):
         cr.raiznegativa.exist = 1
         
         # Reiniciar items (respawnear)
+        sword=item.sword()
         sword.spawn()
+        
+        #Escudo
+        shield=item.shield()
         while True:
             shield.spawn()
-            if shield.actual_x != sword.actual_x or shield.actual_y != sword.actual_y:
+            if shield.actual_x!=sword.actual_x and shield.actual_y!=sword.actual_y:
                 break
+                
+        #Anillo
+        ring=item.ring()
         while True:
             ring.spawn()
-            if (ring.actual_x != sword.actual_x or ring.actual_y != sword.actual_y) and \
-               (ring.actual_x != shield.actual_x or ring.actual_y != shield.actual_y):
+            if ring.actual_x!=sword.actual_x and ring.actual_y!=sword.actual_y and ring.actual_x!=shield.actual_x and ring.actual_y!=shield.actual_y:
+                break
+            
+        #spawnear powerups
+        #speed_boost=pw.speed_boost()
+        #while True:
+        #    speed_boost.random_spawn()
+        #    if speed_boost.actual_x!=sword.actual_x and speed_boost.actual_y!=sword.actual_y and speed_boost.actual_x!=shield.actual_x and speed_boost.actual_y!=shield.actual_y and speed_boost.actual_x!=ring.actual_x and speed_boost.actual_y!=ring.actual_y:
+        #        break
+                
+        slow_time=pw.slow_time()
+        while True:
+            slow_time.random_spawn()
+            if slow_time.actual_x!=sword.actual_x and slow_time.actual_y!=sword.actual_y and slow_time.actual_x!=shield.actual_x and slow_time.actual_y!=shield.actual_y and slow_time.actual_x!=ring.actual_x and slow_time.actual_y!=ring.actual_y:
                 break
         
         # Reiniciar instancias de enemigos
@@ -305,6 +392,13 @@ def jugar(SCREEN):
     pigarto=cr.pigarto()
     raiznegativa=cr.raiznegativa()
     
+    #CONFIGURAR en función de dificultad
+    if cfg.DIFICULTAD_GLOBAL=="DIFICIL":
+        cero.movement_ratio=cero.movement_ratio*0.75
+        pigarto.movement_ratio=pigarto.movement_ratio*0.75
+        raiznegativa.ratios[0]=raiznegativa.ratios[0]*0.75
+        raiznegativa.ratios[1]=raiznegativa.ratios[1]*0.75
+    
     # ============================
     #  MOVIMIENTO DEL JUGADOR 
     # ============================
@@ -320,7 +414,7 @@ def jugar(SCREEN):
     pos_x = player_x * cfg.TILE   #cfg.tile es el tamaño de una casilla en pixeles
     pos_y = player_y * cfg.TILE
 
-    speed = 2  # velocidad (pixeles por frame)
+    speed = 4  # velocidad (pixeles por frame)
 
     running = True
 
@@ -346,24 +440,24 @@ def jugar(SCREEN):
                 if event.key in (pygame.K_w, pygame.K_UP):
                     deseada_x = 0
                     deseada_y = -1  
-                    lista_actual = ANIMACION_ATRAS
+                    player_sprite = MAGO_3 
                 # --- ABAJO (S) ---
                 if event.key in (pygame.K_s, pygame.K_DOWN):
                     deseada_x = 0
                     deseada_y = 1
-                    lista_actual = ANIMACION_FRENTE
+                    player_sprite = MAGO_4  
                 
                 # --- IZQUIERDA (A) --
                 if event.key in (pygame.K_a, pygame.K_LEFT):
                 
                     deseada_x = -1
                     deseada_y = 0 
-                    lista_actual = ANIMACION_IZQUIERDA
+                    player_sprite = MAGO_2
                 # --- DERECHA (D) --
                 if event.key in (pygame.K_d, pygame.K_RIGHT):
                     deseada_x = 1
                     deseada_y = 0
-                    lista_actual = ANIMACION_DERECHA
+                    player_sprite = MAGO_1
 
    
         # Convierte la posición de píxeles a casilla
@@ -409,6 +503,19 @@ def jugar(SCREEN):
         pigarto.mover()
         raiznegativa.mover(player_y, player_x, colision.maze)
         
+        #SPAWNEO EN MITAD DE PARTIDA
+        spawn_chance=random.randint(1, 60*30)
+        print("contador random:", spawn_chance)
+        if spawn_chance==1 and multiplier.spawned==False:
+            while True:
+                multiplier.random_spawn()
+                if multiplier.actual_x!=sword.actual_x and multiplier.actual_y!=sword.actual_y and multiplier.actual_x!=shield.actual_x and multiplier.actual_y!=shield.actual_y and multiplier.actual_x!=ring.actual_x and multiplier.actual_y!=ring.actual_y and multiplier.actual_x!=slow_time.actual_x and multiplier.actual_y!=slow_time.actual_y:
+                    break
+        if spawn_chance==2 and divisor.spawned==False:
+            while True:
+                divisor.random_spawn()
+                if divisor.actual_x!=sword.actual_x and divisor.actual_y!=sword.actual_y and divisor.actual_x!=shield.actual_x and divisor.actual_y!=shield.actual_y and divisor.actual_x!=ring.actual_x and divisor.actual_y!=ring.actual_y and divisor.actual_x!=slow_time.actual_x and divisor.actual_y!=slow_time.actual_y and divisor.actual_x!=multiplier.actual_x and divisor.actual_y!=multiplier.actual_y:
+                    break
         # ---------------------------
         # COLISIÓN (Lógica de DERROTA)
         # ---------------------------
@@ -422,7 +529,14 @@ def jugar(SCREEN):
                 inmunidad=0
                 cfg.play_sfx("player_hurt")
             elif player_item==sword.name:
-                player_pts+=cero.pts
+                if multiplier.state==True and divisor.state==False:
+                    player_pts+=cero.pts*2
+                elif divisor.state==True and multiplier.state==False:
+                    player_pts+=cero.pts//2
+                elif divisor.state==True and multiplier.state==True:
+                    player_pts+=cero.pts
+                else:
+                    player_pts+=cero.pts
                 player_item=""
                 cero.exist=0
                 cfg.play_sfx("enemy_die")
@@ -436,7 +550,7 @@ def jugar(SCREEN):
                 cfg.play_sfx("player_hurt")
                 print("💀 cero")
                 pygame.mixer.music.stop() 
-                if cfg.es_top_3(player_pts):
+                if player_pts > 0:
                     cfg.guardar_nuevo_puntaje(screen, player_pts)
                     return True #Volver al menú
                 else:
@@ -456,12 +570,26 @@ def jugar(SCREEN):
                     cfg.play_sfx("player_hurt")
                 if cero.exist==0 and raiznegativa.exist==0 and pigarto.exist==1:
                     pigarto.exist=0
-                    player_pts+=pigarto.pts
+                    if multiplier.state==True and divisor.state==False:
+                        player_pts+=pigarto.pts*2
+                    elif divisor.state==True and multiplier.state==False:
+                        player_pts+=pigarto.pts//2
+                    elif divisor.state==True and multiplier.state==True:
+                        player_pts+=pigarto.pts
+                    else:
+                        player_pts+=pigarto.pts
                 player_item=""
                 
                 pigarto.resetear_ruta()
                 if pigarto.hp<=0:
-                    player_pts+=pigarto.pts
+                    if multiplier.state==True and divisor.state==False:
+                        player_pts+=pigarto.pts*2
+                    elif divisor.state==True and multiplier.state==False:
+                        player_pts+=pigarto.pts//2
+                    elif divisor.state==True and multiplier.state==True:
+                        player_pts+=pigarto.pts
+                    else:
+                        player_pts+=pigarto.pts
                     pigarto.exist=0
             elif player_item==ring.name:
                 player_pts+=pigarto.pts
@@ -478,7 +606,7 @@ def jugar(SCREEN):
                 cfg.play_sfx("player_hurt")
                 print("💀 pigarto")
                 pygame.mixer.music.stop() 
-                if cfg.es_top_3(player_pts):
+                if player_pts > 0:
                     cfg.guardar_nuevo_puntaje(screen, player_pts)
                     return True #Volver al menú
                 else:
@@ -488,7 +616,14 @@ def jugar(SCREEN):
         if raiznegativa.colisionar(player_y, player_x) and colision_detected==False:
             colision_detected=True
             if player_item==shield.name:
-                player_pts+=raiznegativa.pts
+                if multiplier.state==True and divisor.state==False:
+                    player_pts+=raiznegativa.pts*2
+                elif divisor.state==True and multiplier.state==False:
+                    player_pts+=raiznegativa.pts//2
+                elif divisor.state==True and multiplier.state==True:
+                    player_pts+=raiznegativa.pts
+                else:
+                    player_pts+=raiznegativa.pts
                 player_item=""
                 raiznegativa.exist=0
                 inmunidad=0
@@ -501,7 +636,14 @@ def jugar(SCREEN):
                 cfg.play_sfx("player_hurt")
                 if raiznegativa.hp<=0:
                     raiznegativa.exist=0
-                    player_pts+=raiznegativa.pts
+                    if multiplier.state==True and divisor.state==False:
+                        player_pts+=raiznegativa.pts*2
+                    elif divisor.state==True and multiplier.state==False:
+                        player_pts+=raiznegativa.pts//2
+                    elif divisor.state==True and multiplier.state==True:
+                        player_pts+=raiznegativa.pts
+                    else:
+                        player_pts+=raiznegativa.pts
                 else:
                     player_pts+=100
             elif inmunidad!=1 and player_hp-raiznegativa.damage>0:
@@ -513,7 +655,7 @@ def jugar(SCREEN):
                 cfg.play_sfx("player_hurt")
                 print("💀 raiz")
                 pygame.mixer.music.stop() 
-                if cfg.es_top_3(player_pts):
+                if player_pts > 0:
                     cfg.guardar_nuevo_puntaje(screen, player_pts)
                     return True #Volver al menú 
                 else:
@@ -525,7 +667,14 @@ def jugar(SCREEN):
             player_item=sword.name
             sword.actual_x=0
             sword.actual_y=1
-            player_pts+=sword.pts
+            if multiplier.state==True and divisor.state==False:
+                player_pts+=sword.pts*2
+            elif divisor.state==True and multiplier.state==False:
+                player_pts+=sword.pts//2
+            elif divisor.state==True and multiplier.state==True:
+                player_pts+=sword.pts
+            else:
+                player_pts+=sword.pts
             inmunidad=0
             cfg.play_sfx("item_pickup")
             
@@ -535,7 +684,14 @@ def jugar(SCREEN):
             inmunidad=1
             shield.actual_x=0
             shield.actual_y=2
-            player_pts+=shield.pts
+            if multiplier.state==True and divisor.state==False:
+                player_pts+=shield.pts*2
+            elif divisor.state==True and multiplier.state==False:
+                player_pts+=shield.pts//2
+            elif divisor.state==True and multiplier.state==True:
+                player_pts+=shield.pts
+            else:
+                player_pts+=shield.pts
             cfg.play_sfx("item_pickup")
         
         #Anillo
@@ -543,9 +699,75 @@ def jugar(SCREEN):
             player_item=ring.name
             ring.actual_x=0
             ring.actual_y=3
-            player_pts+=ring.pts
+            if multiplier.state==True and divisor.state==False:
+                player_pts+=ring.pts*2
+            elif divisor.state==True and multiplier.state==False:
+                player_pts+=ring.pts//2
+            elif divisor.state==True and multiplier.state==True:
+                player_pts+=ring.pts
+            else:
+                player_pts+=ring.pts
             inmunidad=0
             cfg.play_sfx("item_pickup")
+            
+        #Power-ups
+        """
+        #Funcionaria de no ser por un problema con los cambios de velocidad del jugador.
+        if speed_boost.colision(player_y, player_x):
+            if speed_boost.pos==-1: #es la forma auxiliar de expresar que la variable no se ha usado
+                speed_boost.pos=60*4 #pos se usará como auxiliar para contar la cnatidad de frames (frame*segunodp)
+                speed=4 #tiene que ser divisor de 32
+            else:
+                speed_boost.pos-=1
+                #if speed_boost.pos==0:
+                #    speed=2
+                #    speed_boost.pos=-1 #resetear variable auxiliar
+        """
+        if slow_time.colision(player_y, player_x):
+            if multiplier.state==True and divisor.state==False:
+                player_pts+=slow_time.pts*2
+            elif divisor.state==True and multiplier.state==False:
+                player_pts+=slow_time.pts//2
+            elif divisor.state==True and multiplier.state==True:
+                player_pts+=slow_time.pts
+            else:
+                player_pts+=slow_time.pts
+            if slow_time.pos==-1: #es la forma auxiliar de expresar que la variable no se ha usado
+                slow_time.pos=60*10 #pos se usará como auxiliar para contar la cnatidad de frames (frame*segunodp)
+                aux=[cero.movement_ratio, pigarto.movement_ratio, raiznegativa.movement_ratio]
+                cero.movement_ratio=cero.movement_ratio*2
+                pigarto.movement_ratio=pigarto.movement_ratio*2
+                raiznegativa.movement_ratio=raiznegativa.movement_ratio*2
+                
+        if slow_time.pos!=-1:
+            slow_time.pos-=1
+            if slow_time.pos==0:
+                cero.movement_ratio=aux[0]
+                pigarto.movement_ratio=aux[1]
+                raiznegativa.movement_ratio=aux[2]
+                slow_time.pos=-1 #resetear variable auxiliar
+                
+        if multiplier.colision(player_y, player_x):
+            if multiplier.pos==-1:
+                multiplier.pos=60*15
+                multiplier.state=True
+                multiplier.spawned=False
+        if multiplier.pos!=-1:
+            multiplier.pos-=1
+            if multiplier.pos==0:
+                multiplier.pos=-1
+                multiplier.state=False
+        
+        if divisor.colision(player_y, player_x):
+            if divisor.pos==-1:
+                divisor.pos=60*15
+                divisor.state=True
+                divisor.spawned=False
+        if divisor.pos!=-1:
+            divisor.pos-=1
+            if divisor.pos==0:
+                divisor.pos=-1
+                divisor.state=False
             
         # DIBUJO DE todo LO QUE SE VE EN PANTALLA
         #Mapa
@@ -594,7 +816,10 @@ def jugar(SCREEN):
         sword.draw(screen)
         shield.draw(screen)
         ring.draw(screen)
-        
+        #speed_boost.draw(screen)
+        slow_time.draw(screen)
+        multiplier.draw(screen)
+        divisor.draw(screen)
         # EFECTO DE FLOTACIÓN DEL MAGO ARRIBA/ABAJO
         #float_offset es cambio constante en eje y
         """ float_offset = 0----> desplazamiento vertical que se suma a mago, ej con 1 baja 1 pixel con -2 sube 2 pixeles
@@ -607,19 +832,9 @@ def jugar(SCREEN):
         # Si el desplazamiento supera -2 píxeles, el mago debe empezar a moverse hacia abajo.
         elif float_offset < -2:
             float_direction = 1
-        # --- LÓGICA DE ANIMACIÓN ---
-        if dir_x == 0 and dir_y == 0:
-            # Si está quieto, usamos el frame 0 (estático)
-            frame = 0
-        else:
-            # Si se mueve, alternamos frame cada 200 milisegundos aprox.
-            # pygame.time.get_ticks() // 200 nos da un número que cambia cada 0.2 seg
-            # % 2 hace que ese número solo sea 0 o 1
-            frame = (pygame.time.get_ticks() // 200) % 2 
-        
-        # --- DIBUJO DEL MAGO ---
+        #Misma lógica de dibujado pero con sprite animado y flotamiento
         screen.blit(
-            lista_actual[frame], # Selecciona el frame 0 o 1 de la lista activa
+            player_sprite,
             (
                 player_x * cfg.TILE + cfg.offset_x,
                 player_y * cfg.TILE + cfg.offset_y + float_offset
@@ -655,7 +870,7 @@ def jugar(SCREEN):
                             
             print("Puntaje total:", player_pts)
             mostrando_mensaje_victoria = True
-            mensaje_temporizador = 180  # 3 segundos a 60 FPS
+            mensaje_temporizador = 90  # 1.5 segundos a 60 FPS
        
         # Manejo del mensaje de victoria
         if mostrando_mensaje_victoria:

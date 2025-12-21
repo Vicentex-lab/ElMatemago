@@ -51,6 +51,13 @@ ESCUDO = load("ESCUDO", recortar=True)
 ANILLO = load("ANILLO", recortar=True)
 CORAZON = load("CORAZON", recortar=True)
 
+
+#Buffs
+SPEED_BOOST = load("PW_SPEED_BOOST", recortar=True)
+SLOW_TIME = load("pw_slow_time", recortar=True)
+MULTIPLIER = load("pw_multiplier", recortar=True)
+DIVISOR = load("pw_divisor", recortar=True)
+
 #ENTORNO
 WALL = load("WALL", recortar=False)  # Paredes suelen llenar todo el cuadro, mejor False
 FLOOR = load("FLOOR", recortar=False)
