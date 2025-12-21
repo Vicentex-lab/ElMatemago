@@ -414,7 +414,7 @@ def jugar(SCREEN):
     pos_x = player_x * cfg.TILE   #cfg.tile es el tamaño de una casilla en pixeles
     pos_y = player_y * cfg.TILE
 
-    speed = 4  # velocidad (pixeles por frame)
+    speed = 2  # velocidad (pixeles por frame)
 
     running = True
 
