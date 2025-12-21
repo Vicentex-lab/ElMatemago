@@ -465,9 +465,14 @@ def es_top_3(player_pts):
     Verifica si un puntaje califica para entrar en el Top 3.
     Retorna True si califica, False de lo contrario.
     """
+    
+    # 1. Si el puntaje es 0, nunca califica para el podio.
+    if player_pts <= 0:
+        return False
+    
     todos_los_puntajes = []
     
-    # 1. Intentar cargar los puntajes existentes
+    # 2. Intentar cargar los puntajes existentes
     if os.path.exists(RUTA_PUNTAJES):
         try:
             with open(RUTA_PUNTAJES, "r") as archivo:
@@ -475,11 +480,11 @@ def es_top_3(player_pts):
         except (json.JSONDecodeError, IOError):
             todos_los_puntajes = []
 
-    # 2. Si hay menos de 3, cualquier puntaje califica
+    # 2. Si hay menos de 3 puntajes y el puntaje es mayor a 0, el puntaje califica
     if len(todos_los_puntajes) < 3:
         return True
 
-    # 3. Ordenar y comparar con el tercero
+    # 3. Si ya hay 3 o más, ordenar y comparar con el tercero
     todos_los_puntajes.sort(key=lambda x: x["player_pts"], reverse=True)
     tercer_mejor_puntaje = todos_los_puntajes[2]["player_pts"]
     
