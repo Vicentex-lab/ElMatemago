@@ -248,15 +248,18 @@ def jugar(SCREEN):
                 print("Matemagicamente Teletransportado")
     
     def reiniciar_juego():
-        nonlocal player_y, player_x, player_hp, player_item, inmunidad, temporizador, invul_frames, colision_detected
+        nonlocal player_y, player_x, pos_x, pos_y, player_hp, player_item, inmunidad, temporizador, invul_frames, colision_detected
+        nonlocal sword, shield, ring, slow_time, multiplier, divisor
         nonlocal dir_x, dir_y, float_offset, float_direction
         nonlocal player_pts  # Ignorar para conservar el puntaje
         nonlocal cero, pigarto, raiznegativa  # Instancias de enemigos que se reasignan
         nonlocal victoria_detectada  # Resetear la bandera
         
         # Reiniciar posición del jugador
-        player_y = cr.player.positions_y
-        player_x = cr.player.positions_x
+        player_y = cr.player.positions_y #posición en grid
+        player_x = cr.player.positions_x #posición en grid
+        pos_x = player_x * cfg.TILE #posición en pixeles
+        pos_y = player_y * cfg.TILE #posición en pixeles
         
         # Reiniciar vida del jugador
         player_hp = cr.player.hp
@@ -292,15 +295,34 @@ def jugar(SCREEN):
         cr.raiznegativa.exist = 1
         
         # Reiniciar items (respawnear)
+        sword=item.sword()
         sword.spawn()
+        
+        #Escudo
+        shield=item.shield()
         while True:
             shield.spawn()
-            if shield.actual_x != sword.actual_x or shield.actual_y != sword.actual_y:
+            if shield.actual_x!=sword.actual_x and shield.actual_y!=sword.actual_y:
                 break
+                
+        #Anillo
+        ring=item.ring()
         while True:
             ring.spawn()
-            if (ring.actual_x != sword.actual_x or ring.actual_y != sword.actual_y) and \
-               (ring.actual_x != shield.actual_x or ring.actual_y != shield.actual_y):
+            if ring.actual_x!=sword.actual_x and ring.actual_y!=sword.actual_y and ring.actual_x!=shield.actual_x and ring.actual_y!=shield.actual_y:
+                break
+            
+        #spawnear powerups
+        #speed_boost=pw.speed_boost()
+        #while True:
+        #    speed_boost.random_spawn()
+        #    if speed_boost.actual_x!=sword.actual_x and speed_boost.actual_y!=sword.actual_y and speed_boost.actual_x!=shield.actual_x and speed_boost.actual_y!=shield.actual_y and speed_boost.actual_x!=ring.actual_x and speed_boost.actual_y!=ring.actual_y:
+        #        break
+                
+        slow_time=pw.slow_time()
+        while True:
+            slow_time.random_spawn()
+            if slow_time.actual_x!=sword.actual_x and slow_time.actual_y!=sword.actual_y and slow_time.actual_x!=shield.actual_x and slow_time.actual_y!=shield.actual_y and slow_time.actual_x!=ring.actual_x and slow_time.actual_y!=ring.actual_y:
                 break
         
         # Reiniciar instancias de enemigos
@@ -340,7 +362,7 @@ def jugar(SCREEN):
     pos_x = player_x * cfg.TILE   #cfg.tile es el tamaño de una casilla en pixeles
     pos_y = player_y * cfg.TILE
 
-    speed = 2  # velocidad (pixeles por frame)
+    speed = 4  # velocidad (pixeles por frame)
 
     running = True
 
@@ -672,11 +694,10 @@ def jugar(SCREEN):
                 pigarto.movement_ratio=aux[1]
                 raiznegativa.movement_ratio=aux[2]
                 slow_time.pos=-1 #resetear variable auxiliar
-                slow_time.pos-=1
                 
         if multiplier.colision(player_y, player_x):
             if multiplier.pos==-1:
-                multiplier.pos==60*15
+                multiplier.pos=60*15
                 multiplier.state=True
                 multiplier.spawned=False
         if multiplier.pos!=-1:
@@ -687,7 +708,7 @@ def jugar(SCREEN):
         
         if divisor.colision(player_y, player_x):
             if divisor.pos==-1:
-                divisor.pos==60*15
+                divisor.pos=60*15
                 divisor.state=True
                 divisor.spawned=False
         if divisor.pos!=-1:
@@ -800,7 +821,7 @@ def jugar(SCREEN):
                             
             print("Puntaje total:", player_pts)
             mostrando_mensaje_victoria = True
-            mensaje_temporizador = 180  # 3 segundos a 60 FPS
+            mensaje_temporizador = 90  # 1.5 segundos a 60 FPS
        
         # Manejo del mensaje de victoria
         if mostrando_mensaje_victoria:
