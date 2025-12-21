@@ -28,7 +28,7 @@ def jugar(SCREEN):
         hud_x = 40           # posicion del hud en eje x
         hud_y = 40            #posicion del hud en eje y
         hud_w = 320          # ancho del hud
-        hud_h = 260          # alto del hud
+        hud_h = 360         # alto del hud
     
         # Se crea una superficie especial para el HUD con transparencia.
         # Esto permite tener un recuadro semitransparente encima del juego
@@ -109,69 +109,82 @@ def jugar(SCREEN):
         
         
         # SECCION BUFFS
+        #Lista para guardar TODOS los buffs activos
+        lista_buffs_activos = []
         
         # Creamos y posicionamos el texto "BUFFS:" en el HUD
         fuente_buffs = cfg.get_letra(22)
         txt_buffs = fuente_buffs.render("BUFFS:", True, (255, 255, 255))
         screen.blit(txt_buffs, (hud_x + 30, hud_y + 200))
-        
-       #Variables por defecto          
-       # Si no hay ningún buff activo, estas variables se quedarán así.
-        sprite_buff_activo = None
-        tiempo_actual = 0
-        tiempo_maximo = 1
-        color_barra = (255, 255, 255)
 
-        #Verificamos cuál power-up está activo y asignamos sprite
+        #Verificamos cuál/cuales power-up están activo y asignamos sprites
 
+        # -- Buff 1: Multiplicador --
         if multiplier.state:
-            sprite_buff_activo = MULTIPLIER
-            tiempo_actual = multiplier.pos  #Frames restantes #En Powerups: pos = Tiempo restante (Frames de vida).
-            tiempo_maximo = 60 * 15   # Duración total (15 seg * 60 FPS)
-            color_barra = (50, 255, 50) # Verde
+            datos_buff = {
+                "sprite": MULTIPLIER,
+                "t_actual": multiplier.pos, #Tiempo restante (frames)
+                "t_max": 60 * 15,  #Tiempo total 60FPS * 15 segundos= 900 frames totales, esto para calcular %
+                "color": (50, 255, 50) # Verde
+            }
+            lista_buffs_activos.append(datos_buff) #Agregamos elemento con todas sus caracteristicas a lista
             
-        elif divisor.state:
-            sprite_buff_activo = DIVISOR
-            tiempo_actual = divisor.pos #Frames restantes #En Powerups: pos = Tiempo restante (Frames de vida).
-            tiempo_maximo = 60 * 15     #Duracion total (15 seg * 60FPS)
-            color_barra = (255, 50, 50) # Rojo
-        # IMPORTANTE: Este objeto NO tiene variable '.state'. 
-        # Usa lógica distinta: si .pos es distinto de -1, significa que está ACTIVO    
-        elif slow_time.pos != -1:
-            sprite_buff_activo = SLOW_TIME
-            tiempo_actual = slow_time.pos  #Frames restantes #En Powerups: pos = Tiempo restante (Frames de vida).
-            tiempo_maximo = 60 * 10 # Duracion total (10 seg * 60fps)
-            color_barra = (50, 100, 255) # Azul
-
-        # 2. DIBUJADO DEL BUFF Y BARRA EN CASO DE BUFF ACTIVO
-        
-        if sprite_buff_activo:
-            #Dibujar icono
-            # Escalamos el sprite a 40x40 para que encaje en el HUD y lo posicionamos
-            ICONO_BUFF = pygame.transform.scale(sprite_buff_activo, (40, 40))
-            screen.blit(ICONO_BUFF, (hud_x + 160, hud_y + 192))
+        # -- Buff 2: Divisor --
+        if divisor.state:
+            datos_buff = {
+                "sprite": DIVISOR,
+                "t_actual": divisor.pos, #Tiempo restante (frames)
+                "t_max": 60 * 15,  #Tiempo total 60FPS * 15 segundos= 900 frames totales, esto para calcular %
+                "color": (255, 50, 50) # Rojo
+            }
+            lista_buffs_activos.append(datos_buff)
             
-            #Dibujar Barra de Tiempo debajo del icono
-            ancho_barra_max = 100
-            alto_barra = 10
-            pos_barra_x = hud_x + 210 # Un poco a la derecha del icono
-            pos_barra_y = hud_y + 208
+        # -- Buff 3: Slow Time --
+        if slow_time.pos != -1: 
+            datos_buff = {
+                "sprite": SLOW_TIME,
+                "t_actual": slow_time.pos,  #Tiempo restante (frames)
+                "t_max": 60 * 10,   #Tiempo total 60FPS * 10 segundos= 600 frames totales, esto para calcular %
+                "color": (50, 100, 255) # Azul
+            }
+            lista_buffs_activos.append(datos_buff)
+        # Si la lista tiene elementos, los dibujamos uno por uno
+        if len(lista_buffs_activos) > 0:
             
-            # Fondo de la barra (Barra vacia: gris oscuro)
-            pygame.draw.rect(screen, (50, 50, 50), (pos_barra_x, pos_barra_y, ancho_barra_max, alto_barra)) 
-            # Porcentaje = Tiempo Restante / Tiempo Total
-            # Evitamos división por cero con max(tiempo_maximo, 1)
-            porcentaje = tiempo_actual / max(tiempo_maximo, 1)
-            #El ancho de la barra rellena es proporcional al porcentaje
-            ancho_actual = int(ancho_barra_max * porcentaje)
-            
-            # Dibujar Relleno (Tiempo Restante - Color Dinámico)
-            pygame.draw.rect(screen, color_barra, (pos_barra_x, pos_barra_y, ancho_actual, alto_barra))
-            
-            # Borde de la barra (blanco fino)
-            pygame.draw.rect(screen, (200, 200, 200), (pos_barra_x, pos_barra_y, ancho_barra_max, alto_barra), 1)
-        #En caso que no haya buffs se escribe texto "Ninguno"
+            # 'i' es el índice (0, 1, 2...) y 'buff' es el diccionario de datos
+            # Multiplicamos el índice por 50px para que no pongan uno encima del otro
+            for i, buff in enumerate(lista_buffs_activos):
+                
+                # Calculamos la altura Y basada en el índice.
+                # Cada buff estará 50 pixeles más abajo que el anterior.
+                offset_y = i * 50 
+                
+                # Dibujar Icono
+                ICONO = pygame.transform.scale(buff["sprite"], (40, 40))
+                # Sumamos 'offset_y' a la altura base
+                screen.blit(ICONO, (hud_x + 160, hud_y + 192 + offset_y))
+                
+                # Dibujar Barra del tiempo
+                ancho_barra_max = 100
+                alto_barra = 10
+                pos_barra_x = hud_x + 210
+                pos_barra_y = hud_y + 208 + offset_y # También bajamos la barra
+                
+                # Fondo barra
+                pygame.draw.rect(screen, (50, 50, 50), (pos_barra_x, pos_barra_y, ancho_barra_max, alto_barra))
+                
+                # Porcentaje = Tiempo Restante / Tiempo Total
+                porcentaje = buff["t_actual"] / max(buff["t_max"], 1)
+                ancho_actual = int(ancho_barra_max * porcentaje)
+                
+                # Relleno barra
+                pygame.draw.rect(screen, buff["color"], (pos_barra_x, pos_barra_y, ancho_actual, alto_barra))
+                
+                # Borde barra
+                pygame.draw.rect(screen, (200, 200, 200), (pos_barra_x, pos_barra_y, ancho_barra_max, alto_barra), 1)
+                
         else:
+            # Si la lista está vacía mensaje "NINGUNO"
             txt_none_buff = fuente_buffs.render("NINGUNO", True, (160, 160, 160))
             screen.blit(txt_none_buff, (hud_x + 160, hud_y + 200))
 

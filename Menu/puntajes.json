@@ -90,5 +90,21 @@
     {
         "nombre": "AAA",
         "player_pts": 2550
+    },
+    {
+        "nombre": "AAA",
+        "player_pts": 350
+    },
+    {
+        "nombre": "AAA",
+        "player_pts": 750
+    },
+    {
+        "nombre": "AAAA",
+        "player_pts": 2850
+    },
+    {
+        "nombre": "AAA",
+        "player_pts": 5550
     }
 ]
