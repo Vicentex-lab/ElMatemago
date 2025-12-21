@@ -22,6 +22,7 @@ CENTRO_Y = ALTO_PANTALLA // 2
 
 # --- CONFIGURACIÓN DEL LABERINTO ---
 TILE = 32  # Tamaño en píxeles de cada celda (o 'tile') del laberinto. Estándar para pixel art.
+#TILE = 28  # Tamaño para la Karina
 
 # Obtiene el número de filas del laberinto (dimensión vertical), definida en colisiones.py
 # Esto se logra midiendo la longitud de la lista principal (que contiene todas las filas).
