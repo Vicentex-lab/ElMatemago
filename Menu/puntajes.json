@@ -10,5 +10,9 @@
     {
         "nombre": "VICENTE",
         "player_pts": 750
+    },
+    {
+        "nombre": "VICE",
+        "player_pts": 1600
     }
 ]
