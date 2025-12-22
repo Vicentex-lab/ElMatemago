@@ -272,7 +272,11 @@ def guardar_preferencias():
     }
     
     # 2. Escribir el diccionario en el archivo JSON
+    #Se utiliza with ya que al terminar el bloque de código dentro de with Python automáticamente
+    #llama al método archivo.close(), que de lo contrario habría que hacerlo manualmente y además garantiza
+    #que siempre se cierre
     with open(ARCHIVO_PREFERENCIAS, 'w') as f:
+        #Convertir el diccionario a formato JSON
         json.dump(datos, f, indent=4)
     
     print("Configuración guardada.")   
@@ -475,11 +479,17 @@ def es_top_3(player_pts):
     todos_los_puntajes = []
     
     # 2. Intentar cargar los puntajes existentes
+    # Verifica si el archivo JSON existe.
     if os.path.exists(RUTA_PUNTAJES):
         try:
+            #Se utiliza with ya que al terminar el bloque de código dentro de with Python automáticamente
+            #llama al método archivo.close(), que de lo contrario habría que hacerlo manualmente y además garantiza
+            #que siempre se cierre
             with open(RUTA_PUNTAJES, "r") as archivo:
+                # Carga la lista completa de puntajes.
                 todos_los_puntajes = json.load(archivo)
         except (json.JSONDecodeError, IOError):
+            # Ignora errores en la lectura y simplemente usa la lista vacía 'todos_los_puntajes = []'.
             todos_los_puntajes = []
 
     # 2. Si hay menos de 3 puntajes y el puntaje es mayor a 0, el puntaje califica
@@ -487,6 +497,11 @@ def es_top_3(player_pts):
         return True
 
     # 3. Si ya hay 3 o más, ordenar y comparar con el tercero
+    
+    # Ordena la lista de diccionarios.
+        #'key=lambda x: x["player_pts"]' indica que el criterio de ordenamiento --> (lambda es una función sin nombre que se define en una sola línea)
+        # es el valor asociado a la clave "player_pts" en cada diccionario.
+        # 'reverse=True' indica que el orden debe ser descendente (de mayor a menor).
     todos_los_puntajes.sort(key=lambda x: x["player_pts"], reverse=True)
     tercer_mejor_puntaje = todos_los_puntajes[2]["player_pts"]
     
