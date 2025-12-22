@@ -20,7 +20,7 @@ class powerup(item.item):
 class speed_boost(item.item):
     def __init__(self):
         super().__init__(
-            name="2x",
+            name="e",
             places_y=0,
             places_x=0,
             damage=0,
