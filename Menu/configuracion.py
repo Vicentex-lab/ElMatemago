@@ -61,6 +61,7 @@ RUTA_SFX_ITEM = "./assets/sfx/Get_item.wav"
 RUTA_SFX_ENEMY_DIE = "./assets/sfx/Enemy_die.wav"
 RUTA_SFX_PLAYER_HURT = "./assets/sfx/Player_hurt.wav"
 RUTA_SFX_GAME_OVER = "./assets/sfx/Game_over.wav"
+RUTA_SFX_BUFF = "./assets/sfx/Get_buff.wav"
 SFX_LIBRARY = {} # Este diccionario global almacenará todos los objetos pygame.mixer.Sound cargados. Se inicializa vacío ({}) para que 'cargar_sfx()' pueda llenarlo al inicio del juego.
 
 # Obtiene el directorio base del archivo actual (configuracion.py), útil para referencias relativas.
@@ -115,7 +116,8 @@ def cargar_sfx():
         "item_pickup": RUTA_SFX_ITEM,
         "enemy_die": RUTA_SFX_ENEMY_DIE,
         "player_hurt": RUTA_SFX_PLAYER_HURT,
-        "game_over": RUTA_SFX_GAME_OVER
+        "game_over": RUTA_SFX_GAME_OVER,
+        "buff_pickup": RUTA_SFX_BUFF
         # Añadir aquí más sonidos
     }
     
@@ -349,7 +351,7 @@ def obtener_nombre(screen, player_pts):
         # Usamos un try/except para get_letra por si no está definida
         try:
             # Título principal de la pantalla.
-            texto_titulo = get_letra(60).render("¡FIN DEL JUEGO!", True, COLOR_CURSOR)
+            texto_titulo = get_letra(60).render("¡NUEVO RECORD!", True, COLOR_CURSOR)
             # Muestra el puntaje obtenido.
             texto_score = get_letra(40).render(f"PUNTAJE: {player_pts}", True, COLOR_TEXTO)
             # Instrucción para el usuario.
@@ -357,7 +359,7 @@ def obtener_nombre(screen, player_pts):
         except NameError:
             # Fallback simple si la función de fuente no está disponible
             font = pygame.font.Font(None, 60)
-            texto_titulo = font.render("¡FIN DEL JUEGO!", True, COLOR_CURSOR)
+            texto_titulo = font.render("¡NUEVO RECORD!", True, COLOR_CURSOR)
             texto_score = font.render(f"PUNTAJE: {player_pts}", True, COLOR_TEXTO)
             texto_prompt = font.render("INGRESA TU NOMBRE (SOLO LETRAS):", True, COLOR_TEXTO)
 
