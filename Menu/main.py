@@ -459,11 +459,13 @@ def opciones():
                     
                 #Cambia la variable a normal cuando se presioona el botón    
                 if BOTON_NORMAL.checkForInput(POS):
-                    cfg.DIFICULTAD_GLOBAL = "NORMAL"  
+                    cfg.DIFICULTAD_GLOBAL = "NORMAL"
+                    cfg.guardar_preferencias()  
                     
                 #Cambia la variable a difícil cuando se presiona el botón    
                 if BOTON_DIFICIL.checkForInput(POS):
-                    cfg.DIFICULTAD_GLOBAL = "DIFICIL"  
+                    cfg.DIFICULTAD_GLOBAL = "DIFICIL"
+                    cfg.guardar_preferencias()  
                     
                 #Activa SFX cuando se presiona el botón
                 if BOTON_SI_SFX.checkForInput(POS):
