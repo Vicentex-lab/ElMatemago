@@ -150,16 +150,18 @@ def jugar(SCREEN):
             lista_buffs_activos.append(datos_buff)
         # Si la lista tiene elementos, los dibujamos uno por uno
         if len(lista_buffs_activos) > 0:
-            
-            # 'i' es el índice (0, 1, 2...) y 'buff' es el diccionario de datos
-            # Multiplicamos el índice por 50px para que no pongan uno encima del otro
+           
+          # 'enumerate' devuelve pares: (0, primer_buff), (1, segundo_buff), etc.
+          # Desempaquetamos esos pares en dos variables:
+            #   - 'i': El número de orden (0, 1, 2...). Vital para calcular la posición Y (offset_y).
+            #   - 'buff': El diccionario con los datos reales (sprite, color, tiempo).
             for i, buff in enumerate(lista_buffs_activos):
                 
                 # Calculamos la altura Y basada en el índice.
                 # Cada buff estará 50 pixeles más abajo que el anterior.
                 offset_y = i * 50 
                 
-                # Dibujar Icono
+                # Dibujar Icono a escala para que quepa en hud
                 ICONO = pygame.transform.scale(buff["sprite"], (40, 40))
                 # Sumamos 'offset_y' a la altura base
                 screen.blit(ICONO, (hud_x + 160, hud_y + 192 + offset_y))
@@ -167,17 +169,24 @@ def jugar(SCREEN):
                 # Dibujar Barra del tiempo
                 ancho_barra_max = 100
                 alto_barra = 10
+                # Coordenadas de la barra (también desplazadas por offset_y)
                 pos_barra_x = hud_x + 210
                 pos_barra_y = hud_y + 208 + offset_y # También bajamos la barra
                 
                 # Fondo barra
                 pygame.draw.rect(screen, (50, 50, 50), (pos_barra_x, pos_barra_y, ancho_barra_max, alto_barra))
                 
-                # Porcentaje = Tiempo Restante / Tiempo Total
+                # 1. CALCULAR PORCENTAJE (0.0 a 1.0)
+                # Divide tiempo actual entre total. max() evita errores si t_max es 0.
+                #max(A, B) compara dos números y devuelve el más grande.
+                #Aquí sirve para evitar una división por cero
                 porcentaje = buff["t_actual"] / max(buff["t_max"], 1)
+                # 2. CONVERTIR A PÍXELES
+                # Aplica el porcentaje al ancho máximo (100px) para obtener el tamaño real.
+                #esta parte va cambiando en cada iteracion y es que tan llena esta la barra:
                 ancho_actual = int(ancho_barra_max * porcentaje)
                 
-                # Relleno barra
+                # Dibuja la barra de color con el ancho calculado (dinámico).
                 pygame.draw.rect(screen, buff["color"], (pos_barra_x, pos_barra_y, ancho_actual, alto_barra))
                 
                 # Borde barra
