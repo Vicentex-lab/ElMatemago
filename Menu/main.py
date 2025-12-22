@@ -7,6 +7,9 @@ import items as item
 import random
 import configuracion as cfg
 from juego import jugar as iniciar_juego # Importa la función principal del juego desde 'juego.py'
+#Sprites simulacion animacion movimiento mago
+from sprites import (ANIMACION_DERECHA, ANIMACION_IZQUIERDA, 
+                     ANIMACION_ATRAS, ANIMACION_FRENTE)
 
 # Inicializa todos los módulos necesarios de Pygame
 pygame.init() 

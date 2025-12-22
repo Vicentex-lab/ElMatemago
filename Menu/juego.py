@@ -202,9 +202,9 @@ def jugar(SCREEN):
     
     
     
-    from sprites import MAGO_1, MAGO_2, MAGO_3,MAGO_4
+    from sprites import ANIMACION_ATRAS,ANIMACION_DERECHA,ANIMACION_FRENTE,ANIMACION_IZQUIERDA
     # --- Animación del mago Mago izquierda derecha
-    player_sprite = MAGO_4      # sprite actual del mago 
+    lista_actual = ANIMACION_FRENTE    # sprite actual del mago 
     # Variables para efecto de flotacion en mago
     float_offset = 0
     float_direction = 1
@@ -440,24 +440,24 @@ def jugar(SCREEN):
                 if event.key in (pygame.K_w, pygame.K_UP):
                     deseada_x = 0
                     deseada_y = -1  
-                    player_sprite = MAGO_3 
+                    lista_actual = ANIMACION_ATRAS 
                 # --- ABAJO (S) ---
                 if event.key in (pygame.K_s, pygame.K_DOWN):
                     deseada_x = 0
                     deseada_y = 1
-                    player_sprite = MAGO_4  
+                    lista_actual = ANIMACION_FRENTE 
                 
                 # --- IZQUIERDA (A) --
                 if event.key in (pygame.K_a, pygame.K_LEFT):
                 
                     deseada_x = -1
                     deseada_y = 0 
-                    player_sprite = MAGO_2
+                    lista_actual = ANIMACION_IZQUIERDA
                 # --- DERECHA (D) --
                 if event.key in (pygame.K_d, pygame.K_RIGHT):
                     deseada_x = 1
                     deseada_y = 0
-                    player_sprite = MAGO_1
+                    lista_actual = ANIMACION_DERECHA
 
    
         # Convierte la posición de píxeles a casilla
@@ -832,14 +832,25 @@ def jugar(SCREEN):
         # Si el desplazamiento supera -2 píxeles, el mago debe empezar a moverse hacia abajo.
         elif float_offset < -2:
             float_direction = 1
-        #Misma lógica de dibujado pero con sprite animado y flotamiento
+                # --- LÓGICA DE ANIMACIÓN ---
+        if dir_x == 0 and dir_y == 0:
+            # Si está quieto, usamos el frame 0 (estático)
+            frame = 0
+        else:
+            # Si se mueve, alternamos frame cada 200 milisegundos aprox.
+            # pygame.time.get_ticks() // 200 nos da un número que cambia cada 0.2 seg
+            # % 2 hace que ese número solo sea 0 o 1
+            frame = (pygame.time.get_ticks() // 200) % 2 
+        
+        # --- DIBUJO DEL MAGO ---
         screen.blit(
-            player_sprite,
+            lista_actual[frame], # Selecciona el frame 0 o 1 de la lista activa
             (
                 player_x * cfg.TILE + cfg.offset_x,
                 player_y * cfg.TILE + cfg.offset_y + float_offset
             )
         )
+                
         
         temporizador+=1
         if colision_detected==True:
