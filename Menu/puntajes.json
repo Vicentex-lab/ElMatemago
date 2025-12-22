@@ -18,5 +18,13 @@
     {
         "nombre": "XD",
         "player_pts": 350
+    },
+    {
+        "nombre": "A",
+        "player_pts": 100
+    },
+    {
+        "nombre": "A",
+        "player_pts": 1500
     }
 ]

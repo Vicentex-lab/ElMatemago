@@ -1,4 +1,3 @@
-
 import pygame, sys
 import random
 import configuracion as cfg
@@ -30,17 +29,8 @@ def jugar(SCREEN):
         hud_w = 320          # ancho del hud
         hud_h = 360         # alto del hud
     
-        # Se crea una superficie especial para el HUD con transparencia.
-        # Esto permite tener un recuadro semitransparente encima del juego
-        #pygame.surface es modulo para construir lienzo para modificarlo
-        #Recibe 2 parametros, el primero tupla (ancho,largo)
-    
         hud_surface = pygame.Surface((hud_w, hud_h), pygame.SRCALPHA) 
-        #pygame.SRCALPHA es para que la superficie que dibujamos permita transparencia por pixel y podamos dibujar encima
-        #En este caso 160 es la transparencia
-        #R,G,B, transparencia
-        hud_surface.fill((25, 30, 80, 160))  # Se rellana superficie, con transparencia 25 y colores
-        #Metodo .fill es para rellenar Surfaces con colores
+        hud_surface.fill((25, 30, 80, 160)) 
     
         #Se dibuja un borde dorado alrededor del HUD
         pygame.draw.rect(hud_surface, (255, 210, 60),  # Color dorado en formato rgb
@@ -49,12 +39,10 @@ def jugar(SCREEN):
                          border_radius=18)     #Bordes redondeados, suaviza esquinas
     
         # Finalmente se coloca el HUD completo en la pantalla principal.
-        #.blit() "pega" una Surface sobre otra.
-        #Se dibuja hud en coordenadas superiores izquierdas
         screen.blit(hud_surface, (hud_x, hud_y))
     
         #SECCIÓN: PUNTAJE
-        fuente = cfg.get_letra(22)   #Funcion en cfg para retornar texto en pygame con tamaño 22
+        fuente = cfg.get_letra(22)   
         # 1. Dibujamos la etiqueta "PUNTAJE:"
         txt_label_pts = fuente.render("PUNTAJE:", True, (255, 255, 120))   
         screen.blit(txt_label_pts, (hud_x + 30, hud_y + 20))
@@ -63,26 +51,21 @@ def jugar(SCREEN):
         screen.blit(txt_value_pts, (hud_x + 205, hud_y + 20))
     
         # SECCIÓN: VIDA 
-        fuente_vida = cfg.get_letra(22)  #Funcion en cfg para retornar texto en pygame con tamaño 22
-        #.render convierte string en surface, mostramos puntaje jugador, True es para bordes suaves no pixelados
+        fuente_vida = cfg.get_letra(22)  
         txt_vida = fuente_vida.render("VIDA:", True, (255, 255, 255))
-        #.render convierte string en surface, mostramos puntaje jugador, True es para bordes suaves no pixelados
         screen.blit(txt_vida, (hud_x + 30, hud_y + 80))
         #nueva variable con corazon reescalado para que encaje con tamaño hud, escala 28x28
         CORAZON_HUD = pygame.transform.scale(CORAZON, (28, 28)) 
         # Dibujamos un corazón por cada punto de vida
-        #Ciclo for para dibujar corazones, cada uno cambiara en "i * 32" pixeles a la derecha
         for i in range(player_hp):
             screen.blit(CORAZON_HUD, (hud_x + 160 + i*32, hud_y + 78)) 
     
         # SECCIÓN: ITEM
-        fuente_item = cfg.get_letra(22)  #Funcion en cfg para retornar texto en pygame con tamaño 22
+        fuente_item = cfg.get_letra(22)  
         txt_item = fuente_item.render("ITEM:", True, (255, 255, 255))
-        #.render convierte string en surface, mostramos puntaje jugador, True es para bordes suaves no pixelados
-        screen.blit(txt_item, (hud_x + 30, hud_y + 140)) # Se dibuja HUD creado en pantalla con su texto con sus coordenadas
+        screen.blit(txt_item, (hud_x + 30, hud_y + 140)) 
     
         # Selección del sprite del ítem
-        #Segun que item tenga jugador lo mostraremos en pantalla con su respectivo sprite
         if player_item == sword.name:
             sprite = ESPADA
         elif player_item == shield.name:
@@ -90,22 +73,16 @@ def jugar(SCREEN):
         elif player_item == ring.name:
             sprite = ANILLO
         else:
-            sprite = None  # Si no tiene ítem, no hay imagen que mostrar
-        # En caso que sprite != None 
-        #Sprite tiene valor falso y se ejecutara else
+            sprite = None  
         
         #Dibujaremos todo dentro de HUD
         if sprite:
-            ITEM_HUD = pygame.transform.scale(sprite, (40, 40))  # Tamaño ideal de items para HUD
-            #Dibujamos todo en pantalla con .blit()
+            ITEM_HUD = pygame.transform.scale(sprite, (40, 40))  
             screen.blit(ITEM_HUD, (hud_x + 160, hud_y + 132))
         else:
             # Si NO hay un ítem equipado, se escribe la palabra "NINGUNO"
             txt_none = fuente_item.render("NINGUNO", True, (160, 160, 160)) 
-            #.render convierte string en surface, mostramos puntaje jugador, True es para bordes suaves no pixelados
             screen.blit(txt_none, (hud_x + 160, hud_y + 140))
-        
-        
         
         
         # SECCION BUFFS
@@ -127,7 +104,7 @@ def jugar(SCREEN):
                 "t_max": 60 * 15,  #Tiempo total 60FPS * 15 segundos= 900 frames totales, esto para calcular %
                 "color": (50, 255, 50) # Verde
             }
-            lista_buffs_activos.append(datos_buff) #Agregamos elemento con todas sus caracteristicas a lista
+            lista_buffs_activos.append(datos_buff) 
             
         # -- Buff 2: Divisor --
         if divisor.state:
@@ -150,13 +127,7 @@ def jugar(SCREEN):
             lista_buffs_activos.append(datos_buff)
         # Si la lista tiene elementos, los dibujamos uno por uno
         if len(lista_buffs_activos) > 0:
-            
-            # 'i' es el índice (0, 1, 2...) y 'buff' es el diccionario de datos
-            # Multiplicamos el índice por 50px para que no pongan uno encima del otro
             for i, buff in enumerate(lista_buffs_activos):
-                
-                # Calculamos la altura Y basada en el índice.
-                # Cada buff estará 50 pixeles más abajo que el anterior.
                 offset_y = i * 50 
                 
                 # Dibujar Icono
@@ -168,7 +139,7 @@ def jugar(SCREEN):
                 ancho_barra_max = 100
                 alto_barra = 10
                 pos_barra_x = hud_x + 210
-                pos_barra_y = hud_y + 208 + offset_y # También bajamos la barra
+                pos_barra_y = hud_y + 208 + offset_y 
                 
                 # Fondo barra
                 pygame.draw.rect(screen, (50, 50, 50), (pos_barra_x, pos_barra_y, ancho_barra_max, alto_barra))
@@ -192,15 +163,13 @@ def jugar(SCREEN):
     FILAS = len(colision.maze)
     COLUMNAS = len(colision.maze[0])
     
-    screen = SCREEN # Usar la variable pasada como argumento
+    screen = SCREEN 
     clock = pygame.time.Clock()
     
     #Definiciones del jugador
     player_y = cr.player.positions_y
     player_x = cr.player.positions_x
     player_hp = cr.player.hp
-    
-    
     
     from sprites import MAGO_1, MAGO_2, MAGO_3,MAGO_4
     # --- Animación del mago Mago izquierda derecha
@@ -364,13 +333,6 @@ def jugar(SCREEN):
             if ring.actual_x!=sword.actual_x and ring.actual_y!=sword.actual_y and ring.actual_x!=shield.actual_x and ring.actual_y!=shield.actual_y:
                 break
             
-        #spawnear powerups
-        #speed_boost=pw.speed_boost()
-        #while True:
-        #    speed_boost.random_spawn()
-        #    if speed_boost.actual_x!=sword.actual_x and speed_boost.actual_y!=sword.actual_y and speed_boost.actual_x!=shield.actual_x and speed_boost.actual_y!=shield.actual_y and speed_boost.actual_x!=ring.actual_x and speed_boost.actual_y!=ring.actual_y:
-        #        break
-                
         slow_time=pw.slow_time()
         while True:
             slow_time.random_spawn()
@@ -414,7 +376,20 @@ def jugar(SCREEN):
     pos_x = player_x * cfg.TILE   #cfg.tile es el tamaño de una casilla en pixeles
     pos_y = player_y * cfg.TILE
 
-    speed = 4  # velocidad (pixeles por frame)
+    speed = 2  # velocidad (pixeles por frame)
+
+    # =========================
+    # KONAMI CODE CONFIG
+    # =========================
+    konami_code = [
+        pygame.K_UP, pygame.K_UP,
+        pygame.K_DOWN, pygame.K_DOWN,
+        pygame.K_LEFT, pygame.K_RIGHT,
+        pygame.K_LEFT, pygame.K_RIGHT,
+        pygame.K_b, pygame.K_a
+    ]
+    konami_buffer = []
+    konami_active = False
 
     running = True
 
@@ -428,15 +403,76 @@ def jugar(SCREEN):
             if event.type == pygame.QUIT:
                 running = False
             
-            # --- AÑADIR MANEJO DE ESCAPE EN JUEGO ---
+            # --- MANEJO DE TECLAS Y CHEATS ---
             if event.type == pygame.KEYDOWN:
+                
+                # 1. Lógica de Activación KONAMI
+                konami_buffer.append(event.key)
+                if len(konami_buffer) > len(konami_code):
+                    konami_buffer.pop(0)
+                
+                if konami_buffer == konami_code:
+                    konami_active = True
+                    inmunidad = 1
+                    invul_frames = 999999
+                    print("CÓDIGO KONAMI ACTIVADO: MODO DIOS ACTIVADO")
+                    konami_buffer = []
+
+                # 2. Cheats Activos
+                if konami_active:
+                    if event.key == pygame.K_1:
+                        cero.exist = 1
+                        pigarto.exist = 1
+                        raiznegativa.exist = 1
+                        print(">> Cheat: Enemigos generados")
+                    if event.key == pygame.K_2:
+                        # Revivir y re-posicionar Espada
+                        sword.exist = 1
+                        sword.spawn()
+                        
+                        # Revivir y re-posicionar Escudo (evitando la espada)
+                        shield.exist = 1
+                        while True:
+                            shield.spawn()
+                            if shield.actual_x != sword.actual_x or shield.actual_y != sword.actual_y:
+                                break
+                        
+                        # Revivir y re-posicionar Anillo (evitando espada y escudo)
+                        ring.exist = 1
+                        while True:
+                            ring.spawn()
+                            if (ring.actual_x != sword.actual_x or ring.actual_y != sword.actual_y) and \
+                               (ring.actual_x != shield.actual_x or ring.actual_y != shield.actual_y):
+                                break
+                                
+                        print(">> Cheat: Ítems generados (Espada, Escudo, Anillo)")
+                        
+                    if event.key == pygame.K_3:
+                        multiplier.random_spawn()
+                        divisor.random_spawn()
+                        slow_time.random_spawn()
+                        print(">> Cheat: PowerUps generados")
+                    """
+                    if event.key == pygame.K_4:
+                        speed += 1
+                        print(f">> Cheat: Velocidad aumentada a {speed}")
+                    if event.key == pygame.K_5:
+                        speed = max(1, speed - 1)
+                        print(f">> Cheat: Velocidad reducida a {speed}")
+                    """
+                    if event.key == pygame.K_0:
+                        konami_active = False
+                        inmunidad = 0
+                        invul_frames = invul_base
+                        print(">> Cheat: Trucos desactivados")
+
+                # --- ESCAPE ---
                 if event.key == pygame.K_ESCAPE:
                     pygame.mixer.music.stop()
-                    running = False # Detiene el bucle para salir o ir a Game Over
+                    running = False 
                     return True 
 
-            if event.type == pygame.KEYDOWN:
-                # --- ARRIBA (W) ---
+                # --- MOVIMIENTO (W, A, S, D) ---
                 if event.key in (pygame.K_w, pygame.K_UP):
                     deseada_x = 0
                     deseada_y = -1  
@@ -505,7 +541,7 @@ def jugar(SCREEN):
         
         #SPAWNEO EN MITAD DE PARTIDA
         spawn_chance=random.randint(1, 60*30)
-        print("contador random:", spawn_chance)
+        # print("contador random:", spawn_chance) # Comentado para limpiar consola
         if spawn_chance==1 and multiplier.spawned==False:
             while True:
                 multiplier.random_spawn()
@@ -711,18 +747,6 @@ def jugar(SCREEN):
             cfg.play_sfx("item_pickup")
             
         #Power-ups
-        """
-        #Funcionaria de no ser por un problema con los cambios de velocidad del jugador.
-        if speed_boost.colision(player_y, player_x):
-            if speed_boost.pos==-1: #es la forma auxiliar de expresar que la variable no se ha usado
-                speed_boost.pos=60*4 #pos se usará como auxiliar para contar la cnatidad de frames (frame*segunodp)
-                speed=4 #tiene que ser divisor de 32
-            else:
-                speed_boost.pos-=1
-                #if speed_boost.pos==0:
-                #    speed=2
-                #    speed_boost.pos=-1 #resetear variable auxiliar
-        """
         if slow_time.colision(player_y, player_x):
             if multiplier.state==True and divisor.state==False:
                 player_pts+=slow_time.pts*2
@@ -771,60 +795,28 @@ def jugar(SCREEN):
             
         # DIBUJO DE todo LO QUE SE VE EN PANTALLA
         #Mapa
-        #for anidado para recorrer todas las filas (r) y columnas (c)
-        #matriz.maze contiene valores si una celda es pared (0)
-        #suelo transitable (1) o teletransporte (2) o (3)
-        #al momento de dibujar solo se distingue entre pared y suelo
         for r in range(FILAS):
             for c in range(COLUMNAS):
-                # Calculamos la posición en píxeles donde se dibujará cada tile.
-                # Se multiplica la columna/fila por el tamaño del tile (32 px)
-                # y se suma offset_x/y para centrar visualmente el laberinto en pantalla.
-                #Recorremos matriz y multiplicamos por 32
-                #Por ejemplo si tenemos (0,1) se dibuja en (32px, 0px)
-                #Se le suma offset_x/y para dibujar mapa centrado y que no empieze en (0,0)
                 x = c * cfg.TILE + cfg.offset_x
                 y = r * cfg.TILE + cfg.offset_y
-                #Si celda vale 0 sera una pared y se dibuja en sus respectivas cordenas con .blit()
                 if colision.maze[r][c] == 0:
                     screen.blit(WALL, (x, y))
-                #En cualquier otro caso 1,2,3 sera dibujado como suelo transitable
                 else:
                     screen.blit(FLOOR, (x, y))
           
         # ENEMIGOS 
-        # Cada enemigo tiene su propio método .dibujar(), el cual sabe
-        # cómo colocarse correctamente en la pantalla según su posición (x, y).
-        # screen: superficie principal donde se dibuja el juego
-        # CERO: sprite del enemigo
-        # cfg.TILE: tamaño de cada tile del mapa (32 px)
-        # cfg.offset_x / cfg.offset_y: desplazamiento para centrar el laberinto
         cero.dibujar(screen, CERO, cfg.TILE, cfg.offset_x, cfg.offset_y)
         pigarto.dibujar(screen, PIGARTO, cfg.TILE, cfg.offset_x, cfg.offset_y)
         raiznegativa.dibujar(screen, RAIZNEGATIVA, cfg.TILE, cfg.offset_x, cfg.offset_y)
         
         #ITEMS
-        # ITEMS
-        # Cada ítem tiene su propio método .draw(), el cual sabe
-        # cómo colocarse correctamente en la pantalla según su posición dentro del mapa.
-        # screen: superficie principal donde se dibuja el juego.
-        # El método .draw() se encarga internamente de:
-        #   - convertir la posición del ítem en la matriz (fila, columna)
-        #     a coordenadas de píxeles usando TILE.
-        #   - aplicar offset_x y offset_y para centrar el mapa en pantalla.
-        #   - dibujar su sprite en la ubicación correcta del laberinto.
         sword.draw(screen)
         shield.draw(screen)
         ring.draw(screen)
-        #speed_boost.draw(screen)
         slow_time.draw(screen)
         multiplier.draw(screen)
         divisor.draw(screen)
         # EFECTO DE FLOTACIÓN DEL MAGO ARRIBA/ABAJO
-        #float_offset es cambio constante en eje y
-        """ float_offset = 0----> desplazamiento vertical que se suma a mago, ej con 1 baja 1 pixel con -2 sube 2 pixeles
-            float_direction = 1   1---> se mueve hacia abajo y -1 hacia arriba
-        """
         float_offset += float_direction * 0.2
         # Si el desplazamiento supera +2 píxeles, el mago debe empezar a moverse hacia arriba.
         if float_offset > 2:
