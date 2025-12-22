@@ -852,10 +852,10 @@ def jugar(SCREEN):
             # Si está quieto, usamos el frame 0 (estático)
             frame = 0
         else:
-            # Si se mueve, alternamos frame cada 200 milisegundos aprox.
-            # pygame.time.get_ticks() // 200 nos da un número que cambia cada 0.2 seg
-            # % 2 hace que ese número solo sea 0 o 1
             # AQUÍ ESTÁ LA DEPENDENCIA DEL TIEMPO, por esta parte al dibujar mago varia entre indice 0 y 1 
+            #getticks obtiene tiempo total
+            # Si se mueve, alternamos frame cada 0,2 segundos
+            # % 2 hace que ese número solo sea 0 o 1 
             frame = (pygame.time.get_ticks() // 200) % 2 
         
         # --- DIBUJO DEL MAGO ---
