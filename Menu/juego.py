@@ -404,12 +404,12 @@ def jugar(SCREEN):
                 running = False
             
             # --- MANEJO DE TECLAS Y CHEATS ---
-            if event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN:     #Revisa si las acciones del jugador son presionar una tecla
                 
                 # 1. Lógica de Activación KONAMI
-                konami_buffer.append(event.key)
+                konami_buffer.append(event.key)      #Agrega un elemento al final de una lista
                 if len(konami_buffer) > len(konami_code):
-                    konami_buffer.pop(0)
+                    konami_buffer.pop(0)    #pop borra el ultimo elemento de la lista
                 
                 if konami_buffer == konami_code:
                     konami_active = True
