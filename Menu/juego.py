@@ -436,6 +436,8 @@ def jugar(SCREEN):
                     return True 
 
             if event.type == pygame.KEYDOWN:
+                
+                #DE BASE: lista_actual = ANIMACION_FRENTE    # sprite actual del mago 
                 # --- ARRIBA (W) ---
                 if event.key in (pygame.K_w, pygame.K_UP):
                     deseada_x = 0
@@ -825,7 +827,7 @@ def jugar(SCREEN):
         divisor.draw(screen)
         # EFECTO DE FLOTACIÓN DEL MAGO ARRIBA/ABAJO
         #float_offset es cambio constante en eje y
-        """ float_offset = 0----> desplazamiento vertical que se suma a mago, ej con 1 baja 1 pixel con -2 sube 2 pixeles
+        """ float_offset = 0   ----> desplazamiento vertical que se suma a mago, ej con 1 baja 1 pixel con -2 sube 2 pixeles
             float_direction = 1   1---> se mueve hacia abajo y -1 hacia arriba
         """
         float_offset += float_direction * 0.2
@@ -836,6 +838,7 @@ def jugar(SCREEN):
         elif float_offset < -2:
             float_direction = 1
                 # --- LÓGICA DE ANIMACIÓN ---
+        # Si el vector dirección es (0,0), el mago está en reposo.
         if dir_x == 0 and dir_y == 0:
             # Si está quieto, usamos el frame 0 (estático)
             frame = 0
@@ -843,6 +846,7 @@ def jugar(SCREEN):
             # Si se mueve, alternamos frame cada 200 milisegundos aprox.
             # pygame.time.get_ticks() // 200 nos da un número que cambia cada 0.2 seg
             # % 2 hace que ese número solo sea 0 o 1
+            # AQUÍ ESTÁ LA DEPENDENCIA DEL TIEMPO, por esta parte al dibujar mago varia entre indice 0 y 1 
             frame = (pygame.time.get_ticks() // 200) % 2 
         
         # --- DIBUJO DEL MAGO ---

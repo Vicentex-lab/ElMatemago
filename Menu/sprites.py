@@ -15,6 +15,8 @@ def load(name, recortar):
     img = pygame.image.load(path) 
     # Solo aplicamos el recorte si se pide explícitamente
     if recortar:
+        # get_bounding_rect(): Calcula el rectángulo más pequeño posible que encierra 
+        # todos los píxeles que NO son completamente transparentes.
         rect_contenido = img.get_bounding_rect()
         img = img.subsurface(rect_contenido)
     # Escala la imagen para que ocupe exactamente un tile del laberinto.
@@ -34,7 +36,7 @@ MAGO_1_B = load("MAGO_1_B", recortar=False) # Derecha
 MAGO_2_B = load("MAGO_2_B", recortar=False) # Izquierda
 MAGO_3_B = load("MAGO_3_B", recortar=False) # Espalda
 MAGO_4_B = load("MAGO_4_B", recortar=False) # Frente
-# 2. Las guardamos en LISTAS (Frame 0 y Frame 1)
+# 2. Las guardamos en LISTAS (Frame 0 y Frame 1 que se iran alternando)
 ANIMACION_DERECHA = [MAGO_1, MAGO_1_B]
 ANIMACION_IZQUIERDA = [MAGO_2, MAGO_2_B]
 ANIMACION_ATRAS = [MAGO_3, MAGO_3_B]
