@@ -550,7 +550,7 @@ def jugar(SCREEN):
                 cfg.play_sfx("player_hurt")
                 print("💀 cero")
                 pygame.mixer.music.stop() 
-                if player_pts > 0:
+                if cfg.es_top_3(player_pts):
                     cfg.guardar_nuevo_puntaje(screen, player_pts)
                     return True #Volver al menú
                 else:
@@ -606,7 +606,7 @@ def jugar(SCREEN):
                 cfg.play_sfx("player_hurt")
                 print("💀 pigarto")
                 pygame.mixer.music.stop() 
-                if player_pts > 0:
+                if cfg.es_top_3(player_pts):
                     cfg.guardar_nuevo_puntaje(screen, player_pts)
                     return True #Volver al menú
                 else:
@@ -655,7 +655,7 @@ def jugar(SCREEN):
                 cfg.play_sfx("player_hurt")
                 print("💀 raiz")
                 pygame.mixer.music.stop() 
-                if player_pts > 0:
+                if cfg.es_top_3(player_pts):
                     cfg.guardar_nuevo_puntaje(screen, player_pts)
                     return True #Volver al menú 
                 else:
@@ -724,6 +724,7 @@ def jugar(SCREEN):
                 #    speed_boost.pos=-1 #resetear variable auxiliar
         """
         if slow_time.colision(player_y, player_x):
+            cfg.play_sfx("buff_pickup")
             if multiplier.state==True and divisor.state==False:
                 player_pts+=slow_time.pts*2
             elif divisor.state==True and multiplier.state==False:
@@ -748,6 +749,7 @@ def jugar(SCREEN):
                 slow_time.pos=-1 #resetear variable auxiliar
                 
         if multiplier.colision(player_y, player_x):
+            cfg.play_sfx("buff_pickup")
             if multiplier.pos==-1:
                 multiplier.pos=60*15
                 multiplier.state=True
@@ -759,6 +761,7 @@ def jugar(SCREEN):
                 multiplier.state=False
         
         if divisor.colision(player_y, player_x):
+            cfg.play_sfx("buff_pickup")
             if divisor.pos==-1:
                 divisor.pos=60*15
                 divisor.state=True
