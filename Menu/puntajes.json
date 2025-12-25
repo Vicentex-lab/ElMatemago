@@ -1,110 +1,18 @@
 [
     {
         "nombre": "VICENTE",
-        "player_pts": 2500
+        "player_pts": 6100
+    },
+    {
+        "nombre": "TEST",
+        "player_pts": 250
     },
     {
         "nombre": "VICENTE",
-        "player_pts": 2500
-    },
-    {
-        "nombre": "AAA",
-        "player_pts": 250
-    },
-    {
-        "nombre": "AAA",
-        "player_pts": 850
-    },
-    {
-        "nombre": "AAAA",
-        "player_pts": 1000
-    },
-    {
-        "nombre": "MMMM",
-        "player_pts": 1750
-    },
-    {
-        "nombre": "A",
         "player_pts": 750
     },
     {
-        "nombre": "AAA",
-        "player_pts": 250
-    },
-    {
-        "nombre": "AAA",
-        "player_pts": 1500
-    },
-    {
-        "nombre": "AA",
-        "player_pts": 750
-    },
-    {
-        "nombre": "AAAA",
-        "player_pts": 1500
-    },
-    {
-        "nombre": "DXD",
-        "player_pts": 750
-    },
-    {
-        "nombre": "L",
-        "player_pts": 350
-    },
-    {
-        "nombre": "XDSADFF",
-        "player_pts": 1100
-    },
-    {
-        "nombre": "XD",
-        "player_pts": 350
-    },
-    {
-        "nombre": "XD",
-        "player_pts": 250
-    },
-    {
-        "nombre": "FUCK",
-        "player_pts": 700
-    },
-    {
-        "nombre": "XD",
-        "player_pts": 750
-    },
-    {
-        "nombre": "XD",
-        "player_pts": 2075
-    },
-    {
-        "nombre": "LOL",
-        "player_pts": 2100
-    },
-    {
-        "nombre": "XD",
-        "player_pts": 850
-    },
-    {
-        "nombre": "A",
-        "player_pts": 750
-    },
-    {
-        "nombre": "AAA",
-        "player_pts": 2550
-    },
-    {
-        "nombre": "AAA",
-        "player_pts": 350
-    },
-    {
-        "nombre": "AAA",
-        "player_pts": 750
-    },
-    {
-        "nombre": "AAAA",
-        "player_pts": 2850
-    },
-    {
-        "nombre": "AAA",
-        "player_pts": 5550
+        "nombre": "VICE",
+        "player_pts": 1600
     }
 ]

@@ -7,6 +7,9 @@ import items as item
 import random
 import configuracion as cfg
 from juego import jugar as iniciar_juego # Importa la función principal del juego desde 'juego.py'
+#Sprites simulacion animacion movimiento mago
+from sprites import (ANIMACION_DERECHA, ANIMACION_IZQUIERDA, 
+                     ANIMACION_ATRAS, ANIMACION_FRENTE)
 
 # Inicializa todos los módulos necesarios de Pygame
 pygame.init() 
@@ -24,6 +27,7 @@ SCREEN = pygame.display.set_mode((cfg.ANCHO_PANTALLA, cfg.ALTO_PANTALLA), pygame
 
 #Importamos sprites luego de definir la pantalla (SCREEN)
 from sprites import CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO, CORAZON
+
 pygame.display.set_caption("EL MATEMAGO") #Establece el título de la ventana
 
 #Utilizamos .convert_alpha() una vez definida SCREEN
@@ -69,8 +73,10 @@ def bajo_puntaje():
        Impide guardar puntajes de cero.
     """
     
-    # Detiene cualquier música que quede sonando
+    # Detiene cualquier música que quede sonando y reproducir sfx de Game Over
     pygame.mixer.music.stop() 
+    
+    cfg.play_sfx("game_over")
     
     # 1. Crea un reloj local y define FPS 
     clock = pygame.time.Clock() 
@@ -102,7 +108,7 @@ def bajo_puntaje():
         SCREEN.blit(TEXTO_TITULO, RECT_TITULO)
         
         #Subtitulos
-        TEXTO_SUB = cfg.get_letra(20).render("TU PUNTAJE ES 0. NECESITAS MÁS DE 0 PUNTOS PARA PODER GUARDARLO.", True, "#FFFFFF")
+        TEXTO_SUB = cfg.get_letra(20).render(f"TU PUNTAJE ES MUY BAJO. NECESITAS MÁS PUNTOS PARA ENTRAR EN EL TOP.", True, "#FFFFFF")
         RECT_SUB = TEXTO_SUB.get_rect(center=(cfg.CENTRO_X, cfg.CENTRO_Y + 50))
         SCREEN.blit(TEXTO_SUB, RECT_SUB)
         
@@ -453,11 +459,13 @@ def opciones():
                     
                 #Cambia la variable a normal cuando se presioona el botón    
                 if BOTON_NORMAL.checkForInput(POS):
-                    cfg.DIFICULTAD_GLOBAL = "NORMAL"  
+                    cfg.DIFICULTAD_GLOBAL = "NORMAL"
+                    cfg.guardar_preferencias()  
                     
                 #Cambia la variable a difícil cuando se presiona el botón    
                 if BOTON_DIFICIL.checkForInput(POS):
-                    cfg.DIFICULTAD_GLOBAL = "DIFICIL"  
+                    cfg.DIFICULTAD_GLOBAL = "DIFICIL"
+                    cfg.guardar_preferencias()  
                     
                 #Activa SFX cuando se presiona el botón
                 if BOTON_SI_SFX.checkForInput(POS):
@@ -578,7 +586,10 @@ def menu_principal():
                         bajo_puntaje()
                     #Si devuelve True, la ejecución simplemente continúa con el menú
                     #(ya que menu_principal() está en un bucle infinito `while True:`)
-                        
+                     
+                    #Detener la música que esté sonando    
+                    pygame.mixer.music.stop()
+                    
                 if BOTON_MARCADORES.checkForInput(POS_MOUSE_MENU):
                     marcadores() # Va a la pantalla de marcadores.
                     

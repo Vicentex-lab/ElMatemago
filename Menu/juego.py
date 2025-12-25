@@ -150,16 +150,18 @@ def jugar(SCREEN):
             lista_buffs_activos.append(datos_buff)
         # Si la lista tiene elementos, los dibujamos uno por uno
         if len(lista_buffs_activos) > 0:
-            
-            # 'i' es el índice (0, 1, 2...) y 'buff' es el diccionario de datos
-            # Multiplicamos el índice por 50px para que no pongan uno encima del otro
+           
+          # 'enumerate' devuelve pares: (0, primer_buff), (1, segundo_buff), etc.
+          # Desempaquetamos esos pares en dos variables:
+            #   - 'i': El número de orden (0, 1, 2...). Vital para calcular la posición Y (offset_y).
+            #   - 'buff': El diccionario con los datos reales (sprite, color, tiempo).
             for i, buff in enumerate(lista_buffs_activos):
                 
                 # Calculamos la altura Y basada en el índice.
                 # Cada buff estará 50 pixeles más abajo que el anterior.
                 offset_y = i * 50 
                 
-                # Dibujar Icono
+                # Dibujar Icono a escala para que quepa en hud
                 ICONO = pygame.transform.scale(buff["sprite"], (40, 40))
                 # Sumamos 'offset_y' a la altura base
                 screen.blit(ICONO, (hud_x + 160, hud_y + 192 + offset_y))
@@ -167,17 +169,24 @@ def jugar(SCREEN):
                 # Dibujar Barra del tiempo
                 ancho_barra_max = 100
                 alto_barra = 10
+                # Coordenadas de la barra (también desplazadas por offset_y)
                 pos_barra_x = hud_x + 210
                 pos_barra_y = hud_y + 208 + offset_y # También bajamos la barra
                 
                 # Fondo barra
                 pygame.draw.rect(screen, (50, 50, 50), (pos_barra_x, pos_barra_y, ancho_barra_max, alto_barra))
                 
-                # Porcentaje = Tiempo Restante / Tiempo Total
+                # 1. CALCULAR PORCENTAJE (0.0 a 1.0)
+                # Divide tiempo actual entre total. max() evita errores si t_max es 0.
+                #max(A, B) compara dos números y devuelve el más grande.
+                #Aquí sirve para evitar una división por cero
                 porcentaje = buff["t_actual"] / max(buff["t_max"], 1)
+                # 2. CONVERTIR A PÍXELES
+                # Aplica el porcentaje al ancho máximo (100px) para obtener el tamaño real.
+                #esta parte va cambiando en cada iteracion y es que tan llena esta la barra:
                 ancho_actual = int(ancho_barra_max * porcentaje)
                 
-                # Relleno barra
+                # Dibuja la barra de color con el ancho calculado (dinámico).
                 pygame.draw.rect(screen, buff["color"], (pos_barra_x, pos_barra_y, ancho_actual, alto_barra))
                 
                 # Borde barra
@@ -202,9 +211,9 @@ def jugar(SCREEN):
     
     
     
-    from sprites import MAGO_1, MAGO_2, MAGO_3,MAGO_4
+    from sprites import ANIMACION_ATRAS,ANIMACION_DERECHA,ANIMACION_FRENTE,ANIMACION_IZQUIERDA
     # --- Animación del mago Mago izquierda derecha
-    player_sprite = MAGO_4      # sprite actual del mago 
+    lista_actual = ANIMACION_FRENTE    # sprite actual del mago 
     # Variables para efecto de flotacion en mago
     float_offset = 0
     float_direction = 1
@@ -414,7 +423,7 @@ def jugar(SCREEN):
     pos_x = player_x * cfg.TILE   #cfg.tile es el tamaño de una casilla en pixeles
     pos_y = player_y * cfg.TILE
 
-    speed = 4  # velocidad (pixeles por frame)
+    speed = 2  # velocidad (pixeles por frame)
 
     running = True
 
@@ -436,28 +445,30 @@ def jugar(SCREEN):
                     return True 
 
             if event.type == pygame.KEYDOWN:
+                
+                #DE BASE: lista_actual = ANIMACION_FRENTE    # sprite actual del mago 
                 # --- ARRIBA (W) ---
                 if event.key in (pygame.K_w, pygame.K_UP):
                     deseada_x = 0
                     deseada_y = -1  
-                    player_sprite = MAGO_3 
+                    lista_actual = ANIMACION_ATRAS 
                 # --- ABAJO (S) ---
                 if event.key in (pygame.K_s, pygame.K_DOWN):
                     deseada_x = 0
                     deseada_y = 1
-                    player_sprite = MAGO_4  
+                    lista_actual = ANIMACION_FRENTE 
                 
                 # --- IZQUIERDA (A) --
                 if event.key in (pygame.K_a, pygame.K_LEFT):
                 
                     deseada_x = -1
                     deseada_y = 0 
-                    player_sprite = MAGO_2
+                    lista_actual = ANIMACION_IZQUIERDA
                 # --- DERECHA (D) --
                 if event.key in (pygame.K_d, pygame.K_RIGHT):
                     deseada_x = 1
                     deseada_y = 0
-                    player_sprite = MAGO_1
+                    lista_actual = ANIMACION_DERECHA
 
    
         # Convierte la posición de píxeles a casilla
@@ -550,7 +561,7 @@ def jugar(SCREEN):
                 cfg.play_sfx("player_hurt")
                 print("💀 cero")
                 pygame.mixer.music.stop() 
-                if player_pts > 0:
+                if cfg.es_top_3(player_pts):
                     cfg.guardar_nuevo_puntaje(screen, player_pts)
                     return True #Volver al menú
                 else:
@@ -606,7 +617,7 @@ def jugar(SCREEN):
                 cfg.play_sfx("player_hurt")
                 print("💀 pigarto")
                 pygame.mixer.music.stop() 
-                if player_pts > 0:
+                if cfg.es_top_3(player_pts):
                     cfg.guardar_nuevo_puntaje(screen, player_pts)
                     return True #Volver al menú
                 else:
@@ -655,7 +666,7 @@ def jugar(SCREEN):
                 cfg.play_sfx("player_hurt")
                 print("💀 raiz")
                 pygame.mixer.music.stop() 
-                if player_pts > 0:
+                if cfg.es_top_3(player_pts):
                     cfg.guardar_nuevo_puntaje(screen, player_pts)
                     return True #Volver al menú 
                 else:
@@ -724,6 +735,7 @@ def jugar(SCREEN):
                 #    speed_boost.pos=-1 #resetear variable auxiliar
         """
         if slow_time.colision(player_y, player_x):
+            cfg.play_sfx("buff_pickup")
             if multiplier.state==True and divisor.state==False:
                 player_pts+=slow_time.pts*2
             elif divisor.state==True and multiplier.state==False:
@@ -748,6 +760,7 @@ def jugar(SCREEN):
                 slow_time.pos=-1 #resetear variable auxiliar
                 
         if multiplier.colision(player_y, player_x):
+            cfg.play_sfx("buff_pickup")
             if multiplier.pos==-1:
                 multiplier.pos=60*15
                 multiplier.state=True
@@ -759,6 +772,7 @@ def jugar(SCREEN):
                 multiplier.state=False
         
         if divisor.colision(player_y, player_x):
+            cfg.play_sfx("buff_pickup")
             if divisor.pos==-1:
                 divisor.pos=60*15
                 divisor.state=True
@@ -822,7 +836,7 @@ def jugar(SCREEN):
         divisor.draw(screen)
         # EFECTO DE FLOTACIÓN DEL MAGO ARRIBA/ABAJO
         #float_offset es cambio constante en eje y
-        """ float_offset = 0----> desplazamiento vertical que se suma a mago, ej con 1 baja 1 pixel con -2 sube 2 pixeles
+        """ float_offset = 0   ----> desplazamiento vertical que se suma a mago, ej con 1 baja 1 pixel con -2 sube 2 pixeles
             float_direction = 1   1---> se mueve hacia abajo y -1 hacia arriba
         """
         float_offset += float_direction * 0.2
@@ -832,14 +846,27 @@ def jugar(SCREEN):
         # Si el desplazamiento supera -2 píxeles, el mago debe empezar a moverse hacia abajo.
         elif float_offset < -2:
             float_direction = 1
-        #Misma lógica de dibujado pero con sprite animado y flotamiento
+                # --- LÓGICA DE ANIMACIÓN ---
+        # Si el vector dirección es (0,0), el mago está en reposo.
+        if dir_x == 0 and dir_y == 0:
+            # Si está quieto, usamos el frame 0 (estático)
+            frame = 0
+        else:
+            # AQUÍ ESTÁ LA DEPENDENCIA DEL TIEMPO, por esta parte al dibujar mago varia entre indice 0 y 1 
+            #getticks obtiene tiempo total
+            # Si se mueve, alternamos frame cada 0,2 segundos
+            # % 2 hace que ese número solo sea 0 o 1 
+            frame = (pygame.time.get_ticks() // 200) % 2 
+        
+        # --- DIBUJO DEL MAGO ---
         screen.blit(
-            player_sprite,
+            lista_actual[frame], # Selecciona el frame 0 o 1 de la lista activa
             (
                 player_x * cfg.TILE + cfg.offset_x,
                 player_y * cfg.TILE + cfg.offset_y + float_offset
             )
         )
+                
         
         temporizador+=1
         if colision_detected==True:

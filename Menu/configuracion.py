@@ -55,11 +55,14 @@ ARCHIVO_PREFERENCIAS = "Menu/preferencias.json" #Ruta archivo de preferencias de
 MUSICA_ACTIVADA = True # Si es True, la música se reproduce.
 RUTA_MUSICA_MENU = "./assets/Matemago_Menu_Song.mp3" 
 RUTA_MUSICA_JUEGO = "./assets/Matemago_Dungeon_Song.mp3"
+RUTA_MUSICA_RECORD = "./assets/High_score.mp3"
 
 SFX_ACTIVADOS = True # Controla si los efectos de sonido se reproducen
 RUTA_SFX_ITEM = "./assets/sfx/Get_item.wav"
 RUTA_SFX_ENEMY_DIE = "./assets/sfx/Enemy_die.wav"
 RUTA_SFX_PLAYER_HURT = "./assets/sfx/Player_hurt.wav"
+RUTA_SFX_GAME_OVER = "./assets/sfx/Game_over.wav"
+RUTA_SFX_BUFF = "./assets/sfx/Get_buff.wav"
 SFX_LIBRARY = {} # Este diccionario global almacenará todos los objetos pygame.mixer.Sound cargados. Se inicializa vacío ({}) para que 'cargar_sfx()' pueda llenarlo al inicio del juego.
 
 # Obtiene el directorio base del archivo actual (configuracion.py), útil para referencias relativas.
@@ -114,7 +117,9 @@ def cargar_sfx():
         "item_pickup": RUTA_SFX_ITEM,
         "enemy_die": RUTA_SFX_ENEMY_DIE,
         "player_hurt": RUTA_SFX_PLAYER_HURT,
-         # Añadir aquí más sonidos
+        "game_over": RUTA_SFX_GAME_OVER,
+        "buff_pickup": RUTA_SFX_BUFF
+        # Añadir aquí más sonidos
     }
     
     # Bucle para recorrer el diccionario y cargar cada sonido.
@@ -268,7 +273,11 @@ def guardar_preferencias():
     }
     
     # 2. Escribir el diccionario en el archivo JSON
+    #Se utiliza with ya que al terminar el bloque de código dentro de with Python automáticamente
+    #llama al método archivo.close(), que de lo contrario habría que hacerlo manualmente y además garantiza
+    #que siempre se cierre
     with open(ARCHIVO_PREFERENCIAS, 'w') as f:
+        #Convertir el diccionario a formato JSON
         json.dump(datos, f, indent=4)
     
     print("Configuración guardada.")   
@@ -347,7 +356,7 @@ def obtener_nombre(screen, player_pts):
         # Usamos un try/except para get_letra por si no está definida
         try:
             # Título principal de la pantalla.
-            texto_titulo = get_letra(60).render("¡FIN DEL JUEGO!", True, COLOR_CURSOR)
+            texto_titulo = get_letra(60).render("¡NUEVO RECORD!", True, COLOR_CURSOR)
             # Muestra el puntaje obtenido.
             texto_score = get_letra(40).render(f"PUNTAJE: {player_pts}", True, COLOR_TEXTO)
             # Instrucción para el usuario.
@@ -355,7 +364,7 @@ def obtener_nombre(screen, player_pts):
         except NameError:
             # Fallback simple si la función de fuente no está disponible
             font = pygame.font.Font(None, 60)
-            texto_titulo = font.render("¡FIN DEL JUEGO!", True, COLOR_CURSOR)
+            texto_titulo = font.render("¡NUEVO RECORD!", True, COLOR_CURSOR)
             texto_score = font.render(f"PUNTAJE: {player_pts}", True, COLOR_TEXTO)
             texto_prompt = font.render("INGRESA TU NOMBRE (SOLO LETRAS):", True, COLOR_TEXTO)
 
@@ -408,6 +417,16 @@ def guardar_nuevo_puntaje(screen, player_pts):
            player_pts (int): El puntaje obtenido.
     """
        
+    # DETENER MÚSICA ANTERIOR Y CARGAR LA DE RÉCORD
+    pygame.mixer.music.stop()
+    if MUSICA_ACTIVADA:
+        try:
+            pygame.mixer.music.load(RUTA_MUSICA_RECORD)
+            pygame.mixer.music.set_volume(VOLUMEN_GLOBAL)
+            pygame.mixer.music.play(-1) # En bucle
+        except pygame.error as e:
+            print(f"Error cargando música de récord: {e}")   
+    
     # 1. Solicita el nombre al usuario usando la ventana de Pygame.
     nombre = obtener_nombre(screen, player_pts)
             
@@ -446,4 +465,46 @@ def guardar_nuevo_puntaje(screen, player_pts):
         print("Puntaje guardado exitosamente.")
     except IOError: # Cubre si es que hay otros problemas aparte de que el archivo no exista al momento de la escritura, IOError es un error de entrada y salida, evita que se cierre el programa
         print(f"Error al escribir en el archivo: {RUTA_PUNTAJES}")
+        
+
+def es_top_3(player_pts):
+    """
+    Verifica si un puntaje califica para entrar en el Top 3.
+    Retorna True si califica, False de lo contrario.
+    """
+    
+    # 1. Si el puntaje es 0, nunca califica para el podio.
+    if player_pts <= 0:
+        return False
+    
+    todos_los_puntajes = []
+    
+    # 2. Intentar cargar los puntajes existentes
+    # Verifica si el archivo JSON existe.
+    if os.path.exists(RUTA_PUNTAJES):
+        try:
+            #Se utiliza with ya que al terminar el bloque de código dentro de with Python automáticamente
+            #llama al método archivo.close(), que de lo contrario habría que hacerlo manualmente y además garantiza
+            #que siempre se cierre
+            with open(RUTA_PUNTAJES, "r") as archivo:
+                # Carga la lista completa de puntajes.
+                todos_los_puntajes = json.load(archivo)
+        except (json.JSONDecodeError, IOError):
+            # Ignora errores en la lectura y simplemente usa la lista vacía 'todos_los_puntajes = []'.
+            todos_los_puntajes = []
+
+    # 2. Si hay menos de 3 puntajes y el puntaje es mayor a 0, el puntaje califica
+    if len(todos_los_puntajes) < 3:
+        return True
+
+    # 3. Si ya hay 3 o más, ordenar y comparar con el tercero
+    
+    # Ordena la lista de diccionarios.
+        #'key=lambda x: x["player_pts"]' indica que el criterio de ordenamiento --> (lambda es una función sin nombre que se define en una sola línea)
+        # es el valor asociado a la clave "player_pts" en cada diccionario.
+        # 'reverse=True' indica que el orden debe ser descendente (de mayor a menor).
+    todos_los_puntajes.sort(key=lambda x: x["player_pts"], reverse=True)
+    tercer_mejor_puntaje = todos_los_puntajes[2]["player_pts"]
+    
+    return player_pts >= tercer_mejor_puntaje
 
