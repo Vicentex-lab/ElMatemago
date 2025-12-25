@@ -1,9 +1,11 @@
+import criaturas as cr
 import configuracion as cfg
 import random
-from sprites import ESPADA, ESCUDO, ANILLO
+import colisiones as colision
+from sprites import ESPADA, ESCUDO, ANILLO, SPEED_BOOST
 
 class item():
-    def __init__(self, places_y, places_x, name, damage, pts, pos, actual_y, actual_x, obj_sprite):
+    def __init__(self, places_y, places_x, name, damage, pts, pos, actual_y, actual_x, obj_sprite, exist):
         self.name=name
         self.damage=damage
         self.pts=pts
@@ -13,6 +15,7 @@ class item():
         self.actual_y=actual_y
         self.actual_x=actual_x
         self.obj_sprite=obj_sprite
+        self.exist=exist
         
     def spawn(self):
         self.pos=random.randint(0, len(self.places_x)-1)
@@ -20,18 +23,30 @@ class item():
         self.actual_x=self.places_x[self.pos]
     
     def colision(self, player_y, player_x):
-        if self.actual_y == player_y and self.actual_x == player_x:
+        if self.actual_y == player_y and self.actual_x == player_x and self.exist==1:
+            self.exist=0
             return True
         return False
     
     def draw(self, screen):
-        screen.blit(
-            self.obj_sprite,
-            (
-                self.actual_x * cfg.TILE + cfg.offset_x,
-                self.actual_y * cfg.TILE + cfg.offset_y
+        if self.exist==1:
+            screen.blit(
+                self.obj_sprite,
+                (
+                    self.actual_x * cfg.TILE + cfg.offset_x,
+                    self.actual_y * cfg.TILE + cfg.offset_y
+                )
             )
-        )
+    
+    def random_spawn(self):
+        self.exist=1
+        while True:
+            self.actual_y=random.randint(0, len(colision.maze)-1) #len(maze) toma cuantos arreglos tiene maze
+            self.actual_x=random.randint(0, len(colision.maze[0])-1) #len(maze[0]) toma cuantos valores tiene el primer arreglo de maze
+            if colision.maze[self.actual_y][self.actual_x]==1 and self.actual_x!=cr.player.positions_x and self.actual_y!=cr.player.positions_y:
+                break
+            else:
+                continue
 
 class sword(item):
     def __init__(self):
@@ -44,7 +59,8 @@ class sword(item):
             pos=0,
             actual_x=0,
             actual_y=0,
-            obj_sprite=ESPADA
+            obj_sprite=ESPADA,
+            exist=1
             )
 
 class shield(item):
@@ -58,7 +74,8 @@ class shield(item):
         pos=0,
         actual_x=0,
         actual_y=0,
-        obj_sprite=ESCUDO
+        obj_sprite=ESCUDO,
+        exist=1
     )
     
 class ring(item):
@@ -73,7 +90,8 @@ class ring(item):
         pos=0,
         actual_x=0,
         actual_y=0,
-        obj_sprite=ANILLO
+        obj_sprite=ANILLO,
+        exist=1
         )
     
 class mathray(item):
