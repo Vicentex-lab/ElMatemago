@@ -4,15 +4,15 @@
         "player_pts": 6100
     },
     {
-        "nombre": "TEST",
-        "player_pts": 250
-    },
-    {
-        "nombre": "VICENTE",
-        "player_pts": 750
+        "nombre": "VICE",
+        "player_pts": 1000
     },
     {
         "nombre": "VICE",
-        "player_pts": 1600
+        "player_pts": 850
+    },
+    {
+        "nombre": "NICOLAS",
+        "player_pts": 5250
     }
 ]
