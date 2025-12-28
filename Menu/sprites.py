@@ -36,7 +36,7 @@ MAGO_1_B = load("MAGO_1_B", recortar=False) # Derecha
 MAGO_2_B = load("MAGO_2_B", recortar=False) # Izquierda
 MAGO_3_B = load("MAGO_3_B", recortar=False) # Espalda
 MAGO_4_B = load("MAGO_4_B", recortar=False) # Frente
-# 2. Las guardamos en LISTAS (Frame 0 y Frame 1 que se iran alternando)
+#Las guardamos en LISTAS (Frame 0 y Frame 1 que se iran alternando)
 ANIMACION_DERECHA = [MAGO_1, MAGO_1_B]
 ANIMACION_IZQUIERDA = [MAGO_2, MAGO_2_B]
 ANIMACION_ATRAS = [MAGO_3, MAGO_3_B]
@@ -44,8 +44,15 @@ ANIMACION_FRENTE = [MAGO_4, MAGO_4_B]
 
 #ENEMIGOS
 CERO = load("CERO", recortar=True)
+CERO_B = load("CERO", recortar=True)
 RAIZNEGATIVA = load("RAIZNEGATIVA", recortar=True)
+RAIZNEGATIVA_B = load("RAIZNEGATIVA_B", recortar=True)
 PIGARTO = load("PIGARTO", recortar=True)
+PIGARTO_B = load("PIGARTO_B", recortar=True)
+#Guardarlos en LISTAS para alternar (Igual que el Mago)
+ANIMACION_CERO = [CERO, CERO_B]
+ANIMACION_RAIZ = [RAIZNEGATIVA, RAIZNEGATIVA_B]
+ANIMACION_PIGARTO = [PIGARTO, PIGARTO_B]
 
 #ITEMS
 ESPADA = load("ESPADA", recortar=False)

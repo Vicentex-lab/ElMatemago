@@ -6,7 +6,9 @@ import colisiones as colision
 import criaturas as cr         
 import items as item
 import powerups as pw           
-from sprites import CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO, CORAZON, WALL, FLOOR, SPEED_BOOST, SLOW_TIME, MULTIPLIER, DIVISOR
+from sprites import (CERO, RAIZNEGATIVA, PIGARTO, ESPADA, ESCUDO, ANILLO, CORAZON, WALL, FLOOR, 
+                     SPEED_BOOST, SLOW_TIME, MULTIPLIER, DIVISOR,
+                     ANIMACION_CERO, ANIMACION_RAIZ, ANIMACION_PIGARTO)
 
 def jugar(SCREEN):
     # Muestra la pantalla de juego, detiene la música del menú e inicia la música de juego.
@@ -813,9 +815,18 @@ def jugar(SCREEN):
         # CERO: sprite del enemigo
         # cfg.TILE: tamaño de cada tile del mapa (32 px)
         # cfg.offset_x / cfg.offset_y: desplazamiento para centrar el laberinto
-        cero.dibujar(screen, CERO, cfg.TILE, cfg.offset_x, cfg.offset_y)
-        pigarto.dibujar(screen, PIGARTO, cfg.TILE, cfg.offset_x, cfg.offset_y)
-        raiznegativa.dibujar(screen, RAIZNEGATIVA, cfg.TILE, cfg.offset_x, cfg.offset_y)
+        # --- ANIMACIÓN DE ENEMIGOS ---
+        # Usamos la misma lógica que el Mago: 
+        # get_ticks() // 200 define la velocidad. % 2 alterna entre 0 y 1.
+        frame_enemigos = (pygame.time.get_ticks() // 200) % 2
+
+        # ENEMIGOS 
+        # En lugar de pasar CERO (que es una imagen fija), pasamos la lista con el índice [frame_enemigos]
+        cero.dibujar(screen, ANIMACION_CERO[frame_enemigos], cfg.TILE, cfg.offset_x, cfg.offset_y)
+        
+        pigarto.dibujar(screen, ANIMACION_PIGARTO[frame_enemigos], cfg.TILE, cfg.offset_x, cfg.offset_y)
+        
+        raiznegativa.dibujar(screen, ANIMACION_RAIZ[frame_enemigos], cfg.TILE, cfg.offset_x, cfg.offset_y)
         
         #ITEMS
         # ITEMS
