@@ -43,8 +43,8 @@ ANIMACION_ATRAS = [MAGO_3, MAGO_3_B]
 ANIMACION_FRENTE = [MAGO_4, MAGO_4_B]
 
 #ENEMIGOS
-CERO = load("CERO", recortar=True)
-CERO_B = load("CERO_B", recortar=True)
+CERO = load("CERO", recortar=False)
+CERO_B = load("CERO_B", recortar=False)
 RAIZNEGATIVA = load("RAIZNEGATIVA", recortar=True)
 RAIZNEGATIVA_B = load("RAIZNEGATIVA_B", recortar=True)
 PIGARTO = load("PIGARTO", recortar=True)
